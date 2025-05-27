@@ -1,0 +1,6 @@
+@EscalaMensal.API_HostAddress = http://localhost:5110
+
+GET {{EscalaMensal.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
