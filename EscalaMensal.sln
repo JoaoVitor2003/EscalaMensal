@@ -5,6 +5,12 @@ VisualStudioVersion = 17.14.36121.58 d17.14
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EscalaMensal.API", "EscalaMensal.API\EscalaMensal.API.csproj", "{97AFA0DF-2F37-46A9-96D8-2AC71793A04E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EscalaMensal.Domain", "EscalaMensal.Domain\EscalaMensal.Domain.csproj", "{47F75A8F-9413-4B58-B264-BD13280D4470}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EscalaMensal.Infrastructure", "EscalaMensal.Infrastructure\EscalaMensal.Infrastructure.csproj", "{872B2A0E-1FC4-4A87-B737-337396539802}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EscalaMensal.Application", "EscalaMensal.Application\EscalaMensal.Application.csproj", "{8CA36C86-07FD-4EC0-9079-DFDBDCD424CA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +21,18 @@ Global
 		{97AFA0DF-2F37-46A9-96D8-2AC71793A04E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{97AFA0DF-2F37-46A9-96D8-2AC71793A04E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{97AFA0DF-2F37-46A9-96D8-2AC71793A04E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{47F75A8F-9413-4B58-B264-BD13280D4470}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{47F75A8F-9413-4B58-B264-BD13280D4470}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{47F75A8F-9413-4B58-B264-BD13280D4470}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{47F75A8F-9413-4B58-B264-BD13280D4470}.Release|Any CPU.Build.0 = Release|Any CPU
+		{872B2A0E-1FC4-4A87-B737-337396539802}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{872B2A0E-1FC4-4A87-B737-337396539802}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{872B2A0E-1FC4-4A87-B737-337396539802}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{872B2A0E-1FC4-4A87-B737-337396539802}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8CA36C86-07FD-4EC0-9079-DFDBDCD424CA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8CA36C86-07FD-4EC0-9079-DFDBDCD424CA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8CA36C86-07FD-4EC0-9079-DFDBDCD424CA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8CA36C86-07FD-4EC0-9079-DFDBDCD424CA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
