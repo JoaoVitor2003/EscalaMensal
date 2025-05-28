@@ -12,20 +12,20 @@ namespace EscalaMensal.Domain.Entities
         {
             public int Id { get; private set; }
             public string Nome { get; private set; }
-            public string Email { get; private set; }
             public bool Ativo { get; private set; }
 
             public int NivelId { get; private set; }
+            public Nivel Nivel { get; private set; }
 
             public int? UsuarioVinculadoId { get; private set; }
             public Usuario? UsuarioVinculado { get; private set; }
 
-            public Usuario(string nome, string email, int nivelId)
+            public Usuario(string nome, int nivelId, int? usuarioVinculadoId = null)
             {
                 Nome = nome;
-                Email = email;
                 NivelId = nivelId;
                 Ativo = true;
+                UsuarioVinculadoId = usuarioVinculadoId;
             }
 
             public void VincularUsuario(int usuarioId) => UsuarioVinculadoId = usuarioId;
