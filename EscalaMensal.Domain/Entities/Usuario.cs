@@ -21,7 +21,7 @@ namespace EscalaMensal.Domain.Entities
 
             public int? UsuarioVinculadoId { get; private set; }
             public Usuario? UsuarioVinculado { get; private set; }
-
+            public ICollection<Restricao> Restricoes { get; private set; } = new List<Restricao>();
             public Usuario(string nome, int nivelId, int cargoId, int? usuarioVinculadoId = null)
             {
                 Nome = nome;
