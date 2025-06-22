@@ -1,4 +1,5 @@
-﻿using System;
+﻿using EscalaMensal.Domain.Enums;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -14,19 +15,17 @@ namespace EscalaMensal.Domain.Entities
             public string Nome { get; private set; }
             public bool Ativo { get; private set; }
 
-            public int NivelId { get; private set; }
-            public Nivel Nivel { get; private set; }
-            public int CargoId { get; private set; }
-            public Cargo Cargo { get; private set; }
+            public CargoEnum Cargo { get; private set; }
+            public NivelEnum Nivel { get; private set; }
 
             public int? UsuarioVinculadoId { get; private set; }
             public Usuario? UsuarioVinculado { get; private set; }
             public ICollection<Restricao> Restricoes { get; private set; } = new List<Restricao>();
-            public Usuario(string nome, int nivelId, int cargoId, int? usuarioVinculadoId = null)
+            public Usuario(string nome, NivelEnum nivel, CargoEnum cargo, int? usuarioVinculadoId = null)
             {
                 Nome = nome;
-                NivelId = nivelId;
-                CargoId = cargoId;
+                Nivel = nivel;
+                Cargo = cargo;
                 UsuarioVinculadoId = usuarioVinculadoId;
                 Ativo = true;
             }
