@@ -10,6 +10,7 @@ namespace EscalaMensal.Domain.Entities
     public class ItemEscala
     {
         public int Id { get; private set; }
+        public DateTime Dia { get; set; }
         public int EscalaId { get; private set; }
         public Escala Escala { get; private set; }
 
@@ -19,10 +20,11 @@ namespace EscalaMensal.Domain.Entities
         public int? UsuarioId { get; private set; }
         public Usuario? Usuario { get; private set; } // pode ser nulo se estiver vago
 
-        public ItemEscala(int escalaId, int funcaoId, int? usuarioId = null)
+        public ItemEscala(int escalaId, int funcaoId, DateTime dia, int? usuarioId = null)
         {
             EscalaId = escalaId;
             FuncaoId = funcaoId;
+            Dia = dia.Date;
             UsuarioId = usuarioId;
         }
 
