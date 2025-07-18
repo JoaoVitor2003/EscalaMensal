@@ -1,8 +1,19 @@
+using EscalaMensal.Domain.Interfaces;
+using EscalaMensal.Infrastructure.Repositories;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
 builder.Services.AddControllers();
+
+builder.Services.AddScoped<IEscalaRepository, EscalaRepository>();
+builder.Services.AddScoped<IItemEscalaRepository, EscalaItemRepository>();
+builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
+builder.Services.AddScoped<IFuncaoRepository, FuncaoRepository>();
+builder.Services.AddScoped<IHistoricoEscalaRepository, HistoricoEscalaRepository>();
+builder.Services.AddScoped<ICargoNivelFuncaoPermitidaRepository, CargoNivelFuncaoPermitidaRepository>();
+
 
 var app = builder.Build();
 
