@@ -1,3 +1,4 @@
+using EscalaMensal.Application.Services;
 using EscalaMensal.Domain.Interfaces;
 using EscalaMensal.Infrastructure.Repositories;
 
@@ -14,6 +15,7 @@ builder.Services.AddScoped<IFuncaoRepository, FuncaoRepository>();
 builder.Services.AddScoped<IHistoricoEscalaRepository, HistoricoEscalaRepository>();
 builder.Services.AddScoped<ICargoNivelFuncaoPermitidaRepository, CargoNivelFuncaoPermitidaRepository>();
 
+builder.Services.AddScoped<IUsuarioService, UsuarioService>();
 
 var app = builder.Build();
 
