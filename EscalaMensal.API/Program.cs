@@ -18,6 +18,7 @@ builder.Services.AddScoped<ICargoNivelFuncaoPermitidaRepository, CargoNivelFunca
 builder.Services.AddScoped<IUsuarioService, UsuarioService>();
 builder.Services.AddScoped<IRestricaoService, RestricaoService>();
 builder.Services.AddScoped<IItemEscalaService, ItemEscalaService>();
+builder.Services.AddScoped<IHistoricoEscalaService, HistoricoEscalaService>();
 
 
 var app = builder.Build();
