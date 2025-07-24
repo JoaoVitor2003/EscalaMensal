@@ -20,6 +20,7 @@ builder.Services.AddScoped<IRestricaoService, RestricaoService>();
 builder.Services.AddScoped<IItemEscalaService, ItemEscalaService>();
 builder.Services.AddScoped<IHistoricoEscalaService, HistoricoEscalaService>();
 builder.Services.AddScoped<IFuncaoService, FuncaoService>();
+builder.Services.AddScoped<IEscalaService, EscalaService>();
 
 
 var app = builder.Build();
