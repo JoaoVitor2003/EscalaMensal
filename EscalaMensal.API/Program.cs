@@ -9,6 +9,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 
 builder.Services.AddScoped<IEscalaRepository, EscalaRepository>();
+builder.Services.AddScoped<IRestricaoRepository, RestricaoRepository>();
 builder.Services.AddScoped<IItemEscalaRepository, EscalaItemRepository>();
 builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
 builder.Services.AddScoped<IFuncaoRepository, FuncaoRepository>();
@@ -21,6 +22,8 @@ builder.Services.AddScoped<IItemEscalaService, ItemEscalaService>();
 builder.Services.AddScoped<IHistoricoEscalaService, HistoricoEscalaService>();
 builder.Services.AddScoped<IFuncaoService, FuncaoService>();
 builder.Services.AddScoped<IEscalaService, EscalaService>();
+builder.Services.AddScoped<ICargoNivelFuncaoPermitidaService, CargoNivelFuncaoPermitidaService>();
+
 
 
 var app = builder.Build();
