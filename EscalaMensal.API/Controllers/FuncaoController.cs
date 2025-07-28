@@ -1,8 +1,6 @@
 ﻿using EscalaMensal.Domain.Entities;
-using EscalaMensal.Application.Services;
+using EscalaMensal.Domain.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace EscalaMensal.API.Controllers
 {
@@ -10,9 +8,9 @@ namespace EscalaMensal.API.Controllers
     [Route("api/[controller]")]
     public class FuncaoController : ControllerBase
     {
-        private readonly FuncaoService _funcaoService;
+        private readonly IFuncaoService _funcaoService;
 
-        public FuncaoController(FuncaoService funcaoService)
+        public FuncaoController(IFuncaoService funcaoService)
         {
             _funcaoService = funcaoService;
         }
@@ -20,8 +18,7 @@ namespace EscalaMensal.API.Controllers
         [HttpGet]
         public async Task<ActionResult<List<Funcao>>> ObterTodas()
         {
-            var funcoes = await _funcaoService.ObterTodasAsync();
-            return Ok(funcoes);
+            return Ok(await _funcaoService.ObterTodasAsync());
         }
 
         [HttpGet("{id}")]
