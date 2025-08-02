@@ -1,5 +1,4 @@
 ﻿using EscalaMensal.Domain.Entities;
-using EscalaMensal.Domain.Entities.EscalaMensal.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -32,7 +31,41 @@ namespace EscalaMensal.Infrastructure.Context
                 .HasForeignKey(u => u.UsuarioVinculadoId)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            modelBuilder.Entity<ItemEscala>()
+                .HasOne(i => i.Escala)
+                .WithMany(e => e.Itens)
+                .HasForeignKey(i => i.EscalaId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<ItemEscala>()
+                .HasOne(i => i.Usuario)
+                .WithMany()
+                .HasForeignKey(i => i.UsuarioId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<ItemEscala>()
+                .HasOne(i => i.Funcao)
+                .WithMany()
+                .HasForeignKey(i => i.FuncaoId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<HistoricoEscala>()
+                .HasOne(h => h.Usuario)
+                .WithMany()
+                .HasForeignKey(h => h.UsuarioId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<HistoricoEscala>()
+                .HasOne(h => h.Funcao)
+                .WithMany()
+                .HasForeignKey(h => h.FuncaoId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<CargoNivelFuncaoPermitida>()
+                .HasIndex(c => new { c.Cargo, c.Nivel, c.FuncaoId })
+                .IsUnique();
         }
+
     }
 
 }

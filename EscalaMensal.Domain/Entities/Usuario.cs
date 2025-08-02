@@ -7,8 +7,6 @@ using System.Threading.Tasks;
 
 namespace EscalaMensal.Domain.Entities
 {
-    namespace EscalaMensal.Domain.Entities
-    {
         public class Usuario
         {
             public int Id { get; private set; }
@@ -38,5 +36,3 @@ namespace EscalaMensal.Domain.Entities
         }
 
     }
-
-}
