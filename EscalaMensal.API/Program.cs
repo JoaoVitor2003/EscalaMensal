@@ -1,10 +1,15 @@
 using EscalaMensal.Application.Services;
 using EscalaMensal.Domain.Interfaces;
+using EscalaMensal.Infrastructure.Context;
 using EscalaMensal.Infrastructure.Repositories;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+
+builder.Services.AddDbContext<AppDbContext>(opt =>
+    opt.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddControllers();
 

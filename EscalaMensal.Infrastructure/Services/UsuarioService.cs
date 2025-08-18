@@ -1,5 +1,4 @@
 ﻿using EscalaMensal.Domain.Entities;
-using EscalaMensal.Domain.Entities.EscalaMensal.Domain.Entities;
 using EscalaMensal.Domain.Interfaces;
 using System.Collections.Generic;
 using System.Threading.Tasks;
