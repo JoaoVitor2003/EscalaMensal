@@ -1,4 +1,5 @@
 ﻿using EscalaMensal.Domain.Entities;
+using EscalaMensal.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -64,6 +65,12 @@ namespace EscalaMensal.Infrastructure.Context
             modelBuilder.Entity<CargoNivelFuncaoPermitida>()
                 .HasIndex(c => new { c.Cargo, c.Nivel, c.FuncaoId })
                 .IsUnique();
+
+            modelBuilder.Entity<Usuario>().HasData(
+    new { Id = 1, Nome = "João", Nivel = NivelEnum.Nivel3, Cargo = CargoEnum.Cerimoniario, Ativo = true },
+    new { Id = 2, Nome = "Maria", Nivel = NivelEnum.Nivel1, Cargo = CargoEnum.Coroinha, Ativo = false }
+);
+
         }
 
     }
