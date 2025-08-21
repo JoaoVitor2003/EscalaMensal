@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace EscalaMensal.Domain.Enums
 {
+    [Flags]
     public enum CargoEnum
     {
         Coroinha = 1,

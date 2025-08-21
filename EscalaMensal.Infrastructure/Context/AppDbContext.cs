@@ -71,6 +71,39 @@ namespace EscalaMensal.Infrastructure.Context
     new { Id = 2, Nome = "Maria", Nivel = NivelEnum.Nivel1, Cargo = CargoEnum.Coroinha, Ativo = false }
 );
 
+            modelBuilder.Entity<Funcao>().HasData(
+                new Funcao(1, "Cerimoniário Geral")
+                {
+                    Abreviacao = "CG",
+                    Cargo = CargoEnum.Cerimoniario,
+                    NivelMinimo = NivelEnum.Nivel3
+                },
+                new Funcao(2,"Cerimoniário Auxiliar 1")
+                {
+                    Abreviacao = "CA1",
+                    Cargo = CargoEnum.Cerimoniario,
+                    NivelMinimo = NivelEnum.Nivel1
+                },
+                new Funcao(3, "Cerimoniário Auxiliar 2")
+                {
+                    Abreviacao = "CA2",
+                    Cargo = CargoEnum.Cerimoniario,
+                    NivelMinimo = NivelEnum.Nivel1
+                },
+                new Funcao(4, "Librífero")
+                {
+                    Abreviacao = "Li",
+                    Cargo = CargoEnum.Cerimoniario,
+                    NivelMinimo = NivelEnum.Nivel3
+                },
+                new Funcao(5, "Leitor")
+                {
+                    Abreviacao = "L",
+                    Cargo = CargoEnum.Coroinha,
+                    NivelMinimo = NivelEnum.Nivel2
+                }
+            );
+
         }
 
     }

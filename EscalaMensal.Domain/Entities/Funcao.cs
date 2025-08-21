@@ -17,6 +17,12 @@ namespace EscalaMensal.Domain.Entities
         public NivelEnum NivelMinimo { get; set; }
 
         public Funcao(string nome) => Nome = nome;
+
+        public Funcao(int id, string nome)
+        {
+            Id = id;
+            Nome = nome;
+        }
     }
 
 }
