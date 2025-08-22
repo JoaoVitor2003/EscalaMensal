@@ -101,6 +101,48 @@ namespace EscalaMensal.Infrastructure.Context
                     Abreviacao = "L",
                     Cargo = CargoEnum.Coroinha,
                     NivelMinimo = NivelEnum.Nivel2
+                },
+                new Funcao(6, "Ceroferario 1")
+                {
+                    Abreviacao = "Ce1",
+                    Cargo = CargoEnum.Coroinha,
+                    NivelMinimo = NivelEnum.Nivel3
+                },
+                new Funcao(7, "Ceroferario 2")
+                {
+                    Abreviacao = "Ce2",
+                    Cargo = CargoEnum.Coroinha,
+                    NivelMinimo = NivelEnum.Nivel3
+                },
+                new Funcao(8, "Cruciferário")
+                {
+                    Abreviacao = "Cr",
+                    Cargo = CargoEnum.Coroinha,
+                    NivelMinimo = NivelEnum.Nivel2
+                },
+                new Funcao(9, "Ofertório")
+                {
+                    Abreviacao = "O",
+                    Cargo = CargoEnum.Coroinha,
+                    NivelMinimo = NivelEnum.Nivel1
+                },
+                new Funcao(10, "Turibulo")
+                {
+                    Abreviacao = "T",
+                    Cargo = CargoEnum.Cerimoniario,
+                    NivelMinimo = NivelEnum.Nivel2
+                },
+                new Funcao(11, "Naveta")
+                {
+                    Abreviacao = "N",
+                    Cargo = CargoEnum.Coroinha,
+                    NivelMinimo = NivelEnum.Nivel1
+                },
+                new Funcao(12, "Cerimoniário de Procissão")
+                {
+                    Abreviacao = "CP",
+                    Cargo = CargoEnum.Cerimoniario,
+                    NivelMinimo = NivelEnum.Nivel1
                 }
             );
 
