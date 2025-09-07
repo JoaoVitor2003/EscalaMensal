@@ -7,32 +7,32 @@ using System.Threading.Tasks;
 
 namespace EscalaMensal.Domain.Entities
 {
-        public class Usuario
+    public class Usuario
+    {
+        public int Id { get; private set; }
+        public string Nome { get; private set; }
+        public bool Ativo { get; private set; }
+
+        public CargoEnum Cargo { get; private set; }
+        public NivelEnum Nivel { get; private set; }
+        public DateTime? HoraPreferencial { get; set; }
+        public int? UsuarioVinculadoId { get; private set; }
+        public Usuario? UsuarioVinculado { get; private set; }
+        public ICollection<Restricao> Restricoes { get; private set; } = new List<Restricao>();
+        public Usuario(string nome, NivelEnum nivel, CargoEnum cargo, int? usuarioVinculadoId = null)
         {
-            public int Id { get; private set; }
-            public string Nome { get; private set; }
-            public bool Ativo { get; private set; }
-
-            public CargoEnum Cargo { get; private set; }
-            public NivelEnum Nivel { get; private set; }
-
-            public int? UsuarioVinculadoId { get; private set; }
-            public Usuario? UsuarioVinculado { get; private set; }
-            public ICollection<Restricao> Restricoes { get; private set; } = new List<Restricao>();
-            public Usuario(string nome, NivelEnum nivel, CargoEnum cargo, int? usuarioVinculadoId = null)
-            {
-                Nome = nome;
-                Nivel = nivel;
-                Cargo = cargo;
-                UsuarioVinculadoId = usuarioVinculadoId;
-                Ativo = true;
-            }
-
-            public void VincularUsuario(int usuarioId) => UsuarioVinculadoId = usuarioId;
-            public void DesvincularUsuario() => UsuarioVinculadoId = null;
-
-            public void Ativar() => Ativo = true;
-            public void Desativar() => Ativo = false;
+            Nome = nome;
+            Nivel = nivel;
+            Cargo = cargo;
+            UsuarioVinculadoId = usuarioVinculadoId;
+            Ativo = true;
         }
 
+        public void VincularUsuario(int usuarioId) => UsuarioVinculadoId = usuarioId;
+        public void DesvincularUsuario() => UsuarioVinculadoId = null;
+
+        public void Ativar() => Ativo = true;
+        public void Desativar() => Ativo = false;
     }
+
+}
