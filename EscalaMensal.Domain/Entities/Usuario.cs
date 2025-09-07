@@ -15,7 +15,7 @@ namespace EscalaMensal.Domain.Entities
 
         public CargoEnum Cargo { get; private set; }
         public NivelEnum Nivel { get; private set; }
-        public DateTime? HoraPreferencial { get; set; }
+        public TimeOnly? HoraPreferencial { get; set; }
         public int? UsuarioVinculadoId { get; private set; }
         public Usuario? UsuarioVinculado { get; private set; }
         public ICollection<Restricao> Restricoes { get; private set; } = new List<Restricao>();
