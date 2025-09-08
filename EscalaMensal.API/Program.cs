@@ -6,7 +6,16 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowMyFrontendPolicy", policy =>
+    {
+        // Agora podemos voltar para a versão segura, especificando a origem
+        policy.WithOrigins("http://localhost:5173")
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
+});
 
 builder.Services.AddDbContext<AppDbContext>(opt =>
     opt.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
@@ -25,11 +34,11 @@ builder.Services.AddScoped<IUsuarioService, UsuarioService>();
 builder.Services.AddScoped<IRestricaoService, RestricaoService>();
 builder.Services.AddScoped<IItemEscalaService, ItemEscalaService>();
 builder.Services.AddScoped<IHistoricoEscalaService, HistoricoEscalaService>();
-builder.Services.AddScoped<IFuncaoService, FuncaoService>();
+builder.Services.AddScoped<IFuncaoService, FuncaoService>(); // <-- A linha que estava faltando para este erro
 builder.Services.AddScoped<IEscalaService, EscalaService>();
 builder.Services.AddScoped<ICargoNivelFuncaoPermitidaService, CargoNivelFuncaoPermitidaService>();
 
-
+builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
@@ -41,9 +50,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-// Configure the HTTP request pipeline.
-
-app.UseHttpsRedirection();
+app.UseCors("AllowMyFrontendPolicy");
 
 app.UseAuthorization();
 
