@@ -42,19 +42,18 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowBlazor",
+        policy => policy
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .WithOrigins("https://localhost:7185", "http://localhost:5293"));
+});
+
 var app = builder.Build();
 
 var policyName = "corsblazor";
-
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy(name: policyName, policy =>
-    {
-        policy.WithOrigins("https://localhost:5000")
-              .AllowAnyHeader()
-              .AllowAnyMethod();
-    });
-});
 
 app.UseCors(policyName);
 
@@ -67,6 +66,8 @@ if (app.Environment.IsDevelopment())
 app.UseCors("AllowMyFrontendPolicy");
 
 app.UseAuthorization();
+
+app.UseCors("AllowBlazor");
 
 app.MapControllers();
 
