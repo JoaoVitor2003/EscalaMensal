@@ -44,6 +44,20 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
+var policyName = "corsblazor";
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(name: policyName, policy =>
+    {
+        policy.WithOrigins("https://localhost:5000")
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
+});
+
+app.UseCors(policyName);
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
