@@ -15,13 +15,15 @@ namespace EscalaMensal.Domain.Entities
 
         public CargoEnum Cargo { get; set; }
         public NivelEnum NivelMinimo { get; set; }
+        public bool Obrigatoria { get; set; }
 
         public Funcao(string nome) => Nome = nome;
 
-        public Funcao(int id, string nome)
+        public Funcao(int id, string nome, bool obrigatoria)
         {
             Id = id;
             Nome = nome;
+            Obrigatoria = obrigatoria;
         }
     }
 

@@ -12,10 +12,10 @@ namespace EscalaMensal.Domain.Entities
         public DateTime Dia { get; set; }
         public TimeOnly? Horario { get; set; }
         public int EscalaId { get; private set; }
-        public Escala Escala { get; private set; }
+        public Escala? Escala { get; private set; }
 
         public int FuncaoId { get; private set; }
-        public Funcao Funcao { get; private set; }
+        public Funcao? Funcao { get; private set; }
 
         public int? UsuarioId { get; private set; }
         public Usuario? Usuario { get; private set; } // pode ser nulo se estiver vago

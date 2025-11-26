@@ -72,73 +72,73 @@ namespace EscalaMensal.Infrastructure.Context
 );
 
             modelBuilder.Entity<Funcao>().HasData(
-                new Funcao(1, "Cerimoniário Geral")
+                new Funcao(1, "Cerimoniário Geral", true)
                 {
                     Abreviacao = "CG",
                     Cargo = CargoEnum.Cerimoniario,
                     NivelMinimo = NivelEnum.Nivel3
                 },
-                new Funcao(2,"Cerimoniário Auxiliar 1")
+                new Funcao(2,"Cerimoniário Auxiliar 1", false)
                 {
                     Abreviacao = "CA1",
                     Cargo = CargoEnum.Cerimoniario,
                     NivelMinimo = NivelEnum.Nivel1
                 },
-                new Funcao(3, "Cerimoniário Auxiliar 2")
+                new Funcao(3, "Cerimoniário Auxiliar 2", false)
                 {
                     Abreviacao = "CA2",
                     Cargo = CargoEnum.Cerimoniario,
                     NivelMinimo = NivelEnum.Nivel1
                 },
-                new Funcao(4, "Librífero")
+                new Funcao(4, "Librífero", true)
                 {
                     Abreviacao = "Li",
                     Cargo = CargoEnum.Cerimoniario,
                     NivelMinimo = NivelEnum.Nivel3
                 },
-                new Funcao(5, "Leitor")
+                new Funcao(5, "Leitor", false)
                 {
                     Abreviacao = "L",
                     Cargo = CargoEnum.Coroinha,
                     NivelMinimo = NivelEnum.Nivel2
                 },
-                new Funcao(6, "Ceroferario 1")
+                new Funcao(6, "Ceroferario 1", false)
                 {
                     Abreviacao = "Ce1",
                     Cargo = CargoEnum.Coroinha,
                     NivelMinimo = NivelEnum.Nivel3
                 },
-                new Funcao(7, "Ceroferario 2")
+                new Funcao(7, "Ceroferario 2", false)
                 {
                     Abreviacao = "Ce2",
                     Cargo = CargoEnum.Coroinha,
                     NivelMinimo = NivelEnum.Nivel3
                 },
-                new Funcao(8, "Cruciferário")
+                new Funcao(8, "Cruciferário", false)
                 {
                     Abreviacao = "Cr",
                     Cargo = CargoEnum.Coroinha,
                     NivelMinimo = NivelEnum.Nivel2
                 },
-                new Funcao(9, "Ofertório")
+                new Funcao(9, "Ofertório", false)
                 {
                     Abreviacao = "O",
                     Cargo = CargoEnum.Coroinha,
                     NivelMinimo = NivelEnum.Nivel1
                 },
-                new Funcao(10, "Turibulo")
+                new Funcao(10, "Turibulo", false)
                 {
                     Abreviacao = "T",
                     Cargo = CargoEnum.Cerimoniario,
                     NivelMinimo = NivelEnum.Nivel2
                 },
-                new Funcao(11, "Naveta")
+                new Funcao(11, "Naveta", false)
                 {
                     Abreviacao = "N",
                     Cargo = CargoEnum.Coroinha,
                     NivelMinimo = NivelEnum.Nivel1
                 },
-                new Funcao(12, "Cerimoniário de Procissão")
+                new Funcao(12, "Cerimoniário de Procissão", false)
                 {
                     Abreviacao = "CP",
                     Cargo = CargoEnum.Cerimoniario,
