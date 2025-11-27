@@ -10,11 +10,13 @@ namespace EscalaMensal.Application.Services
     {
         private readonly IItemEscalaRepository _itemEscalaRepository;
         private readonly IFuncaoRepository _funcaoRepository;
+        private readonly IUsuarioRepository _usuarioRepository;
 
-        public ItemEscalaService(IItemEscalaRepository itemEscalaRepository, IFuncaoRepository funcaoRepository)
+        public ItemEscalaService(IItemEscalaRepository itemEscalaRepository, IFuncaoRepository funcaoRepository, IUsuarioRepository usuarioRepository)
         {
             _itemEscalaRepository = itemEscalaRepository;
             _funcaoRepository = funcaoRepository;
+            _usuarioRepository = usuarioRepository;
         }
 
         public async Task<List<ItemEscala>> ObterPorEscalaIdAsync(int escalaId)
@@ -25,6 +27,7 @@ namespace EscalaMensal.Application.Services
         public async Task AdicionarAsync(ItemEscala item)
         {
             var funcaoCompleta = await _funcaoRepository.ObterPorIdAsync(item.FuncaoId);
+            var usuarioCompleto = item.UsuarioId.HasValue ? await _usuarioRepository.ObterPorIdAsync(item.UsuarioId.Value) : null;
 
             if (funcaoCompleta == null)
             {
@@ -34,6 +37,10 @@ namespace EscalaMensal.Application.Services
             if (funcaoCompleta.Obrigatoria && item.UsuarioId == null)
             {
                 erros.Add($"A função '{funcaoCompleta.Nome}' é obrigatória e não foi preenchida.");
+            }
+            if (erros.Count > 0)
+            {
+                throw new Exception(string.Join(" ", erros));
             }
             await _itemEscalaRepository.AdicionarAsync(item);
         }
