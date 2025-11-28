@@ -1,5 +1,8 @@
 ﻿using EscalaMensal.Domain.Entities;
+using EscalaMensal.Domain.Enums;
+using EscalaMensal.Domain.Exceptions;
 using EscalaMensal.Domain.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using static System.Runtime.InteropServices.JavaScript.JSType;
@@ -26,22 +29,37 @@ namespace EscalaMensal.Application.Services
 
         public async Task AdicionarAsync(ItemEscala item)
         {
-            var funcaoCompleta = await _funcaoRepository.ObterPorIdAsync(item.FuncaoId);
-            var usuarioCompleto = item.UsuarioId.HasValue ? await _usuarioRepository.ObterPorIdAsync(item.UsuarioId.Value) : null;
+            var funcao = await _funcaoRepository.ObterPorIdAsync(item.FuncaoId);
 
-            if (funcaoCompleta == null)
+            if (funcao == null) throw new Exception("Função não encontrada.");
+
+            var usuario = item.UsuarioId.HasValue
+                          ? await _usuarioRepository.ObterPorIdAsync(item.UsuarioId.Value)
+                          : null;
+
+
+            string? erro = (funcao.Id, usuario) switch
             {
-                throw new Exception("Função não encontrada.");
-            }
-            var erros = new List<string>();
-            if (funcaoCompleta.Obrigatoria && item.UsuarioId == null)
+                (_, null) when funcao.Obrigatoria => $"A função '{funcao.Nome}' é obrigatória.",
+
+                (_, null) => null,
+
+
+                (_, var u) when u.Cargo < funcao.Cargo => $"Usuário '{u.Nome}' não tem patente suficiente.",
+
+                (1, var u) when u.Cargo == CargoEnum.Coroinha => "Coroinhas não podem assumir a função 1.",
+
+                (6, var u) when u.Cargo == CargoEnum.Coroinha && u.Nivel < NivelEnum.Nivel2
+                     => "Coroinhas precisam ser Nível 2 para esta função.",
+
+                _ => null
+            };
+
+            if (erro != null)
             {
-                erros.Add($"A função '{funcaoCompleta.Nome}' é obrigatória e não foi preenchida.");
+                throw new DomainException(erro);
             }
-            if (erros.Count > 0)
-            {
-                throw new Exception(string.Join(" ", erros));
-            }
+
             await _itemEscalaRepository.AdicionarAsync(item);
         }
 
