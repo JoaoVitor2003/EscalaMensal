@@ -38,5 +38,10 @@ namespace EscalaMensal.Application.Services
         {
             await _escalaRepository.RemoverAsync(id);
         }
+
+        public async Task<Escala?> ObterPorIdAsync(int id)
+        {
+            return await _escalaRepository.ObterPorIdAsync(id);
+        }
     }
 }

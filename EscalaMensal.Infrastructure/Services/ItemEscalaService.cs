@@ -14,12 +14,14 @@ namespace EscalaMensal.Application.Services
         private readonly IItemEscalaRepository _itemEscalaRepository;
         private readonly IFuncaoRepository _funcaoRepository;
         private readonly IUsuarioRepository _usuarioRepository;
+        private readonly IEscalaRepository _escalaRepository;
 
-        public ItemEscalaService(IItemEscalaRepository itemEscalaRepository, IFuncaoRepository funcaoRepository, IUsuarioRepository usuarioRepository)
+        public ItemEscalaService(IItemEscalaRepository itemEscalaRepository, IFuncaoRepository funcaoRepository, IUsuarioRepository usuarioRepository, IEscalaRepository escalaRepository)
         {
             _itemEscalaRepository = itemEscalaRepository;
             _funcaoRepository = funcaoRepository;
             _usuarioRepository = usuarioRepository;
+            _escalaRepository = escalaRepository;
         }
 
         public async Task<List<ItemEscala>> ObterPorEscalaIdAsync(int escalaId)
@@ -37,13 +39,11 @@ namespace EscalaMensal.Application.Services
                           ? await _usuarioRepository.ObterPorIdAsync(item.UsuarioId.Value)
                           : null;
 
-
             string? erro = (funcao.Id, usuario) switch
             {
                 (_, null) when funcao.Obrigatoria => $"A função '{funcao.Nome}' é obrigatória.",
 
                 (_, null) => null,
-
 
                 (_, var u) when u.Cargo < funcao.Cargo => $"Usuário '{u.Nome}' não tem patente suficiente.",
 

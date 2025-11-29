@@ -11,6 +11,7 @@ namespace EscalaMensal.Domain.Interfaces
     {
         Task<Escala?> ObterPorMesAnoAsync(int mes, int ano);
         Task<List<Escala>> ObterTodasAsync();
+        Task<Escala?> ObterPorIdAsync(int id);
         Task AdicionarAsync(Escala escala);
         Task AtualizarAsync(Escala escala);
         Task RemoverAsync(int id);

@@ -22,6 +22,14 @@ namespace EscalaMensal.API.Controllers
             var escalas = await _escalaService.ObterTodasAsync();
             return Ok(escalas);
         }
+        [HttpGet("id")]
+        public async Task<ActionResult<Escala>> ObterPorId([FromQuery] int id)
+        {
+            var escala = await _escalaService.ObterPorIdAsync(id);
+            if (escala == null)
+                return NotFound();
+            return Ok(escala);
+        }
 
         [HttpGet("por-mes-ano")]
         public async Task<ActionResult<Escala>> ObterPorMesAno([FromQuery] int mes, [FromQuery] int ano)

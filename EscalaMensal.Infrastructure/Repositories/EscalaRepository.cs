@@ -26,6 +26,16 @@ namespace EscalaMensal.Infrastructure.Repositories
             await _context.SaveChangesAsync();
         }
 
+        public async Task<Escala?> ObterPorIdAsync(int id)
+        {
+            return await _context.Escalas
+                .Include(e => e.Itens)
+                    .ThenInclude(i => i.Usuario)
+                .Include(e => e.Itens)
+                    .ThenInclude(i => i.Funcao)
+                    .FirstOrDefaultAsync(e => e.Id == id);
+        }
+
         public async Task<Escala?> ObterPorMesAnoAsync(int mes, int ano)
         {
             return await _context.Escalas

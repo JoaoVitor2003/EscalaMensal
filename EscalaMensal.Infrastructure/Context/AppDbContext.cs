@@ -67,8 +67,8 @@ namespace EscalaMensal.Infrastructure.Context
                 .IsUnique();
 
             modelBuilder.Entity<Usuario>().HasData(
-    new { Id = 1, Nome = "João", Nivel = NivelEnum.Nivel3, Cargo = CargoEnum.Cerimoniario, Ativo = true, HoraPreferencial = TimeOnly.Parse("10:00") },
-    new { Id = 2, Nome = "Maria", Nivel = NivelEnum.Nivel1, Cargo = CargoEnum.Coroinha, Ativo = false, HoraPreferencial = TimeOnly.Parse("07:30") }
+    new { Id = 1, Nome = "João", Nivel = NivelEnum.Nivel3, Cargo = CargoEnum.Cerimoniario, Ativo = true, HoraPreferencial = TimeOnly.Parse("10:00"), DisponivelQuarta = false, DisponivelSabado = true, DisponivelQuinta = false },
+    new { Id = 2, Nome = "Maria", Nivel = NivelEnum.Nivel1, Cargo = CargoEnum.Coroinha, Ativo = false, HoraPreferencial = TimeOnly.Parse("07:30"), DisponivelQuarta = true, DisponivelSabado = true, DisponivelQuinta = true }
 );
 
             modelBuilder.Entity<Funcao>().HasData(
