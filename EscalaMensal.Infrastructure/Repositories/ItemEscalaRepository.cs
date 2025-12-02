@@ -12,20 +12,20 @@ public class EscalaItemRepository : IItemEscalaRepository
         _context = context;
     }
 
-    public async Task<List<ItemEscala>> ObterPorEscalaIdAsync(int escalaId)
+    public async Task<List<ItemMissa>> ObterPorEscalaIdAsync(int escalaId)
     {
         return await _context.ItensEscala
             .Where(i => i.EscalaId == escalaId)
             .ToListAsync();
     }
 
-    public async Task AdicionarAsync(ItemEscala item)
+    public async Task AdicionarAsync(ItemMissa item)
     {
         _context.ItensEscala.Add(item);
         await _context.SaveChangesAsync();
     }
 
-    public async Task AtualizarAsync(ItemEscala item)
+    public async Task AtualizarAsync(ItemMissa item)
     {
         _context.ItensEscala.Update(item);
         await _context.SaveChangesAsync();

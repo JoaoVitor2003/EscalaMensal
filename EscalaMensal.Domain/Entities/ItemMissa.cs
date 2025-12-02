@@ -8,28 +8,21 @@ using System.Threading.Tasks;
 
 namespace EscalaMensal.Domain.Entities
 {
-    public class ItemEscala
+    public class ItemMissa
     {
         public int Id { get; private set; }
-        public DateOnly Dia { get; set; }
-
-        [JsonConverter(typeof(TimeOnlyHmConverter))]
-        public TimeOnly? Horario { get; set; }
-        public int EscalaId { get; private set; }
-        public Escala? Escala { get; private set; }
-
         public int FuncaoId { get; private set; }
         public Funcao? Funcao { get; private set; }
+        public int MissaId { get; private set; }
+        public Missas? Missas { get; private set; }
 
         public int? UsuarioId { get; private set; }
         public Usuario? Usuario { get; private set; } // pode ser nulo se estiver vago
 
-        public ItemEscala(int escalaId, int funcaoId, DateOnly dia, int? usuarioId = null)
+        public ItemMissa(int funcaoId, int missaId)
         {
-            EscalaId = escalaId;
             FuncaoId = funcaoId;
-            Dia = dia;
-            UsuarioId = usuarioId;
+            MissaId = missaId;
         }
 
         public void AtribuirUsuario(int usuarioId) => UsuarioId = usuarioId;

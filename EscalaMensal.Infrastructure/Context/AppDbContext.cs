@@ -16,7 +16,7 @@ namespace EscalaMensal.Infrastructure.Context
 
         public DbSet<Usuario> Usuarios { get; set; }
         public DbSet<Escala> Escalas { get; set; }
-        public DbSet<ItemEscala> ItensEscala { get; set; }
+        public DbSet<ItemMissa> ItensEscala { get; set; }
         public DbSet<Funcao> Funcoes { get; set; }
         public DbSet<Restricao> Restricoes { get; set; }
         public DbSet<CargoNivelFuncaoPermitida> CargoNivelFuncaoPermitidas { get; set; }
@@ -32,19 +32,19 @@ namespace EscalaMensal.Infrastructure.Context
                 .HasForeignKey(u => u.UsuarioVinculadoId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            modelBuilder.Entity<ItemEscala>()
+            modelBuilder.Entity<ItemMissa>()
                 .HasOne(i => i.Escala)
                 .WithMany(e => e.Itens)
                 .HasForeignKey(i => i.EscalaId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            modelBuilder.Entity<ItemEscala>()
+            modelBuilder.Entity<ItemMissa>()
                 .HasOne(i => i.Usuario)
                 .WithMany()
                 .HasForeignKey(i => i.UsuarioId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            modelBuilder.Entity<ItemEscala>()
+            modelBuilder.Entity<ItemMissa>()
                 .HasOne(i => i.Funcao)
                 .WithMany()
                 .HasForeignKey(i => i.FuncaoId)

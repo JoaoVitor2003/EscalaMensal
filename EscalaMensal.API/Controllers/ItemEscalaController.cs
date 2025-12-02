@@ -16,21 +16,21 @@ namespace EscalaMensal.API.Controllers
         }
 
         [HttpGet("por-escala/{escalaId}")]
-        public async Task<ActionResult<List<ItemEscala>>> ObterPorEscalaId(int escalaId)
+        public async Task<ActionResult<List<ItemMissa>>> ObterPorEscalaId(int escalaId)
         {
             var itens = await _itemEscalaService.ObterPorEscalaIdAsync(escalaId);
             return Ok(itens);
         }
 
         [HttpPost]
-        public async Task<ActionResult> Adicionar([FromBody] ItemEscala item)
+        public async Task<ActionResult> Adicionar([FromBody] ItemMissa item)
         {
             await _itemEscalaService.AdicionarAsync(item);
             return CreatedAtAction(nameof(ObterPorEscalaId), new { escalaId = item.EscalaId }, item);
         }
 
         [HttpPut("{id}")]
-        public async Task<ActionResult> Atualizar(int id, [FromBody] ItemEscala item)
+        public async Task<ActionResult> Atualizar(int id, [FromBody] ItemMissa item)
         {
             if (id != item.Id)
                 return BadRequest("O ID do item não confere.");

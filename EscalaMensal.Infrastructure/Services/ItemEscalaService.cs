@@ -24,12 +24,12 @@ namespace EscalaMensal.Application.Services
             _escalaRepository = escalaRepository;
         }
 
-        public async Task<List<ItemEscala>> ObterPorEscalaIdAsync(int escalaId)
+        public async Task<List<ItemMissa>> ObterPorEscalaIdAsync(int escalaId)
         {
             return await _itemEscalaRepository.ObterPorEscalaIdAsync(escalaId);
         }
 
-        public async Task AdicionarAsync(ItemEscala item)
+        public async Task AdicionarAsync(ItemMissa item)
         {
             var funcao = await _funcaoRepository.ObterPorIdAsync(item.FuncaoId);
 
@@ -63,7 +63,7 @@ namespace EscalaMensal.Application.Services
             await _itemEscalaRepository.AdicionarAsync(item);
         }
 
-        public async Task AtualizarAsync(ItemEscala item)
+        public async Task AtualizarAsync(ItemMissa item)
         {
             await _itemEscalaRepository.AtualizarAsync(item);
         }
