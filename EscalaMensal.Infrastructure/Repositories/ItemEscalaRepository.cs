@@ -15,7 +15,7 @@ public class EscalaItemRepository : IItemEscalaRepository
     public async Task<List<ItemMissa>> ObterPorEscalaIdAsync(int escalaId)
     {
         return await _context.ItensEscala
-            .Where(i => i.EscalaId == escalaId)
+            .Where(i => i.MissaId == escalaId)
             .ToListAsync();
     }
 

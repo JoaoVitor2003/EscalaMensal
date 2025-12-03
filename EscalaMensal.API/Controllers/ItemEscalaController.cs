@@ -26,7 +26,7 @@ namespace EscalaMensal.API.Controllers
         public async Task<ActionResult> Adicionar([FromBody] ItemMissa item)
         {
             await _itemEscalaService.AdicionarAsync(item);
-            return CreatedAtAction(nameof(ObterPorEscalaId), new { escalaId = item.EscalaId }, item);
+            return CreatedAtAction(nameof(ObterPorEscalaId), new { missaId = item.MissaId }, item);
         }
 
         [HttpPut("{id}")]

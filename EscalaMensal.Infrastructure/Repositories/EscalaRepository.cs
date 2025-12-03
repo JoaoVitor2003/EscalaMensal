@@ -29,31 +29,25 @@ namespace EscalaMensal.Infrastructure.Repositories
         public async Task<Escala?> ObterPorIdAsync(int id)
         {
             return await _context.Escalas
-                .Include(e => e.Itens)
-                    .ThenInclude(i => i.Usuario)
-                .Include(e => e.Itens)
-                    .ThenInclude(i => i.Funcao)
+                .Include(e => e.Missas)
+                    .ThenInclude(i => i.Itens)
                     .FirstOrDefaultAsync(e => e.Id == id);
         }
 
         public async Task<Escala?> ObterPorMesAnoAsync(int mes, int ano)
         {
             return await _context.Escalas
-                .Include(e => e.Itens)
-                    .ThenInclude(i => i.Usuario)
-                .Include(e => e.Itens)
-                    .ThenInclude(i => i.Funcao)
-                .Where(e => e.Itens.Any(i => i.Dia.Month == mes && i.Dia.Year == ano))
+                .Include(e => e.Missas)
+                    .ThenInclude(i => i.Itens)
+                .Where(e => e.Missas.Any(i => i.Dia.Month == mes && i.Dia.Year == ano))
                 .FirstOrDefaultAsync();
         }
 
         public async Task<List<Escala>> ObterTodasAsync()
         {
             return await _context.Escalas
-                .Include(e => e.Itens)
-                    .ThenInclude(i => i.Usuario)
-                .Include(e => e.Itens)
-                    .ThenInclude(i => i.Funcao)
+                .Include(e => e.Missas)
+                    .ThenInclude(i => i.Itens)
                 .ToListAsync();
         }
 
