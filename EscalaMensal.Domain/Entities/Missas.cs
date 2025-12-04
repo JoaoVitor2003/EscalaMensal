@@ -25,9 +25,9 @@ namespace EscalaMensal.Domain.Entities
             EscalaId = escalaId;
         }
 
-        public ItemMissa AdicionarFuncao(int funcaoId)
+        public ItemMissa AdicionarFuncao()
         {
-            var item = new ItemMissa(funcaoId, this.Id);
+            var item = new ItemMissa(this.Id);
             Itens.Add(item);
             return item;
         }

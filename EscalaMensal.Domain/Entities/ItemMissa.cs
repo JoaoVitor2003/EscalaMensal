@@ -17,9 +17,8 @@ namespace EscalaMensal.Domain.Entities
         public int? UsuarioId { get; private set; }
         public Usuario? Usuario { get; private set; } // pode ser nulo se estiver vago
 
-        public ItemMissa(int usuarioId, int missaId)
+        public ItemMissa(int missaId)
         {
-            UsuarioId = usuarioId;
             MissaId = missaId;
         }
 
