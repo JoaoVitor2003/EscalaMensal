@@ -12,10 +12,10 @@ namespace EscalaMensal.Domain.Entities
         public DateOnly DataInicio { get; private set; }
         public DateOnly DataFim { get; private set; }
         public ICollection<Missas> Missas { get; private set; } = new List<Missas>();
-        public Escala(DateOnly inicio, DateOnly fim)
+        public Escala(DateOnly dataInicio, DateOnly dataFim)
         {
-            DataInicio = inicio;
-            DataFim = fim;
+            DataInicio = dataInicio;
+            DataFim = dataFim;
         }
 
         public Missas AdicionarMissa(DateOnly dia, TimeOnly horario)
