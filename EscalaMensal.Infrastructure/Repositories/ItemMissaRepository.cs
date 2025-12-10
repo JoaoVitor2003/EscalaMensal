@@ -14,29 +14,29 @@ public class EscalaItemRepository : IItemMissaRepository
 
     public async Task<List<ItemMissa>> ObterPorEscalaIdAsync(int escalaId)
     {
-        return await _context.ItensEscala
+        return await _context.ItensMissa
             .Where(i => i.MissaId == escalaId)
             .ToListAsync();
     }
 
     public async Task AdicionarAsync(ItemMissa item)
     {
-        _context.ItensEscala.Add(item);
+        _context.ItensMissa.Add(item);
         await _context.SaveChangesAsync();
     }
 
     public async Task AtualizarAsync(ItemMissa item)
     {
-        _context.ItensEscala.Update(item);
+        _context.ItensMissa.Update(item);
         await _context.SaveChangesAsync();
     }
 
     public async Task RemoverAsync(int id)
     {
-        var item = await _context.ItensEscala.FindAsync(id);
+        var item = await _context.ItensMissa.FindAsync(id);
         if (item != null)
         {
-            _context.ItensEscala.Remove(item);
+            _context.ItensMissa.Remove(item);
             await _context.SaveChangesAsync();
         }
     }

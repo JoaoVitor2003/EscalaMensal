@@ -11,14 +11,14 @@ namespace EscalaMensal.Application.Services
 {
     public class ItemMissaService : IItemMissaService
     {
-        private readonly IItemMissaRepository _itemEscalaRepository;
+        private readonly IItemMissaRepository _itemMissaRepository;
         private readonly IFuncaoRepository _funcaoRepository;
         private readonly IUsuarioRepository _usuarioRepository;
         private readonly IEscalaRepository _escalaRepository;
 
-        public ItemMissaService(IItemMissaRepository itemEscalaRepository, IFuncaoRepository funcaoRepository, IUsuarioRepository usuarioRepository, IEscalaRepository escalaRepository)
+        public ItemMissaService(IItemMissaRepository itemMissaRepository, IFuncaoRepository funcaoRepository, IUsuarioRepository usuarioRepository, IEscalaRepository escalaRepository)
         {
-            _itemEscalaRepository = itemEscalaRepository;
+            _itemMissaRepository = itemMissaRepository;
             _funcaoRepository = funcaoRepository;
             _usuarioRepository = usuarioRepository;
             _escalaRepository = escalaRepository;
@@ -26,7 +26,7 @@ namespace EscalaMensal.Application.Services
 
         public async Task<List<ItemMissa>> ObterPorEscalaIdAsync(int escalaId)
         {
-            return await _itemEscalaRepository.ObterPorEscalaIdAsync(escalaId);
+            return await _itemMissaRepository.ObterPorEscalaIdAsync(escalaId);
         }
 
         public async Task AdicionarAsync(ItemMissa item)
@@ -60,17 +60,17 @@ namespace EscalaMensal.Application.Services
                 throw new DomainException(erro);
             }
 
-            await _itemEscalaRepository.AdicionarAsync(item);
+            await _itemMissaRepository.AdicionarAsync(item);
         }
 
         public async Task AtualizarAsync(ItemMissa item)
         {
-            await _itemEscalaRepository.AtualizarAsync(item);
+            await _itemMissaRepository.AtualizarAsync(item);
         }
 
         public async Task RemoverAsync(int id)
         {
-            await _itemEscalaRepository.RemoverAsync(id);
+            await _itemMissaRepository.RemoverAsync(id);
         }
     }
 }
