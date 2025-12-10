@@ -8,24 +8,24 @@ namespace EscalaMensal.API.Controllers
     [Route("api/[controller]")]
     public class ItensMissaController : ControllerBase
     {
-        private readonly IItemMissaService _itemEscalaService;
+        private readonly IItemMissaService _itemMissaService;
 
-        public ItensMissaController(IItemMissaService itemEscalaService)
+        public ItensMissaController(IItemMissaService itemMissaService)
         {
-            _itemEscalaService = itemEscalaService;
+            _itemMissaService = itemMissaService;
         }
 
         [HttpGet("por-escala/{escalaId}")]
         public async Task<ActionResult<List<ItemMissa>>> ObterPorEscalaId(int escalaId)
         {
-            var itens = await _itemEscalaService.ObterPorEscalaIdAsync(escalaId);
+            var itens = await _itemMissaService.ObterPorEscalaIdAsync(escalaId);
             return Ok(itens);
         }
 
         [HttpPost]
         public async Task<ActionResult> Adicionar([FromBody] ItemMissa item)
         {
-            await _itemEscalaService.AdicionarAsync(item);
+            await _itemMissaService.AdicionarAsync(item);
             return CreatedAtAction(nameof(ObterPorEscalaId), new { missaId = item.MissaId }, item);
         }
 
@@ -35,14 +35,14 @@ namespace EscalaMensal.API.Controllers
             if (id != item.Id)
                 return BadRequest("O ID do item não confere.");
 
-            await _itemEscalaService.AtualizarAsync(item);
+            await _itemMissaService.AtualizarAsync(item);
             return NoContent();
         }
 
         [HttpDelete("{id}")]
         public async Task<ActionResult> Remover(int id)
         {
-            await _itemEscalaService.RemoverAsync(id);
+            await _itemMissaService.RemoverAsync(id);
             return NoContent();
         }
     }
