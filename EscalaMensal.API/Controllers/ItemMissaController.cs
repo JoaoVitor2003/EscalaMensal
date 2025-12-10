@@ -6,11 +6,11 @@ namespace EscalaMensal.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class ItensEscalaController : ControllerBase
+    public class ItensMissaController : ControllerBase
     {
-        private readonly IItemEscalaService _itemEscalaService;
+        private readonly IItemMissaService _itemEscalaService;
 
-        public ItensEscalaController(IItemEscalaService itemEscalaService)
+        public ItensMissaController(IItemMissaService itemEscalaService)
         {
             _itemEscalaService = itemEscalaService;
         }

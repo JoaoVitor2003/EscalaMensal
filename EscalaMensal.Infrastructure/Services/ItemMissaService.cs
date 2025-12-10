@@ -9,14 +9,14 @@ using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace EscalaMensal.Application.Services
 {
-    public class ItemEscalaService : IItemEscalaService
+    public class ItemMissaService : IItemMissaService
     {
-        private readonly IItemEscalaRepository _itemEscalaRepository;
+        private readonly IItemMissaRepository _itemEscalaRepository;
         private readonly IFuncaoRepository _funcaoRepository;
         private readonly IUsuarioRepository _usuarioRepository;
         private readonly IEscalaRepository _escalaRepository;
 
-        public ItemEscalaService(IItemEscalaRepository itemEscalaRepository, IFuncaoRepository funcaoRepository, IUsuarioRepository usuarioRepository, IEscalaRepository escalaRepository)
+        public ItemMissaService(IItemMissaRepository itemEscalaRepository, IFuncaoRepository funcaoRepository, IUsuarioRepository usuarioRepository, IEscalaRepository escalaRepository)
         {
             _itemEscalaRepository = itemEscalaRepository;
             _funcaoRepository = funcaoRepository;

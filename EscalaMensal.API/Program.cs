@@ -24,7 +24,7 @@ builder.Services.AddControllers();
 
 builder.Services.AddScoped<IEscalaRepository, EscalaRepository>();
 builder.Services.AddScoped<IRestricaoRepository, RestricaoRepository>();
-builder.Services.AddScoped<IItemEscalaRepository, EscalaItemRepository>();
+builder.Services.AddScoped<IItemMissaRepository, EscalaItemRepository>();
 builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
 builder.Services.AddScoped<IFuncaoRepository, FuncaoRepository>();
 builder.Services.AddScoped<IHistoricoEscalaRepository, HistoricoEscalaRepository>();
@@ -32,7 +32,7 @@ builder.Services.AddScoped<ICargoNivelFuncaoPermitidaRepository, CargoNivelFunca
 
 builder.Services.AddScoped<IUsuarioService, UsuarioService>();
 builder.Services.AddScoped<IRestricaoService, RestricaoService>();
-builder.Services.AddScoped<IItemEscalaService, ItemEscalaService>();
+builder.Services.AddScoped<IItemMissaService, ItemMissaService>();
 builder.Services.AddScoped<IHistoricoEscalaService, HistoricoEscalaService>();
 builder.Services.AddScoped<IFuncaoService, FuncaoService>(); // <-- A linha que estava faltando para este erro
 builder.Services.AddScoped<IEscalaService, EscalaService>();

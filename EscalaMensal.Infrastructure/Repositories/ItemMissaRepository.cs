@@ -3,7 +3,7 @@ using EscalaMensal.Domain.Interfaces;
 using EscalaMensal.Infrastructure.Context;
 using Microsoft.EntityFrameworkCore;
 
-public class EscalaItemRepository : IItemEscalaRepository
+public class EscalaItemRepository : IItemMissaRepository
 {
     private readonly AppDbContext _context;
 
