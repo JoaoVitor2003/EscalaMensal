@@ -16,6 +16,7 @@ namespace EscalaMensal.Infrastructure.Context
 
         public DbSet<Usuario> Usuarios { get; set; }
         public DbSet<Escala> Escalas { get; set; }
+        public DbSet<Missas> Missas { get; set; }
         public DbSet<ItemMissa> ItensMissa { get; set; }
         public DbSet<Funcao> Funcoes { get; set; }
         public DbSet<Restricao> Restricoes { get; set; }
