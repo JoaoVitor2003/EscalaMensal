@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace EscalaMensal.Domain.Interfaces
 {
-    public interface IMissaService
+    public interface IMissasService
     {
         Task<List<Missas>> ObterPorEscalaIdAsync(int escalaId);
         Task AdicionarAsync(Missas missa);

@@ -9,10 +9,10 @@ using System.Threading.Tasks;
 
 namespace EscalaMensal.Infrastructure.Services
 {
-    public class MissaService : IMissaService
+    public class MissasService : IMissasService
     {
         private readonly MissasRepository _missaRepository;
-        public MissaService(MissasRepository missaRepository)
+        public MissasService(MissasRepository missaRepository)
         {
             _missaRepository = missaRepository;
         }
