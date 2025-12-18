@@ -7,12 +7,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace EscalaMensal.Infrastructure.Services
+namespace EscalaMensal.Application.Services
 {
     public class MissasService : IMissasService
     {
-        private readonly MissasRepository _missaRepository;
-        public MissasService(MissasRepository missaRepository)
+        private readonly IMissasRepository _missaRepository;
+        public MissasService(IMissasRepository missaRepository)
         {
             _missaRepository = missaRepository;
         }

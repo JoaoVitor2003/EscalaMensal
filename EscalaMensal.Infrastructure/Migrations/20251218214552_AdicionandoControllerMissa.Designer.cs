@@ -4,6 +4,7 @@ using EscalaMensal.Infrastructure.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EscalaMensal.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251218214552_AdicionandoControllerMissa")]
+    partial class AdicionandoControllerMissa
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -242,9 +245,6 @@ namespace EscalaMensal.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("FuncaoId")
-                        .HasColumnType("int");
-
                     b.Property<int>("MissaId")
                         .HasColumnType("int");
 
@@ -255,8 +255,6 @@ namespace EscalaMensal.Infrastructure.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("FuncaoId");
 
                     b.HasIndex("MissaId");
 
@@ -281,12 +279,17 @@ namespace EscalaMensal.Infrastructure.Migrations
                     b.Property<int>("EscalaId")
                         .HasColumnType("int");
 
+                    b.Property<int>("FuncaoId")
+                        .HasColumnType("int");
+
                     b.Property<TimeOnly>("Horario")
                         .HasColumnType("time");
 
                     b.HasKey("Id");
 
                     b.HasIndex("EscalaId");
+
+                    b.HasIndex("FuncaoId");
 
                     b.ToTable("Missas");
                 });
@@ -416,12 +419,6 @@ namespace EscalaMensal.Infrastructure.Migrations
 
             modelBuilder.Entity("EscalaMensal.Domain.Entities.ItemMissa", b =>
                 {
-                    b.HasOne("EscalaMensal.Domain.Entities.Funcao", "Funcao")
-                        .WithMany()
-                        .HasForeignKey("FuncaoId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("EscalaMensal.Domain.Entities.Missas", "Missas")
                         .WithMany()
                         .HasForeignKey("MissaId")
@@ -437,8 +434,6 @@ namespace EscalaMensal.Infrastructure.Migrations
                         .HasForeignKey("UsuarioId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.Navigation("Funcao");
-
                     b.Navigation("Missas");
 
                     b.Navigation("Usuario");
@@ -452,7 +447,15 @@ namespace EscalaMensal.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("EscalaMensal.Domain.Entities.Funcao", "Funcao")
+                        .WithMany()
+                        .HasForeignKey("FuncaoId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("Escala");
+
+                    b.Navigation("Funcao");
                 });
 
             modelBuilder.Entity("EscalaMensal.Domain.Entities.Restricao", b =>

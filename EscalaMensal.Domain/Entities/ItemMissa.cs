@@ -13,7 +13,8 @@ namespace EscalaMensal.Domain.Entities
         public int Id { get; private set; }
         public int MissaId { get; private set; }
         public Missas? Missas { get; private set; }
-
+        public int FuncaoId { get; private set; }
+        public Funcao? Funcao { get; private set; }
         public int? UsuarioId { get; private set; }
         public Usuario? Usuario { get; private set; } // pode ser nulo se estiver vago
 

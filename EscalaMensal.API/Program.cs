@@ -29,14 +29,16 @@ builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
 builder.Services.AddScoped<IFuncaoRepository, FuncaoRepository>();
 builder.Services.AddScoped<IHistoricoEscalaRepository, HistoricoEscalaRepository>();
 builder.Services.AddScoped<ICargoNivelFuncaoPermitidaRepository, CargoNivelFuncaoPermitidaRepository>();
+builder.Services.AddScoped<IMissasRepository, MissasRepository>();
 
 builder.Services.AddScoped<IUsuarioService, UsuarioService>();
 builder.Services.AddScoped<IRestricaoService, RestricaoService>();
 builder.Services.AddScoped<IItemMissaService, ItemMissaService>();
 builder.Services.AddScoped<IHistoricoEscalaService, HistoricoEscalaService>();
-builder.Services.AddScoped<IFuncaoService, FuncaoService>(); // <-- A linha que estava faltando para este erro
+builder.Services.AddScoped<IFuncaoService, FuncaoService>();
 builder.Services.AddScoped<IEscalaService, EscalaService>();
 builder.Services.AddScoped<ICargoNivelFuncaoPermitidaService, CargoNivelFuncaoPermitidaService>();
+builder.Services.AddScoped<IMissasService, MissasService>();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
