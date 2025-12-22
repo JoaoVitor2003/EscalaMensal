@@ -16,11 +16,12 @@ namespace EscalaMensal.Domain.Entities
         public int FuncaoId { get; private set; }
         public Funcao? Funcao { get; private set; }
         public int? UsuarioId { get; private set; }
-        public Usuario? Usuario { get; private set; } // pode ser nulo se estiver vago
+        public Usuario? Usuario { get; private set; }
 
-        public ItemMissa(int missaId)
+        public ItemMissa(int missaId, int funcaoId)
         {
             MissaId = missaId;
+            FuncaoId = funcaoId;
         }
 
         public void AtribuirUsuario(int usuarioId) => UsuarioId = usuarioId;

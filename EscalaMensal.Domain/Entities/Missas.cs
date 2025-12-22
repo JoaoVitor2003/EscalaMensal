@@ -22,12 +22,5 @@ namespace EscalaMensal.Domain.Entities
             Horario = horario;
             EscalaId = escalaId;
         }
-
-        public ItemMissa AdicionarFuncao()
-        {
-            var item = new ItemMissa(this.Id);
-            Itens.Add(item);
-            return item;
-        }
     }
 }

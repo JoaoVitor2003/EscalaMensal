@@ -19,6 +19,7 @@ namespace EscalaMensal.API.Controllers
         public async Task<ActionResult<List<ItemMissa>>> ObterPorEscalaId(int escalaId)
         {
             var itens = await _itemMissaService.ObterPorEscalaIdAsync(escalaId);
+            if (itens == null) return NotFound();
             return Ok(itens);
         }
 
