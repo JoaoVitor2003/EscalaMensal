@@ -24,9 +24,9 @@ namespace EscalaMensal.Application.Services
             _escalaRepository = escalaRepository;
         }
 
-        public async Task<List<ItemMissa>> ObterPorEscalaIdAsync(int escalaId)
+        public async Task<List<ItemMissa>> ObterPorMissaIdAsync(int escalaId)
         {
-            return await _itemMissaRepository.ObterPorEscalaIdAsync(escalaId);
+            return await _itemMissaRepository.ObterPorMissaIdAsync(escalaId);
         }
 
         public async Task AdicionarAsync(ItemMissa item)

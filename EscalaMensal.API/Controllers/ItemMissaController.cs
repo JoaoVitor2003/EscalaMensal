@@ -16,9 +16,9 @@ namespace EscalaMensal.API.Controllers
         }
 
         [HttpGet("por-escala/{escalaId}")]
-        public async Task<ActionResult<List<ItemMissa>>> ObterPorEscalaId(int escalaId)
+        public async Task<ActionResult<List<ItemMissa>>> ObterPorMissaIdAsync(int escalaId)
         {
-            var itens = await _itemMissaService.ObterPorEscalaIdAsync(escalaId);
+            var itens = await _itemMissaService.ObterPorMissaIdAsync(escalaId);
             if (itens == null) return NotFound();
             return Ok(itens);
         }
@@ -27,7 +27,7 @@ namespace EscalaMensal.API.Controllers
         public async Task<ActionResult> Adicionar([FromBody] ItemMissa item)
         {
             await _itemMissaService.AdicionarAsync(item);
-            return CreatedAtAction(nameof(ObterPorEscalaId), new { missaId = item.MissaId }, item);
+            return CreatedAtAction(nameof(ObterPorMissaIdAsync), new { missaId = item.MissaId }, item);
         }
 
         [HttpPut("{id}")]

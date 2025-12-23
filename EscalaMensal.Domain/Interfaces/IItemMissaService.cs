@@ -6,7 +6,7 @@ namespace EscalaMensal.Domain.Interfaces
 {
     public interface IItemMissaService
     {
-        Task<List<ItemMissa>> ObterPorEscalaIdAsync(int escalaId);
+        Task<List<ItemMissa>> ObterPorMissaIdAsync(int escalaId);
         Task AdicionarAsync(ItemMissa item);
         Task AtualizarAsync(ItemMissa item);
         Task RemoverAsync(int id);
