@@ -34,8 +34,8 @@ namespace EscalaMensal.Infrastructure.Context
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<ItemMissa>()
-                .HasOne(i => i.Missas)
-                .WithMany(e => e.Itens)
+                .HasOne(i => i.Missa)
+                .WithMany(e => e.ItensMissa)
                 .HasForeignKey(i => i.MissaId)
                 .OnDelete(DeleteBehavior.Cascade);
 
@@ -43,12 +43,6 @@ namespace EscalaMensal.Infrastructure.Context
                 .HasOne(i => i.Usuario)
                 .WithMany()
                 .HasForeignKey(i => i.UsuarioId)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            modelBuilder.Entity<ItemMissa>()
-                .HasOne(i => i.Missas)
-                .WithMany()
-                .HasForeignKey(i => i.MissaId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<HistoricoEscala>()

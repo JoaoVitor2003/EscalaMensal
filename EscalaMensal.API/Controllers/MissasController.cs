@@ -15,9 +15,9 @@ namespace EscalaMensal.API.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<List<Missas>>> ObterPorEscalaId(int id)
+        public async Task<ActionResult<Missas>> ObterPorEscalaId(int id)
         {
-            return Ok(await _missasService.ObterPorEscalaIdAsync(id));
+            return Ok(await _missasService.ObterPorMissaIdAsync(id));
         }
 
         [HttpPost]

@@ -15,10 +15,10 @@ namespace EscalaMensal.API.Controllers
             _itemMissaService = itemMissaService;
         }
 
-        [HttpGet("por-escala/{escalaId}")]
-        public async Task<ActionResult<List<ItemMissa>>> ObterPorMissaIdAsync(int escalaId)
+        [HttpGet("por-escala/{missaId}")]
+        public async Task<ActionResult<List<ItemMissa>>> ObterPorMissaIdAsync(int missaId)
         {
-            var itens = await _itemMissaService.ObterPorMissaIdAsync(escalaId);
+            var itens = await _itemMissaService.ObterPorMissaIdAsync(missaId);
             if (itens == null) return NotFound();
             return Ok(itens);
         }

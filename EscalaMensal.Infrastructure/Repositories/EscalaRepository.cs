@@ -30,15 +30,19 @@ namespace EscalaMensal.Infrastructure.Repositories
         {
             return await _context.Escalas
                 .Include(e => e.Missas)
-                    .ThenInclude(i => i.Itens)
-                    .FirstOrDefaultAsync(e => e.Id == id);
+                    .ThenInclude(i => i.ItensMissa)
+                    .ThenInclude(f => f.Funcao)
+                .Include(e => e.Missas)
+                    .ThenInclude(m => m.ItensMissa)
+                    .ThenInclude(i => i.Usuario)
+                .FirstOrDefaultAsync(e => e.Id == id);
         }
 
         public async Task<Escala?> ObterPorMesAnoAsync(int mes, int ano)
         {
             return await _context.Escalas
                 .Include(e => e.Missas)
-                    .ThenInclude(i => i.Itens)
+                    .ThenInclude(i => i.ItensMissa)
                 .Where(e => e.Missas.Any(i => i.Dia.Month == mes && i.Dia.Year == ano))
                 .FirstOrDefaultAsync();
         }
@@ -47,7 +51,7 @@ namespace EscalaMensal.Infrastructure.Repositories
         {
             return await _context.Escalas
                 .Include(e => e.Missas)
-                    .ThenInclude(i => i.Itens)
+                    .ThenInclude(i => i.ItensMissa)
                 .ToListAsync();
         }
 

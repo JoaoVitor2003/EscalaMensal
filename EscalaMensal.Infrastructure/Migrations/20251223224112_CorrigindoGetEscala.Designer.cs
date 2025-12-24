@@ -4,6 +4,7 @@ using EscalaMensal.Infrastructure.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EscalaMensal.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251223224112_CorrigindoGetEscala")]
+    partial class CorrigindoGetEscala
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -248,6 +251,9 @@ namespace EscalaMensal.Infrastructure.Migrations
                     b.Property<int>("MissaId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("MissasId")
+                        .HasColumnType("int");
+
                     b.Property<int?>("UsuarioId")
                         .HasColumnType("int");
 
@@ -256,6 +262,8 @@ namespace EscalaMensal.Infrastructure.Migrations
                     b.HasIndex("FuncaoId");
 
                     b.HasIndex("MissaId");
+
+                    b.HasIndex("MissasId");
 
                     b.HasIndex("UsuarioId");
 
@@ -417,11 +425,15 @@ namespace EscalaMensal.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("EscalaMensal.Domain.Entities.Missas", "Missa")
-                        .WithMany("ItensMissa")
+                    b.HasOne("EscalaMensal.Domain.Entities.Missas", "Missas")
+                        .WithMany()
                         .HasForeignKey("MissaId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.HasOne("EscalaMensal.Domain.Entities.Missas", null)
+                        .WithMany("Itens")
+                        .HasForeignKey("MissasId");
 
                     b.HasOne("EscalaMensal.Domain.Entities.Usuario", "Usuario")
                         .WithMany()
@@ -430,7 +442,7 @@ namespace EscalaMensal.Infrastructure.Migrations
 
                     b.Navigation("Funcao");
 
-                    b.Navigation("Missa");
+                    b.Navigation("Missas");
 
                     b.Navigation("Usuario");
                 });
@@ -474,7 +486,7 @@ namespace EscalaMensal.Infrastructure.Migrations
 
             modelBuilder.Entity("EscalaMensal.Domain.Entities.Missas", b =>
                 {
-                    b.Navigation("ItensMissa");
+                    b.Navigation("Itens");
                 });
 
             modelBuilder.Entity("EscalaMensal.Domain.Entities.Usuario", b =>

@@ -29,11 +29,14 @@ namespace EscalaMensal.Infrastructure.Repositories
             await _context.SaveChangesAsync();
         }
 
-        public async Task<List<Missas>> ObterPorEscalaIdAsync(int escalaId)
+        public async Task<Missas> ObterPorMissaIdAsync(int missaId)
         {
             return await _context.Missas
-                .Where(m => m.EscalaId == escalaId)
-                .ToListAsync();
+                    .Include(m => m.ItensMissa)
+                    .ThenInclude(f => f.Funcao)
+                    .Include(m => m.ItensMissa)
+                    .ThenInclude(u => u.Usuario)
+                    .FirstAsync(m => m.Id == missaId);
         }
 
         public async Task RemoverAsync(int id)

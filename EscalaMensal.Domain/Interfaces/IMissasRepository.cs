@@ -9,7 +9,7 @@ namespace EscalaMensal.Domain.Interfaces
 {
     public interface IMissasRepository
     {
-        Task<List<Missas>> ObterPorEscalaIdAsync(int escalaId);
+        Task<Missas> ObterPorMissaIdAsync(int missaId);
         Task AdicionarAsync(Missas missa);
         Task AtualizarAsync(Missas missa);
         Task RemoverAsync(int id);

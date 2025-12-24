@@ -26,9 +26,9 @@ namespace EscalaMensal.Application.Services
             await _missaRepository.AtualizarAsync(missa);
         }
 
-        public async Task<List<Missas>> ObterPorEscalaIdAsync(int escalaId)
+        public async Task<Missas> ObterPorMissaIdAsync(int missaId)
         {
-            return await _missaRepository.ObterPorEscalaIdAsync(escalaId);
+            return await _missaRepository.ObterPorMissaIdAsync(missaId);
         }
 
         public async Task RemoverAsync(int id)

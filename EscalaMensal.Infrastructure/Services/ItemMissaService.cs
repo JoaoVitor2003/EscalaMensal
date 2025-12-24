@@ -31,7 +31,7 @@ namespace EscalaMensal.Application.Services
 
         public async Task AdicionarAsync(ItemMissa item)
         {
-            var funcao = await _funcaoRepository.ObterPorIdAsync(item.MissaId);
+            var funcao = await _funcaoRepository.ObterPorIdAsync(item.FuncaoId);
 
             if (funcao == null) throw new Exception("Função não encontrada.");
 

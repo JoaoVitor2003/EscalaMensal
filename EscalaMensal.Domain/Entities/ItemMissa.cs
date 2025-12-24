@@ -12,12 +12,12 @@ namespace EscalaMensal.Domain.Entities
     {
         public int Id { get; private set; }
         public int MissaId { get; private set; }
-        public Missas? Missas { get; private set; }
+        [JsonIgnore]
+        public Missas? Missa { get; private set; }
         public int FuncaoId { get; private set; }
         public Funcao? Funcao { get; private set; }
         public int? UsuarioId { get; private set; }
         public Usuario? Usuario { get; private set; }
-
         public ItemMissa(int missaId, int funcaoId, int? usuarioId = null)
         {
             MissaId = missaId;
