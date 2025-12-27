@@ -52,6 +52,10 @@ namespace EscalaMensal.Infrastructure.Repositories
             return await _context.Escalas
                 .Include(e => e.Missas)
                     .ThenInclude(i => i.ItensMissa)
+                    .ThenInclude(i => i.Funcao)
+                .Include(e => e.Missas)
+                    .ThenInclude(i => i.ItensMissa)
+                    .ThenInclude(i => i.Usuario)
                 .ToListAsync();
         }
 
