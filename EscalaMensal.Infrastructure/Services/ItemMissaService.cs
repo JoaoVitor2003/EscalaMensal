@@ -47,7 +47,7 @@ namespace EscalaMensal.Application.Services
 
                 (_, var u) when u.Cargo < funcao.Cargo => $"Usuário '{u.Nome}' não tem patente suficiente.",
 
-                (1, var u) when u.Cargo == CargoEnum.Coroinha => "Coroinhas não podem assumir a função 1.",
+                (1, var u) when u.Cargo == CargoEnum.Coroinha => "Coroinhas não podem assumir essa função.",
 
                 (6, var u) when u.Cargo == CargoEnum.Coroinha && u.Nivel < NivelEnum.Nivel2
                      => "Coroinhas precisam ser Nível 2 para esta função.",
@@ -65,6 +65,33 @@ namespace EscalaMensal.Application.Services
 
         public async Task AtualizarAsync(ItemMissa item)
         {
+            var funcao = await _funcaoRepository.ObterPorIdAsync(item.FuncaoId);
+
+            if (funcao == null) throw new Exception("Função não encontrada.");
+
+            var usuario = item.UsuarioId.HasValue
+                          ? await _usuarioRepository.ObterPorIdAsync(item.UsuarioId.Value)
+                          : null;
+
+            string? erro = (funcao.Id, usuario) switch
+            {
+                (_, null) => null,
+
+                (_, var u) when u.Cargo < funcao.Cargo => $"Usuário '{u.Nome}' não tem patente suficiente.",
+
+                (1, var u) when u.Cargo == CargoEnum.Coroinha => "Coroinhas não podem assumir essa função.",
+
+                (6, var u) when u.Cargo == CargoEnum.Coroinha && u.Nivel < NivelEnum.Nivel2
+                     => "Coroinhas precisam ser Nível 2 para esta função.",
+
+                _ => null
+            };
+
+            if (erro != null)
+            {
+                throw new DomainException(erro);
+            }
+
             await _itemMissaRepository.AtualizarAsync(item);
         }
 
