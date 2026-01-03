@@ -2,6 +2,7 @@
 using EscalaMensal.Domain.Interfaces;
 using EscalaMensal.Infrastructure.Context;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Cryptography.X509Certificates;
 
 public class EscalaItemRepository : IItemMissaRepository
 {
@@ -41,5 +42,10 @@ public class EscalaItemRepository : IItemMissaRepository
             _context.ItensMissa.Remove(item);
             await _context.SaveChangesAsync();
         }
+    }
+
+    public async Task<bool> ExisteUsuarioNaMissaAsync(int missaId, int usuarioId)
+    {
+        return await _context.ItensMissa.AnyAsync(m => m.MissaId == missaId && m.UsuarioId == usuarioId);
     }
 }
