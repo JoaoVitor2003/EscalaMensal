@@ -29,6 +29,12 @@ namespace EscalaMensal.Infrastructure.Repositories
             await _context.SaveChangesAsync();
         }
 
+        public Task<bool> ExistePorDiaHorarioEscalaAsync(DateOnly dia, TimeOnly horario, int escalaId)
+        {
+            return _context.Missas
+                .AnyAsync(m => m.Dia == dia && m.Horario == horario && m.EscalaId == escalaId);
+        }
+
         public async Task<Missas> ObterPorMissaIdAsync(int missaId)
         {
             return await _context.Missas

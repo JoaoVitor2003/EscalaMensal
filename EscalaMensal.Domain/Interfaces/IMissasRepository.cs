@@ -10,6 +10,7 @@ namespace EscalaMensal.Domain.Interfaces
     public interface IMissasRepository
     {
         Task<Missas> ObterPorMissaIdAsync(int missaId);
+        Task<bool> ExistePorDiaHorarioEscalaAsync(DateOnly dia, TimeOnly horario, int escalaId);
         Task AdicionarAsync(Missas missa);
         Task AtualizarAsync(Missas missa);
         Task RemoverAsync(int id);
