@@ -54,7 +54,7 @@ namespace EscalaMensal.Application.Services
 
                 (_, null) => null,
 
-                (_, var u) when u.Cargo < funcao.Cargo => $"Usuário '{u.Nome}' não tem patente suficiente.",
+                (_, var u) when u.Cargo < funcao.Cargo => $"Essa pessoa '{u.Nome}' não tem é um {funcao.Cargo} para servir nessa função.",
 
                 (1, var u) when u.Cargo == CargoEnum.Coroinha => "Coroinhas não podem assumir essa função.",
 
@@ -97,7 +97,7 @@ namespace EscalaMensal.Application.Services
 
                 (_, null) => null,
 
-                (_, var u) when u.Cargo < funcao.Cargo => $"Usuário '{u.Nome}' não tem patente suficiente.",
+                (_, var u) when u.Cargo < funcao.Cargo => $"Essa pessoa '{u.Nome}' não tem é um {funcao.Cargo} para servir nessa função.",
 
                 (1, var u) when u.Cargo == CargoEnum.Coroinha => "Coroinhas não podem assumir essa função.",
 
