@@ -82,8 +82,19 @@ namespace EscalaMensal.Application.Services
                           ? await _usuarioRepository.ObterPorIdAsync(item.UsuarioId.Value)
                           : null;
 
+            if (usuario != null)
+            {
+                bool jaEscalado = await _itemMissaRepository.ExisteUsuarioNaMissaAsync(item.MissaId, usuario.Id);
+                if (jaEscalado)
+                {
+                    throw new DomainException($"O usuário '{usuario.Nome}' já está escalado para outra função nesta missa.");
+                }
+            }
+
             string? erro = (funcao.Id, usuario) switch
             {
+                (_, null) when funcao.Obrigatoria => $"A função '{funcao.Nome}' é obrigatória.",
+
                 (_, null) => null,
 
                 (_, var u) when u.Cargo < funcao.Cargo => $"Usuário '{u.Nome}' não tem patente suficiente.",
