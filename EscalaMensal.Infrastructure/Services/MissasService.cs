@@ -28,6 +28,11 @@ namespace EscalaMensal.Application.Services
 
         public async Task AtualizarAsync(Missas missa)
         {
+            var missaExistente = await _missaRepository.ExistePorDiaHorarioEscalaAsync(missa.Dia, missa.Horario, missa.EscalaId);
+            if (missaExistente)
+            {
+                throw new Exception("Já existe uma missa cadastrada para o mesmo dia, horário nessa escala.");
+            }
             await _missaRepository.AtualizarAsync(missa);
         }
 
