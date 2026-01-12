@@ -61,7 +61,11 @@ namespace EscalaMensal.Infrastructure.Repositories
 
         public async Task RemoverAsync(int id)
         {
-            var escala = await _context.Escalas.FindAsync(id);
+            var escala = await _context.Escalas
+                    .Include(e => e.Missas)
+                        .ThenInclude(m => m.ItensMissa)
+                    .FirstOrDefaultAsync(e => e.Id == id);
+
             if (escala is not null)
             {
                 _context.Escalas.Remove(escala);
