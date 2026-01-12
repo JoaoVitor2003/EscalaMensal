@@ -11,7 +11,8 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowMyFrontendPolicy", policy =>
     {
         // Agora podemos voltar para a versão segura, especificando a origem
-        policy.WithOrigins("http://localhost:5173")
+        policy.WithOrigins("http://localhost:5173");
+        policy.WithOrigins("https://localhost:7185")
               .AllowAnyHeader()
               .AllowAnyMethod();
     });

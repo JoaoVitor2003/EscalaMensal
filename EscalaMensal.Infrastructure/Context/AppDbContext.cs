@@ -33,6 +33,12 @@ namespace EscalaMensal.Infrastructure.Context
                 .HasForeignKey(u => u.UsuarioVinculadoId)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            modelBuilder.Entity<Escala>()
+                .HasMany(e => e.Missas)
+                .WithOne(m => m.Escala)
+                .HasForeignKey(m => m.EscalaId)
+                .OnDelete(DeleteBehavior.Cascade);
+
             modelBuilder.Entity<ItemMissa>()
                 .HasOne(i => i.Missa)
                 .WithMany(e => e.ItensMissa)
@@ -75,7 +81,7 @@ namespace EscalaMensal.Infrastructure.Context
                     Cargo = CargoEnum.Cerimoniario,
                     NivelMinimo = NivelEnum.Nivel3
                 },
-                new Funcao(2,"Cerimoniário Auxiliar 1", false)
+                new Funcao(2, "Cerimoniário Auxiliar 1", false)
                 {
                     Abreviacao = "CA1",
                     Cargo = CargoEnum.Cerimoniario,
