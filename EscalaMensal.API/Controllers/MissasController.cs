@@ -1,4 +1,6 @@
-﻿using EscalaMensal.Domain.Entities;
+﻿using AutoMapper;
+using EscalaMensal.Application.DTOs.Missa;
+using EscalaMensal.Domain.Entities;
 using EscalaMensal.Domain.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,15 +11,23 @@ namespace EscalaMensal.API.Controllers
     public class MissasController : Controller
     {
         private readonly IMissasService _missasService;
-        public MissasController(IMissasService missasService)
+        private readonly IMapper _mapper;
+        public MissasController(IMissasService missasService, IMapper mapper)
         {
             _missasService = missasService;
+            _mapper = mapper;
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<Missas>> ObterPorEscalaId(int id)
+        public async Task<ActionResult<MissasDto>> ObterPorEscalaId(int id)
         {
-            return Ok(await _missasService.ObterPorMissaIdAsync(id));
+            var missas = await _missasService.ObterPorMissaIdAsync(id);
+
+            if (missas == null)
+                return NotFound();
+
+            var dto = _mapper.Map<MissasDto>(missas);
+            return Ok(dto);
         }
 
         [HttpPost]

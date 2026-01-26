@@ -1,8 +1,11 @@
+using EscalaMensal.Application.DTOs.Funcao;
+using EscalaMensal.Application.Mappings;
 using EscalaMensal.Application.Services;
 using EscalaMensal.Domain.Interfaces;
 using EscalaMensal.Infrastructure.Context;
 using EscalaMensal.Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -44,6 +47,10 @@ builder.Services.AddScoped<IMissasService, MissasService>();
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddAutoMapper(typeof(MissaProfile));
+builder.Services.AddAutoMapper(typeof(ItemMissaProfile));
+builder.Services.AddAutoMapper(typeof(FuncaoDto));
 
 builder.Services.AddCors(options =>
 {
