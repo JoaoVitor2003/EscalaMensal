@@ -1,4 +1,6 @@
-﻿using EscalaMensal.Domain.Entities;
+﻿using AutoMapper;
+using EscalaMensal.Application.DTOs.Funcao;
+using EscalaMensal.Domain.Entities;
 using EscalaMensal.Domain.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,26 +11,32 @@ namespace EscalaMensal.API.Controllers
     public class FuncaoController : ControllerBase
     {
         private readonly IFuncaoService _funcaoService;
+        private readonly IMapper _mapper;
 
-        public FuncaoController(IFuncaoService funcaoService)
+        public FuncaoController(IFuncaoService funcaoService, IMapper mapper)
         {
             _funcaoService = funcaoService;
+            _mapper = mapper;
         }
 
         [HttpGet]
-        public async Task<ActionResult<List<Funcao>>> ObterTodas()
+        public async Task<ActionResult<List<FuncaoDto>>> ObterTodas()
         {
-            return Ok(await _funcaoService.ObterTodasAsync());
+            var funcoes = await _funcaoService.ObterTodasAsync();
+            var dto = _mapper.Map<List<FuncaoDto>>(funcoes);
+            return Ok(dto);
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<Funcao>> ObterPorId(int id)
+        public async Task<ActionResult<FuncaoDto>> ObterPorId(int id)
         {
             var funcao = await _funcaoService.ObterPorIdAsync(id);
             if (funcao == null)
                 return NotFound();
 
-            return Ok(funcao);
+            var dto = _mapper.Map<FuncaoDto>(funcao);
+
+            return Ok(dto);
         }
 
         [HttpPost]

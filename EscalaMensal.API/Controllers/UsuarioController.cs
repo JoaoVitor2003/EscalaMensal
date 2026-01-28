@@ -1,4 +1,6 @@
-﻿using EscalaMensal.Domain.Entities;
+﻿using AutoMapper;
+using EscalaMensal.Application.DTOs.Usuario;
+using EscalaMensal.Domain.Entities;
 using EscalaMensal.Domain.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,27 +11,32 @@ namespace EscalaMensal.API.Controllers
     public class UsuarioController : ControllerBase
     {
         private readonly IUsuarioService _usuarioService;
+        private readonly IMapper _mapper;
 
-        public UsuarioController(IUsuarioService usuarioService)
+        public UsuarioController(IUsuarioService usuarioService, IMapper mapper)
         {
             _usuarioService = usuarioService;
+            _mapper = mapper;
         }
 
         [HttpGet]
-        public async Task<ActionResult<List<Usuario>>> ObterTodos()
+        public async Task<ActionResult<List<UsuarioDto>>> ObterTodos()
         {
             var usuarios = await _usuarioService.ObterTodosAsync();
-            return Ok(usuarios);
+            var dto = _mapper.Map<List<UsuarioDto>>(usuarios);
+            return Ok(dto);
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<Usuario>> ObterPorId(int id)
+        public async Task<ActionResult<UsuarioDto>> ObterPorId(int id)
         {
             var usuario = await _usuarioService.ObterPorIdAsync(id);
             if (usuario == null)
                 return NotFound();
 
-            return Ok(usuario);
+            var dto = _mapper.Map<UsuarioDto>(usuario);
+
+            return Ok(dto);
         }
 
         [HttpPost]

@@ -30,12 +30,14 @@ namespace EscalaMensal.API.Controllers
             return Ok(dto);
         }
         [HttpGet("{id}")]
-        public async Task<ActionResult<Escala>> ObterPorId(int id)
+        public async Task<ActionResult<EscalaDto>> ObterPorId(int id)
         {
             var escala = await _escalaService.ObterPorIdAsync(id);
             if (escala == null)
                 return NotFound();
-            return Ok(escala);
+
+            var dto = _mapper.Map<EscalaDto>(escala);
+            return Ok(dto);
         }
 
         [HttpGet("por-mes-ano")]
