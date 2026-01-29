@@ -51,10 +51,11 @@ namespace EscalaMensal.API.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult> Adicionar([FromBody] Escala novaEscala)
+        public async Task<ActionResult> Adicionar([FromBody] EscalaAdicionarDto novaEscala)
         {
-            await _escalaService.AdicionarAsync(novaEscala);
-            return CreatedAtAction(nameof(ObterPorMesAno), new { mes = novaEscala.Missas.FirstOrDefault()?.Dia.Month, ano = novaEscala.Missas.FirstOrDefault()?.Dia.Year }, novaEscala);
+            var novaEscalaEntity = _mapper.Map<Escala>(novaEscala);
+            await _escalaService.AdicionarAsync(novaEscalaEntity);
+            return CreatedAtAction(nameof(ObterPorMesAno), new { mes = novaEscalaEntity.Missas.FirstOrDefault()?.Dia.Month, ano = novaEscalaEntity.Missas.FirstOrDefault()?.Dia.Year }, novaEscala);
         }
 
         [HttpPut("{id}")]
