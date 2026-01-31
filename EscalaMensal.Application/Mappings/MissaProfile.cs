@@ -14,6 +14,7 @@ namespace EscalaMensal.Application.Mappings
         public MissaProfile()
         {
             CreateMap<Missas, MissasDto>();
+            CreateMap<MissaAdicionarDto, Missas>();
         }
     }
 }

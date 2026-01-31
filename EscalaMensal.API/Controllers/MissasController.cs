@@ -31,10 +31,11 @@ namespace EscalaMensal.API.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult> Adicionar([FromBody] Missas missa)
+        public async Task<ActionResult> Adicionar([FromBody] MissaAdicionarDto missa)
         {
-            await _missasService.AdicionarAsync(missa);
-            return CreatedAtAction(nameof(ObterPorEscalaId), new { id = missa.EscalaId }, missa);
+            var missaEntity = _mapper.Map<Missas>(missa);
+            await _missasService.AdicionarAsync(missaEntity);
+            return CreatedAtAction(nameof(ObterPorEscalaId), new { id = missaEntity.EscalaId }, missaEntity);
         }
 
         [HttpPut("{id}")]
