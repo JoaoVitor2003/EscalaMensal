@@ -1,4 +1,6 @@
-﻿using EscalaMensal.Domain.Entities;
+﻿using AutoMapper;
+using EscalaMensal.Application.DTOs.Restricao;
+using EscalaMensal.Domain.Entities;
 using EscalaMensal.Domain.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,10 +11,12 @@ namespace EscalaMensal.API.Controllers
     public class RestricaoController : ControllerBase
     {
         private readonly IRestricaoService _restricaoService;
+        private readonly IMapper _mapper;
 
-        public RestricaoController(IRestricaoService restricaoService)
+        public RestricaoController(IRestricaoService restricaoService, IMapper mapper)
         {
             _restricaoService = restricaoService;
+            _mapper = mapper;
         }
 
         [HttpGet("mes/{mes}/ano/{ano}")]
@@ -30,10 +34,11 @@ namespace EscalaMensal.API.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Adicionar([FromBody] Restricao restricao)
+        public async Task<IActionResult> Adicionar([FromBody] RestricaoDto restricao)
         {
-            await _restricaoService.AdicionarAsync(restricao);
-            return CreatedAtAction(nameof(ObterPorMesAno), new { mes = restricao.Data.Month, ano = restricao.Data.Year }, restricao);
+            var restricaoEntity = _mapper.Map<Restricao>(restricao);
+            await _restricaoService.AdicionarAsync(restricaoEntity);
+            return CreatedAtAction(nameof(ObterPorMesAno), new { mes = restricaoEntity.Data.Month, ano = restricaoEntity.Data.Year }, restricaoEntity);
         }
 
         [HttpPut("{id}")]
