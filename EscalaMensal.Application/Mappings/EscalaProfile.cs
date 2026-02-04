@@ -15,6 +15,8 @@ namespace EscalaMensal.Application.Mappings
         {
             CreateMap<Escala, EscalaDto>();
             CreateMap<EscalaAdicionarDto, Escala>();
+            CreateMap<EscalaAtualizarDto, Escala>();
+            CreateMap<EscalaDeleteDto, Escala>();
         }
     }
 }

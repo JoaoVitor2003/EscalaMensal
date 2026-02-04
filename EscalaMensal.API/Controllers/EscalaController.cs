@@ -59,18 +59,24 @@ namespace EscalaMensal.API.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<ActionResult> Atualizar(int id, [FromBody] Escala escala)
+        public async Task<ActionResult> Atualizar(int id, [FromBody] EscalaAtualizarDto escalaDto)
         {
-            if (id != escala.Id)
-                return BadRequest("ID da URL difere do corpo da requisição.");
+            if (escalaDto == null) return BadRequest();
 
-            await _escalaService.AtualizarAsync(escala);
+            var escalaExistente = await _escalaService.ObterPorIdAsync(id);
+            if (escalaExistente == null) return NotFound("Escala não encontrada.");
+
+            _mapper.Map(escalaDto, escalaExistente);
+
+            await _escalaService.AtualizarAsync(escalaExistente);
+
             return NoContent();
         }
 
         [HttpDelete("{id}")]
-        public async Task<ActionResult> Remover(int id)
+        public async Task<ActionResult> Remover(EscalaDeleteDto dto)
         {
+            var id = dto.Id;
             await _escalaService.RemoverAsync(id);
             return NoContent();
         }
