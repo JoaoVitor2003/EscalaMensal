@@ -7,9 +7,8 @@ using System.Threading.Tasks;
 
 namespace EscalaMensal.Application.DTOs.Restricao
 {
-    public class RestricaoAdicionarDto
+    public class RestricaoAtualizarDto
     {
-        public int Id { get; set; }
         public int UsuarioId { get; set; }
         public DateTime Data { get; set; }
     }
