@@ -14,6 +14,7 @@ namespace EscalaMensal.Application.Mappings
         public FuncaoProfile()
         {
             CreateMap<Funcao, FuncaoDto>();
+            CreateMap<FuncaoAdicionarDto, Funcao>();
         }
     }
 }

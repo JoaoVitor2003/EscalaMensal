@@ -40,10 +40,11 @@ namespace EscalaMensal.API.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult> Adicionar(Funcao funcao)
+        public async Task<ActionResult> Adicionar(FuncaoAdicionarDto funcao)
         {
-            await _funcaoService.AdicionarAsync(funcao);
-            return CreatedAtAction(nameof(ObterPorId), new { id = funcao.Id }, funcao);
+            var funcaoEntity = _mapper.Map<Funcao>(funcao);
+            await _funcaoService.AdicionarAsync(funcaoEntity);
+            return CreatedAtAction(nameof(ObterPorId), new { id = funcaoEntity.Id }, funcaoEntity);
         }
 
         [HttpPut("{id}")]
