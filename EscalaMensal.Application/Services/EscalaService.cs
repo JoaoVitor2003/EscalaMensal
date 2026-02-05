@@ -1,4 +1,6 @@
-﻿using EscalaMensal.Domain.Entities;
+﻿using AutoMapper;
+using EscalaMensal.Application.DTOs.Escala;
+using EscalaMensal.Domain.Entities;
 using EscalaMensal.Domain.Interfaces;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -8,10 +10,12 @@ namespace EscalaMensal.Application.Services
     public class EscalaService : IEscalaService
     {
         private readonly IEscalaRepository _escalaRepository;
+        private readonly IMapper _mapper;
 
-        public EscalaService(IEscalaRepository escalaRepository)
+        public EscalaService(IEscalaRepository escalaRepository, IMapper mapper)
         {
             _escalaRepository = escalaRepository;
+            _mapper = mapper;
         }
 
         public async Task<Escala?> ObterPorMesAnoAsync(int mes, int ano)
@@ -29,8 +33,15 @@ namespace EscalaMensal.Application.Services
             await _escalaRepository.AdicionarAsync(escala);
         }
 
-        public async Task AtualizarAsync(Escala escala)
+        public async Task AtualizarAsync(EscalaAtualizarDto escalaDto)
         {
+            var escala = await _escalaRepository.ObterPorIdAsync(escalaDto.Id);
+
+            if (escala == null)
+                throw new Exception("Escala não encontrada.");
+
+            _mapper.Map(escalaDto, escala);
+
             await _escalaRepository.AtualizarAsync(escala);
         }
 

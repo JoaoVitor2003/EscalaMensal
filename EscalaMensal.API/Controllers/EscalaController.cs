@@ -61,15 +61,8 @@ namespace EscalaMensal.API.Controllers
         [HttpPut("{id}")]
         public async Task<ActionResult> Atualizar(int id, [FromBody] EscalaAtualizarDto escalaDto)
         {
-            if (escalaDto == null) return BadRequest();
-
-            var escalaExistente = await _escalaService.ObterPorIdAsync(id);
-            if (escalaExistente == null) return NotFound("Escala não encontrada.");
-
-            _mapper.Map(escalaDto, escalaExistente);
-
-            await _escalaService.AtualizarAsync(escalaExistente);
-
+            escalaDto.Id = id;
+            await _escalaService.AtualizarAsync(escalaDto);
             return NoContent();
         }
 

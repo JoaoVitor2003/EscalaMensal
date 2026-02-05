@@ -1,4 +1,5 @@
-﻿using EscalaMensal.Domain.Entities;
+﻿using EscalaMensal.Application.DTOs.Escala;
+using EscalaMensal.Domain.Entities;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -10,7 +11,7 @@ namespace EscalaMensal.Domain.Interfaces
         Task<List<Escala>> ObterTodasAsync();
         Task<Escala?> ObterPorIdAsync(int id);
         Task AdicionarAsync(Escala escala);
-        Task AtualizarAsync(Escala escala);
+        Task AtualizarAsync(EscalaAtualizarDto escala);
         Task RemoverAsync(int id);
     }
 }
