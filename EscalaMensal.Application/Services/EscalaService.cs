@@ -28,9 +28,10 @@ namespace EscalaMensal.Application.Services
             return await _escalaRepository.ObterTodasAsync();
         }
 
-        public async Task AdicionarAsync(Escala escala)
+        public async Task AdicionarAsync(EscalaAdicionarDto escala)
         {
-            await _escalaRepository.AdicionarAsync(escala);
+            var novaEscalaEntity = _mapper.Map<Escala>(escala);
+            await _escalaRepository.AdicionarAsync(novaEscalaEntity);
         }
 
         public async Task AtualizarAsync(EscalaAtualizarDto escalaDto)
