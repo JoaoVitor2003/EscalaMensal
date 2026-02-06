@@ -18,14 +18,19 @@ namespace EscalaMensal.Application.Services
             _mapper = mapper;
         }
 
-        public async Task<Escala?> ObterPorMesAnoAsync(int mes, int ano)
+        public async Task<EscalaDto?> ObterPorMesAnoAsync(int mes, int ano)
         {
-            return await _escalaRepository.ObterPorMesAnoAsync(mes, ano);
+            var escala = await _escalaRepository.ObterPorMesAnoAsync(mes, ano);
+            var dto = _mapper.Map<EscalaDto>(escala);
+            return dto;
         }
 
-        public async Task<List<Escala>> ObterTodasAsync()
+        public async Task<List<EscalaDto>> ObterTodasAsync()
         {
-            return await _escalaRepository.ObterTodasAsync();
+            var escalas = await _escalaRepository.ObterTodasAsync();
+            var dto = _mapper.Map<List<EscalaDto>>(escalas);
+
+            return dto;
         }
 
         public async Task AdicionarAsync(EscalaAdicionarDto escala)
@@ -51,9 +56,12 @@ namespace EscalaMensal.Application.Services
             await _escalaRepository.RemoverAsync(id);
         }
 
-        public async Task<Escala?> ObterPorIdAsync(int id)
+        public async Task<EscalaDto?> ObterPorIdAsync(int id)
         {
-            return await _escalaRepository.ObterPorIdAsync(id);
+            var escala = await _escalaRepository.ObterPorIdAsync(id);
+
+            var dto = _mapper.Map<EscalaDto>(escala);
+            return dto;
         }
     }
 }
