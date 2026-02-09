@@ -20,7 +20,6 @@ namespace EscalaMensal.API.Controllers
         {
             var escalas = await _escalaService.ObterTodasAsync();
 
-
             return Ok(escalas);
         }
         [HttpGet("{id}")]

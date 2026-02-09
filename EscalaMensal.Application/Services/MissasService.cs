@@ -1,44 +1,46 @@
-﻿using EscalaMensal.Domain.Entities;
+﻿using AutoMapper;
+using EscalaMensal.Application.DTOs.Missa;
+using EscalaMensal.Domain.Entities;
 using EscalaMensal.Domain.Interfaces;
-using EscalaMensal.Infrastructure.Repositories;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace EscalaMensal.Application.Services
 {
     public class MissasService : IMissasService
     {
         private readonly IMissasRepository _missaRepository;
-        public MissasService(IMissasRepository missaRepository)
+        private readonly IMapper _mapper;
+        public MissasService(IMissasRepository missaRepository, IMapper mapper)
         {
             _missaRepository = missaRepository;
+            _mapper = mapper;
         }
-        public async Task AdicionarAsync(Missas missa)
+        public async Task AdicionarAsync(MissaAdicionarDto missa)
+        {
+            var missaEntity = _mapper.Map<Missas>(missa);
+            var missaExistente = await _missaRepository.ExistePorDiaHorarioEscalaAsync(missa.Dia, missa.Horario, missa.EscalaId);
+            if (missaExistente)
+            {
+                throw new Exception("Já existe uma missa cadastrada para o mesmo dia, horário nessa escala.");
+            }
+            await _missaRepository.AdicionarAsync(missaEntity);
+        }
+
+        public async Task AtualizarAsync(MissaAtualizarDto missa)
         {
             var missaExistente = await _missaRepository.ExistePorDiaHorarioEscalaAsync(missa.Dia, missa.Horario, missa.EscalaId);
             if (missaExistente)
             {
                 throw new Exception("Já existe uma missa cadastrada para o mesmo dia, horário nessa escala.");
             }
-            await _missaRepository.AdicionarAsync(missa);
+            var missaEntity = _mapper.Map<Missas>(missa);
+            await _missaRepository.AtualizarAsync(missaEntity);
         }
 
-        public async Task AtualizarAsync(Missas missa)
+        public async Task<MissasDto> ObterPorMissaIdAsync(int missaId)
         {
-            var missaExistente = await _missaRepository.ExistePorDiaHorarioEscalaAsync(missa.Dia, missa.Horario, missa.EscalaId);
-            if (missaExistente)
-            {
-                throw new Exception("Já existe uma missa cadastrada para o mesmo dia, horário nessa escala.");
-            }
-            await _missaRepository.AtualizarAsync(missa);
-        }
-
-        public async Task<Missas> ObterPorMissaIdAsync(int missaId)
-        {
-            return await _missaRepository.ObterPorMissaIdAsync(missaId);
+            var missa = await _missaRepository.ObterPorMissaIdAsync(missaId);
+            var dto = _mapper.Map<MissasDto>(missa);
+            return dto;
         }
 
         public async Task RemoverAsync(int id)

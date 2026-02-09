@@ -1,4 +1,5 @@
-﻿using EscalaMensal.Domain.Entities;
+﻿using EscalaMensal.Application.DTOs.Missa;
+using EscalaMensal.Domain.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,9 +10,9 @@ namespace EscalaMensal.Domain.Interfaces
 {
     public interface IMissasService
     {
-        Task<Missas> ObterPorMissaIdAsync(int missaId);
-        Task AdicionarAsync(Missas missa);
-        Task AtualizarAsync(Missas missa);
+        Task<MissasDto> ObterPorMissaIdAsync(int missaId);
+        Task AdicionarAsync(MissaAdicionarDto missa);
+        Task AtualizarAsync(MissaAtualizarDto missa);
         Task RemoverAsync(int id);
     }
 }
