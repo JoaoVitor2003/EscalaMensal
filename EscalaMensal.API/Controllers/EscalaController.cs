@@ -1,7 +1,4 @@
-﻿using AutoMapper;
-using EscalaMensal.Application.DTOs.Escala;
-using EscalaMensal.Application.Services;
-using EscalaMensal.Domain.Entities;
+﻿using EscalaMensal.Application.DTOs.Escala;
 using EscalaMensal.Domain.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
@@ -12,12 +9,10 @@ namespace EscalaMensal.API.Controllers
     public class EscalaController : ControllerBase
     {
         private readonly IEscalaService _escalaService;
-        private readonly IMapper _mapper;
 
-        public EscalaController(IEscalaService escalaService, IMapper mapper)
+        public EscalaController(IEscalaService escalaService)
         {
             _escalaService = escalaService;
-            _mapper = mapper;
         }
 
         [HttpGet]
