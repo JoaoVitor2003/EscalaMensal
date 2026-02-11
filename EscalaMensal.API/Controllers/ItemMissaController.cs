@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using EscalaMensal.Application.DTOs.Escala;
 using EscalaMensal.Application.DTOs.ItemMissa;
 using EscalaMensal.Domain.Entities;
 using EscalaMensal.Domain.Interfaces;
@@ -25,32 +26,30 @@ namespace EscalaMensal.API.Controllers
             var itens = await _itemMissaService.ObterPorMissaIdAsync(missaId);
             if (itens == null) return NotFound();
 
-            var dto = _mapper.Map<List<ItemMissaDto>>(itens);
-
-            return Ok(dto);
+            return Ok(itens);
         }
 
         [HttpPost]
         public async Task<ActionResult> Adicionar([FromBody] ItemMissaAdicionarDto item)
         {
-            var itemMissaEntity = _mapper.Map<ItemMissa>(item);
-            await _itemMissaService.AdicionarAsync(itemMissaEntity);
-            return Ok(itemMissaEntity);
+            await _itemMissaService.AdicionarAsync(item);
+            return Ok(item);
         }
 
         [HttpPut("{id}")]
-        public async Task<ActionResult> Atualizar(int id, [FromBody] ItemMissa item)
+        public async Task<ActionResult> Atualizar(int id, [FromBody] ItemMissaAtualizarDto item)
         {
             if (id != item.Id)
                 return BadRequest("O ID do item não confere.");
-
+            item.Id = id;
             await _itemMissaService.AtualizarAsync(item);
             return NoContent();
         }
 
         [HttpDelete("{id}")]
-        public async Task<ActionResult> Remover(int id)
+        public async Task<ActionResult> Remover(ItemMissaDeleteDto dto)
         {
+            var id = dto.Id;
             await _itemMissaService.RemoverAsync(id);
             return NoContent();
         }
