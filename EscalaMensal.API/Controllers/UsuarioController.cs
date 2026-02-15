@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using EscalaMensal.Application.DTOs.Escala;
 using EscalaMensal.Application.DTOs.Usuario;
 using EscalaMensal.Domain.Entities;
 using EscalaMensal.Domain.Interfaces;
@@ -23,8 +24,7 @@ namespace EscalaMensal.API.Controllers
         public async Task<ActionResult<List<UsuarioDto>>> ObterTodos()
         {
             var usuarios = await _usuarioService.ObterTodosAsync();
-            var dto = _mapper.Map<List<UsuarioDto>>(usuarios);
-            return Ok(dto);
+            return Ok(usuarios);
         }
 
         [HttpGet("{id}")]
@@ -34,32 +34,31 @@ namespace EscalaMensal.API.Controllers
             if (usuario == null)
                 return NotFound();
 
-            var dto = _mapper.Map<UsuarioDto>(usuario);
-
-            return Ok(dto);
+            return Ok(usuario);
         }
 
         [HttpPost]
         public async Task<ActionResult> Adicionar([FromBody] UsuarioAdicionarDto usuario)
         {
-            var usuarioEntity = _mapper.Map<Usuario>(usuario);
-            await _usuarioService.AdicionarAsync(usuarioEntity);
-            return CreatedAtAction(nameof(ObterPorId), new { id = usuarioEntity.Id }, usuarioEntity);
+            await _usuarioService.AdicionarAsync(usuario);
+            return Ok(usuario);
         }
 
         [HttpPut("{id}")]
-        public async Task<ActionResult> Atualizar(int id, [FromBody] Usuario usuario)
+        public async Task<ActionResult> Atualizar(int id, [FromBody] UsuarioAtualizarDto usuario)
         {
             if (id != usuario.Id)
                 return BadRequest("IDs não coincidem");
 
             await _usuarioService.AtualizarAsync(usuario);
-            return NoContent();
+            var usuarioAtualizado = await _usuarioService.ObterPorIdAsync(id);
+            return Ok(usuarioAtualizado);
         }
 
         [HttpDelete("{id}")]
-        public async Task<ActionResult> Remover(int id)
+        public async Task<ActionResult> Remover(UsuarioDeleteDto dto)
         {
+            var id = dto.Id;
             await _usuarioService.RemoverAsync(id);
             return NoContent();
         }

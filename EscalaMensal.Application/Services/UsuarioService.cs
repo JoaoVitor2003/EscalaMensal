@@ -1,4 +1,6 @@
-﻿using EscalaMensal.Domain.Entities;
+﻿using AutoMapper;
+using EscalaMensal.Application.DTOs.Usuario;
+using EscalaMensal.Domain.Entities;
 using EscalaMensal.Domain.Interfaces;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -8,30 +10,40 @@ namespace EscalaMensal.Application.Services
     public class UsuarioService : IUsuarioService
     {
         private readonly IUsuarioRepository _usuarioRepository;
+        private readonly IMapper _mapper;
 
-        public UsuarioService(IUsuarioRepository usuarioRepository)
+        public UsuarioService(IUsuarioRepository usuarioRepository, IMapper mapper)
         {
             _usuarioRepository = usuarioRepository;
+            _mapper = mapper;
         }
 
-        public async Task<Usuario?> ObterPorIdAsync(int id)
+        public async Task<UsuarioDto?> ObterPorIdAsync(int id)
         {
-            return await _usuarioRepository.ObterPorIdAsync(id);
+            var usuario = await _usuarioRepository.ObterPorIdAsync(id);
+            var dto = _mapper.Map<UsuarioDto>(usuario);
+
+            return dto;
         }
 
-        public async Task<List<Usuario>> ObterTodosAsync()
+        public async Task<List<UsuarioDto>> ObterTodosAsync()
         {
-            return await _usuarioRepository.ObterTodosAsync();
+            var usuarios = await _usuarioRepository.ObterTodosAsync();
+            var usuariosDto = _mapper.Map<List<UsuarioDto>>(usuarios);
+            return usuariosDto;
         }
 
-        public async Task AdicionarAsync(Usuario usuario)
+        public async Task AdicionarAsync(UsuarioAdicionarDto usuario)
         {
-            await _usuarioRepository.AdicionarAsync(usuario);
+            var usuarioEntity = _mapper.Map<Usuario>(usuario);
+
+            await _usuarioRepository.AdicionarAsync(usuarioEntity);
         }
 
-        public async Task AtualizarAsync(Usuario usuario)
+        public async Task AtualizarAsync(UsuarioAtualizarDto usuario)
         {
-            await _usuarioRepository.AtualizarAsync(usuario);
+            var usuarioEntity = _mapper.Map<Usuario>(usuario);
+            await _usuarioRepository.AtualizarAsync(usuarioEntity);
         }
 
         public async Task RemoverAsync(int id)
