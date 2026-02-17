@@ -12,12 +12,10 @@ namespace EscalaMensal.API.Controllers
     public class ItensMissaController : ControllerBase
     {
         private readonly IItemMissaService _itemMissaService;
-        private readonly IMapper _mapper;
 
-        public ItensMissaController(IItemMissaService itemMissaService, IMapper mapper)
+        public ItensMissaController(IItemMissaService itemMissaService)
         {
             _itemMissaService = itemMissaService;
-            _mapper = mapper;
         }
 
         [HttpGet("por-escala/{missaId}")]

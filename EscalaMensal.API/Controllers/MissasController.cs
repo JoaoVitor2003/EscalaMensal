@@ -12,11 +12,9 @@ namespace EscalaMensal.API.Controllers
     public class MissasController : Controller
     {
         private readonly IMissasService _missasService;
-        private readonly IMapper _mapper;
-        public MissasController(IMissasService missasService, IMapper mapper)
+        public MissasController(IMissasService missasService)
         {
             _missasService = missasService;
-            _mapper = mapper;
         }
 
         [HttpGet("{id}")]
