@@ -1,4 +1,5 @@
-﻿using EscalaMensal.Domain.Entities;
+﻿using EscalaMensal.Application.DTOs.Funcao;
+using EscalaMensal.Domain.Entities;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -6,7 +7,7 @@ namespace EscalaMensal.Domain.Interfaces
 {
     public interface IFuncaoService
     {
-        Task<List<Funcao>> ObterTodasAsync();
+        Task<List<FuncaoDto>> ObterTodasAsync();
         Task<Funcao?> ObterPorIdAsync(int id);
         Task AdicionarAsync(Funcao funcao);
         Task AtualizarAsync(Funcao funcao);

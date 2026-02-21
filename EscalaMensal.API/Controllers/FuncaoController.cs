@@ -23,8 +23,7 @@ namespace EscalaMensal.API.Controllers
         public async Task<ActionResult<List<FuncaoDto>>> ObterTodas()
         {
             var funcoes = await _funcaoService.ObterTodasAsync();
-            var dto = _mapper.Map<List<FuncaoDto>>(funcoes);
-            return Ok(dto);
+            return Ok(funcoes);
         }
 
         [HttpGet("{id}")]
