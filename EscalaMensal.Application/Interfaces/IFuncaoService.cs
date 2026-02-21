@@ -8,9 +8,9 @@ namespace EscalaMensal.Domain.Interfaces
     public interface IFuncaoService
     {
         Task<List<FuncaoDto>> ObterTodasAsync();
-        Task<Funcao?> ObterPorIdAsync(int id);
-        Task AdicionarAsync(Funcao funcao);
-        Task AtualizarAsync(Funcao funcao);
+        Task<FuncaoDto?> ObterPorIdAsync(int id);
+        Task AdicionarAsync(FuncaoAdicionarDto funcao);
+        Task AtualizarAsync(FuncaoAtualizarDto funcao);
         Task RemoverAsync(int id);
     }
 }

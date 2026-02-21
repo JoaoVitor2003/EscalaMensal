@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using EscalaMensal.Application.DTOs.Escala;
 using EscalaMensal.Application.DTOs.Funcao;
 using EscalaMensal.Domain.Entities;
 using EscalaMensal.Domain.Interfaces;
@@ -33,21 +34,18 @@ namespace EscalaMensal.API.Controllers
             if (funcao == null)
                 return NotFound();
 
-            var dto = _mapper.Map<FuncaoDto>(funcao);
-
-            return Ok(dto);
+            return Ok(funcao);
         }
 
         [HttpPost]
-        public async Task<ActionResult> Adicionar(FuncaoAdicionarDto funcao)
+        public async Task<ActionResult> Adicionar([FromBody]FuncaoAdicionarDto funcao)
         {
-            var funcaoEntity = _mapper.Map<Funcao>(funcao);
-            await _funcaoService.AdicionarAsync(funcaoEntity);
-            return CreatedAtAction(nameof(ObterPorId), new { id = funcaoEntity.Id }, funcaoEntity);
+            await _funcaoService.AdicionarAsync(funcao);
+            return Ok(funcao);
         }
 
         [HttpPut("{id}")]
-        public async Task<ActionResult> Atualizar(int id, Funcao funcao)
+        public async Task<ActionResult> Atualizar(int id, FuncaoAtualizarDto funcao)
         {
             if (id != funcao.Id)
                 return BadRequest("ID do parâmetro não confere com o da entidade");
@@ -57,8 +55,9 @@ namespace EscalaMensal.API.Controllers
         }
 
         [HttpDelete("{id}")]
-        public async Task<ActionResult> Remover(int id)
+        public async Task<ActionResult> Remover(FuncaoDeleteDto dto)
         {
+            var id = dto.Id;
             await _funcaoService.RemoverAsync(id);
             return NoContent();
         }
