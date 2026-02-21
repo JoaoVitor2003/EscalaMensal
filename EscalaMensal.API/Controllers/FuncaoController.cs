@@ -1,7 +1,5 @@
-﻿using AutoMapper;
-using EscalaMensal.Application.DTOs.Escala;
+﻿using EscalaMensal.Application.DTOs.Escala;
 using EscalaMensal.Application.DTOs.Funcao;
-using EscalaMensal.Domain.Entities;
 using EscalaMensal.Domain.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
@@ -12,12 +10,10 @@ namespace EscalaMensal.API.Controllers
     public class FuncaoController : ControllerBase
     {
         private readonly IFuncaoService _funcaoService;
-        private readonly IMapper _mapper;
 
-        public FuncaoController(IFuncaoService funcaoService, IMapper mapper)
+        public FuncaoController(IFuncaoService funcaoService)
         {
             _funcaoService = funcaoService;
-            _mapper = mapper;
         }
 
         [HttpGet]
