@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using EscalaMensal.Application.DTOs.Escala;
 using EscalaMensal.Application.DTOs.Restricao;
 using EscalaMensal.Domain.Entities;
 using EscalaMensal.Domain.Interfaces;
@@ -34,15 +35,14 @@ namespace EscalaMensal.API.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Adicionar([FromBody] RestricaoDto restricao)
+        public async Task<IActionResult> Adicionar([FromBody] RestricaoAdicionarDto restricao)
         {
-            var restricaoEntity = _mapper.Map<Restricao>(restricao);
-            await _restricaoService.AdicionarAsync(restricaoEntity);
-            return CreatedAtAction(nameof(ObterPorMesAno), new { mes = restricaoEntity.Data.Month, ano = restricaoEntity.Data.Year }, restricaoEntity);
+            await _restricaoService.AdicionarAsync(restricao);
+            return Ok(restricao);
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> Atualizar(int id, [FromBody] Restricao restricao)
+        public async Task<IActionResult> Atualizar(int id, [FromBody] RestricaoAtualizarDto restricao)
         {
             if (id != restricao.Id)
                 return BadRequest("IDs não correspondem");
@@ -52,8 +52,9 @@ namespace EscalaMensal.API.Controllers
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> Remover(int id)
+        public async Task<IActionResult> Remover(RestricaoDeleteDto dto)
         {
+            var id = dto.Id;
             await _restricaoService.RemoverAsync(id);
             return NoContent();
         }

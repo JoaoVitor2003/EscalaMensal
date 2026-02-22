@@ -1,4 +1,6 @@
-﻿using EscalaMensal.Domain.Entities;
+﻿using AutoMapper;
+using EscalaMensal.Application.DTOs.Restricao;
+using EscalaMensal.Domain.Entities;
 using EscalaMensal.Domain.Interfaces;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -8,30 +10,38 @@ namespace EscalaMensal.Application.Services
     public class RestricaoService : IRestricaoService
     {
         private readonly IRestricaoRepository _restricaoRepository;
+        private readonly IMapper _mapper;
 
-        public RestricaoService(IRestricaoRepository restricaoRepository)
+        public RestricaoService(IRestricaoRepository restricaoRepository, IMapper mapper)
         {
             _restricaoRepository = restricaoRepository;
+            _mapper = mapper;
         }
 
-        public async Task<List<Restricao>> ObterPorMesAnoAsync(int mes, int ano)
+        public async Task<List<RestricaoDto>> ObterPorMesAnoAsync(int mes, int ano)
         {
-            return await _restricaoRepository.ObterPorMesAnoAsync(mes, ano);
+            var restricoes = await _restricaoRepository.ObterPorMesAnoAsync(mes, ano);
+            var restricoesDto = _mapper.Map<List<RestricaoDto>>(restricoes);
+            return restricoesDto;
         }
 
-        public async Task<List<Restricao>> ObterPorUsuarioIdAsync(int usuarioId, int mes, int ano)
+        public async Task<List<RestricaoDto>> ObterPorUsuarioIdAsync(int usuarioId, int mes, int ano)
         {
-            return await _restricaoRepository.ObterPorUsuarioIdAsync(usuarioId, mes, ano);
+            var restricoes = await _restricaoRepository.ObterPorUsuarioIdAsync(usuarioId, mes, ano);
+            var restricoesDto = _mapper.Map<List<RestricaoDto>>(restricoes);
+            return restricoesDto;
         }
 
-        public async Task AdicionarAsync(Restricao restricao)
+        public async Task AdicionarAsync(RestricaoAdicionarDto restricao)
         {
-            await _restricaoRepository.AdicionarAsync(restricao);
+            var restricaoEntity = _mapper.Map<Restricao>(restricao);
+            await _restricaoRepository.AdicionarAsync(restricaoEntity);
         }
 
-        public async Task AtualizarAsync(Restricao restricao)
+        public async Task AtualizarAsync(RestricaoAtualizarDto restricao)
         {
-            await _restricaoRepository.AtualizarAsync(restricao);
+            var restricaoEntity = _mapper.Map<Restricao>(restricao);
+            await _restricaoRepository.AtualizarAsync(restricaoEntity);
         }
 
         public async Task RemoverAsync(int id)
