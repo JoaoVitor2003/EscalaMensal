@@ -1,7 +1,5 @@
-﻿using AutoMapper;
-using EscalaMensal.Application.DTOs.Escala;
+﻿using EscalaMensal.Application.DTOs.Escala;
 using EscalaMensal.Application.DTOs.Restricao;
-using EscalaMensal.Domain.Entities;
 using EscalaMensal.Domain.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
@@ -12,12 +10,10 @@ namespace EscalaMensal.API.Controllers
     public class RestricaoController : ControllerBase
     {
         private readonly IRestricaoService _restricaoService;
-        private readonly IMapper _mapper;
 
-        public RestricaoController(IRestricaoService restricaoService, IMapper mapper)
+        public RestricaoController(IRestricaoService restricaoService)
         {
             _restricaoService = restricaoService;
-            _mapper = mapper;
         }
 
         [HttpGet("mes/{mes}/ano/{ano}")]
