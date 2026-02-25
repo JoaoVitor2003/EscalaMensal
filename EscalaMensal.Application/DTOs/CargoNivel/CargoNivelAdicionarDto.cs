@@ -1,5 +1,4 @@
-﻿using EscalaMensal.Application.DTOs.Funcao;
-using EscalaMensal.Domain.Enums;
+﻿using EscalaMensal.Domain.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,12 +7,10 @@ using System.Threading.Tasks;
 
 namespace EscalaMensal.Application.DTOs.CargoNivel
 {
-    public class CargoNivelDto
+    public class CargoNivelAdicionarDto
     {
-        public int Id { get; set; }
         public CargoEnum Cargo { get; set; }
         public NivelEnum Nivel { get; set; }
         public int FuncaoId { get; set; }
-        public FuncaoDto Funcao { get; private set; }
     }
 }
