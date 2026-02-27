@@ -1,4 +1,6 @@
-﻿using EscalaMensal.Domain.Entities;
+﻿using AutoMapper;
+using EscalaMensal.Application.DTOs.HistoricoEscala;
+using EscalaMensal.Domain.Entities;
 using EscalaMensal.Domain.Interfaces;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -8,15 +10,19 @@ namespace EscalaMensal.Application.Services
     public class HistoricoEscalaService : IHistoricoEscalaService
     {
         private readonly IHistoricoEscalaRepository _historicoEscalaRepository;
+        private readonly IMapper _mapper;
 
-        public HistoricoEscalaService(IHistoricoEscalaRepository historicoEscalaRepository)
+        public HistoricoEscalaService(IHistoricoEscalaRepository historicoEscalaRepository, IMapper mapper)
         {
             _historicoEscalaRepository = historicoEscalaRepository;
+            _mapper = mapper;
         }
 
-        public async Task<List<HistoricoEscala>> ObterPorMesAnoAsync(int mes, int ano)
+        public async Task<List<HistoricoEscalaDto>> ObterPorMesAnoAsync(int mes, int ano)
         {
-            return await _historicoEscalaRepository.ObterPorMesAnoAsync(mes, ano);
+            var historicos = await _historicoEscalaRepository.ObterPorMesAnoAsync(mes, ano);
+            var dtos = _mapper.Map<List<HistoricoEscalaDto>>(historicos);
+            return dtos;
         }
 
         public async Task<List<HistoricoEscala>> ObterPorUsuarioIdAsync(int usuarioId)
