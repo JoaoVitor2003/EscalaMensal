@@ -32,10 +32,10 @@ namespace EscalaMensal.Application.Services
             _mapper = mapper;
         }
 
-        public async Task<List<ItemMissaDto>> ObterPorMissaIdAsync(int escalaId)
+        public async Task<ItemMissaDto> ObterPorMissaIdAsync(int escalaId)
         {
             var itens = await _itemMissaRepository.ObterPorMissaIdAsync(escalaId);
-            var dto = _mapper.Map<List<ItemMissaDto>>(itens);
+            var dto = _mapper.Map<ItemMissaDto>(itens);
 
             return dto;
         }
@@ -86,7 +86,12 @@ namespace EscalaMensal.Application.Services
 
         public async Task AtualizarAsync(ItemMissaAtualizarDto item)
         {
-            var itemMissaEntity = _mapper.Map<ItemMissa>(item);
+            var itemMissaExistente = await _itemMissaRepository.ObterPorMissaIdAsync(item.MissaId);
+            if (itemMissaExistente == null)
+            {
+                throw new Exception($"Item da missa com ID {item.Id} não encontrado.");
+            }
+            ItemMissa itemMissaEntity = _mapper.Map(item, itemMissaExistente);
             var funcao = await _funcaoRepository.ObterPorIdAsync(itemMissaEntity.FuncaoId)
                          ?? throw new Exception("Função não encontrada.");
 

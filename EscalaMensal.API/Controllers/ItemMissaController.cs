@@ -19,7 +19,7 @@ namespace EscalaMensal.API.Controllers
         }
 
         [HttpGet("por-escala/{missaId}")]
-        public async Task<ActionResult<List<ItemMissaDto>>> ObterPorMissaIdAsync(int missaId)
+        public async Task<ActionResult<ItemMissaDto>> ObterPorMissaIdAsync(int missaId)
         {
             var itens = await _itemMissaService.ObterPorMissaIdAsync(missaId);
             if (itens == null) return NotFound();
