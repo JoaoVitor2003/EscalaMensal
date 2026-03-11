@@ -63,6 +63,8 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
+app.UseMiddleware<ExceptionHandlingMiddleware>();
+
 var policyName = "corsblazor";
 
 app.UseCors(policyName);
