@@ -109,6 +109,12 @@ namespace EscalaMensal.Application.Services
                             $"O usuário '{usuario.Nome}' já está escalado para outra função nesta missa."
                         );
                     }
+                    else if (usuario.DiasEscalados > usuario.LimitePermitido)
+                    {
+                        throw new DomainException(
+                            $"O usuário '{usuario.Nome}' já atingiu o limite de escalas permitidas para este mês."
+                        );
+                    }
                 }
             }
 
