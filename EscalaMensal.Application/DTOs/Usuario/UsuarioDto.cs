@@ -23,7 +23,7 @@ namespace EscalaMensal.Application.DTOs.Usuario
         public int? UsuarioVinculadoId { get; set; }
         public UsuarioDto? UsuarioVinculado { get; set; }
         public int? DiasEscalados { get; set; }
-        public int LimitePermitido { get; set; } = 3;
+        public int? LimitePermitido { get; set; }
         public ICollection<RestricaoDto> Restricoes { get; set; } = new List<RestricaoDto>();
     }
 }

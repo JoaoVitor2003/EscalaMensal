@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EscalaMensal.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20251129025200_AjustesUsuario")]
-    partial class AjustesUsuario
+    [Migration("20260319001547_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -59,6 +59,12 @@ namespace EscalaMensal.Infrastructure.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateOnly>("DataFim")
+                        .HasColumnType("date");
+
+                    b.Property<DateOnly>("DataInicio")
+                        .HasColumnType("date");
 
                     b.HasKey("Id");
 
@@ -231,7 +237,7 @@ namespace EscalaMensal.Infrastructure.Migrations
                     b.ToTable("HistoricosEscala");
                 });
 
-            modelBuilder.Entity("EscalaMensal.Domain.Entities.ItemEscala", b =>
+            modelBuilder.Entity("EscalaMensal.Domain.Entities.ItemMissa", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -239,30 +245,48 @@ namespace EscalaMensal.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTime>("Dia")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("EscalaId")
-                        .HasColumnType("int");
-
                     b.Property<int>("FuncaoId")
                         .HasColumnType("int");
 
-                    b.Property<TimeOnly?>("Horario")
-                        .HasColumnType("time");
+                    b.Property<int>("MissaId")
+                        .HasColumnType("int");
 
                     b.Property<int?>("UsuarioId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("EscalaId");
-
                     b.HasIndex("FuncaoId");
+
+                    b.HasIndex("MissaId");
 
                     b.HasIndex("UsuarioId");
 
-                    b.ToTable("ItensEscala");
+                    b.ToTable("ItensMissa");
+                });
+
+            modelBuilder.Entity("EscalaMensal.Domain.Entities.Missas", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateOnly>("Dia")
+                        .HasColumnType("date");
+
+                    b.Property<int>("EscalaId")
+                        .HasColumnType("int");
+
+                    b.Property<TimeOnly>("Horario")
+                        .HasColumnType("time");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EscalaId");
+
+                    b.ToTable("Missas");
                 });
 
             modelBuilder.Entity("EscalaMensal.Domain.Entities.Restricao", b =>
@@ -300,6 +324,9 @@ namespace EscalaMensal.Infrastructure.Migrations
                     b.Property<int>("Cargo")
                         .HasColumnType("int");
 
+                    b.Property<int?>("DiasEscalados")
+                        .HasColumnType("int");
+
                     b.Property<bool>("DisponivelQuarta")
                         .HasColumnType("bit");
 
@@ -311,6 +338,11 @@ namespace EscalaMensal.Infrastructure.Migrations
 
                     b.Property<TimeOnly?>("HoraPreferencial")
                         .HasColumnType("time");
+
+                    b.Property<int?>("LimitePermitido")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(3);
 
                     b.Property<int>("Nivel")
                         .HasColumnType("int");
@@ -338,6 +370,7 @@ namespace EscalaMensal.Infrastructure.Migrations
                             DisponivelQuinta = false,
                             DisponivelSabado = true,
                             HoraPreferencial = new TimeOnly(10, 0, 0),
+                            LimitePermitido = 3,
                             Nivel = 3,
                             Nome = "João"
                         },
@@ -345,11 +378,38 @@ namespace EscalaMensal.Infrastructure.Migrations
                         {
                             Id = 2,
                             Ativo = false,
+                            Cargo = 2,
+                            DisponivelQuarta = true,
+                            DisponivelQuinta = true,
+                            DisponivelSabado = true,
+                            HoraPreferencial = new TimeOnly(7, 30, 0),
+                            LimitePermitido = 3,
+                            Nivel = 2,
+                            Nome = "Pedro"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Ativo = false,
+                            Cargo = 2,
+                            DisponivelQuarta = true,
+                            DisponivelQuinta = true,
+                            DisponivelSabado = true,
+                            HoraPreferencial = new TimeOnly(7, 30, 0),
+                            LimitePermitido = 3,
+                            Nivel = 2,
+                            Nome = "Anna"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Ativo = false,
                             Cargo = 1,
                             DisponivelQuarta = true,
                             DisponivelQuinta = true,
                             DisponivelSabado = true,
                             HoraPreferencial = new TimeOnly(7, 30, 0),
+                            LimitePermitido = 3,
                             Nivel = 1,
                             Nome = "Maria"
                         });
@@ -385,18 +445,18 @@ namespace EscalaMensal.Infrastructure.Migrations
                     b.Navigation("Usuario");
                 });
 
-            modelBuilder.Entity("EscalaMensal.Domain.Entities.ItemEscala", b =>
+            modelBuilder.Entity("EscalaMensal.Domain.Entities.ItemMissa", b =>
                 {
-                    b.HasOne("EscalaMensal.Domain.Entities.Escala", "Escala")
-                        .WithMany("Itens")
-                        .HasForeignKey("EscalaId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("EscalaMensal.Domain.Entities.Funcao", "Funcao")
                         .WithMany()
                         .HasForeignKey("FuncaoId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("EscalaMensal.Domain.Entities.Missas", "Missa")
+                        .WithMany("ItensMissa")
+                        .HasForeignKey("MissaId")
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("EscalaMensal.Domain.Entities.Usuario", "Usuario")
@@ -404,11 +464,22 @@ namespace EscalaMensal.Infrastructure.Migrations
                         .HasForeignKey("UsuarioId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.Navigation("Escala");
-
                     b.Navigation("Funcao");
 
+                    b.Navigation("Missa");
+
                     b.Navigation("Usuario");
+                });
+
+            modelBuilder.Entity("EscalaMensal.Domain.Entities.Missas", b =>
+                {
+                    b.HasOne("EscalaMensal.Domain.Entities.Escala", "Escala")
+                        .WithMany("Missas")
+                        .HasForeignKey("EscalaId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Escala");
                 });
 
             modelBuilder.Entity("EscalaMensal.Domain.Entities.Restricao", b =>
@@ -434,7 +505,12 @@ namespace EscalaMensal.Infrastructure.Migrations
 
             modelBuilder.Entity("EscalaMensal.Domain.Entities.Escala", b =>
                 {
-                    b.Navigation("Itens");
+                    b.Navigation("Missas");
+                });
+
+            modelBuilder.Entity("EscalaMensal.Domain.Entities.Missas", b =>
+                {
+                    b.Navigation("ItensMissa");
                 });
 
             modelBuilder.Entity("EscalaMensal.Domain.Entities.Usuario", b =>

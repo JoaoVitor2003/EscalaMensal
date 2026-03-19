@@ -33,6 +33,10 @@ namespace EscalaMensal.Infrastructure.Context
                 .HasForeignKey(u => u.UsuarioVinculadoId)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            modelBuilder.Entity<Usuario>()
+                .Property(u => u.LimitePermitido)
+                .HasDefaultValue(3);
+
             modelBuilder.Entity<Escala>()
                 .HasMany(e => e.Missas)
                 .WithOne(m => m.Escala)
@@ -68,10 +72,10 @@ namespace EscalaMensal.Infrastructure.Context
                 .IsUnique();
 
             modelBuilder.Entity<Usuario>().HasData(
-    new { Id = 1, Nome = "João", Nivel = NivelEnum.Nivel3, Cargo = CargoEnum.Cerimoniario, Ativo = true, HoraPreferencial = TimeOnly.Parse("10:00"), DisponivelQuarta = false, DisponivelSabado = true, DisponivelQuinta = false },
-    new { Id = 2, Nome = "Pedro", Nivel = NivelEnum.Nivel2, Cargo = CargoEnum.Cerimoniario, Ativo = false, HoraPreferencial = TimeOnly.Parse("07:30"), DisponivelQuarta = true, DisponivelSabado = true, DisponivelQuinta = true },
-    new { Id = 3, Nome = "Anna", Nivel = NivelEnum.Nivel2, Cargo = CargoEnum.Cerimoniario, Ativo = false, HoraPreferencial = TimeOnly.Parse("07:30"), DisponivelQuarta = true, DisponivelSabado = true, DisponivelQuinta = true },
-    new { Id = 4, Nome = "Maria", Nivel = NivelEnum.Nivel1, Cargo = CargoEnum.Coroinha, Ativo = false, HoraPreferencial = TimeOnly.Parse("07:30"), DisponivelQuarta = true, DisponivelSabado = true, DisponivelQuinta = true }
+    new { Id = 1, Nome = "João", Nivel = NivelEnum.Nivel3, Cargo = CargoEnum.Cerimoniario, Ativo = true, HoraPreferencial = TimeOnly.Parse("10:00"), DisponivelQuarta = false, DisponivelSabado = true, DisponivelQuinta = false, LimitePermitido = 3 },
+    new { Id = 2, Nome = "Pedro", Nivel = NivelEnum.Nivel2, Cargo = CargoEnum.Cerimoniario, Ativo = false, HoraPreferencial = TimeOnly.Parse("07:30"), DisponivelQuarta = true, DisponivelSabado = true, DisponivelQuinta = true, LimitePermitido = 3 },
+    new { Id = 3, Nome = "Anna", Nivel = NivelEnum.Nivel2, Cargo = CargoEnum.Cerimoniario, Ativo = false, HoraPreferencial = TimeOnly.Parse("07:30"), DisponivelQuarta = true, DisponivelSabado = true, DisponivelQuinta = true, LimitePermitido = 3 },
+    new { Id = 4, Nome = "Maria", Nivel = NivelEnum.Nivel1, Cargo = CargoEnum.Coroinha, Ativo = false, HoraPreferencial = TimeOnly.Parse("07:30"), DisponivelQuarta = true, DisponivelSabado = true, DisponivelQuinta = true, LimitePermitido = 3 }
 );
 
             modelBuilder.Entity<Funcao>().HasData(

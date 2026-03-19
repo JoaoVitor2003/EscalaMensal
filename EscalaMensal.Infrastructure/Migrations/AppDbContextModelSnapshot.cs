@@ -336,6 +336,11 @@ namespace EscalaMensal.Infrastructure.Migrations
                     b.Property<TimeOnly?>("HoraPreferencial")
                         .HasColumnType("time");
 
+                    b.Property<int?>("LimitePermitido")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(3);
+
                     b.Property<int>("Nivel")
                         .HasColumnType("int");
 
@@ -362,6 +367,7 @@ namespace EscalaMensal.Infrastructure.Migrations
                             DisponivelQuinta = false,
                             DisponivelSabado = true,
                             HoraPreferencial = new TimeOnly(10, 0, 0),
+                            LimitePermitido = 3,
                             Nivel = 3,
                             Nome = "João"
                         },
@@ -374,6 +380,7 @@ namespace EscalaMensal.Infrastructure.Migrations
                             DisponivelQuinta = true,
                             DisponivelSabado = true,
                             HoraPreferencial = new TimeOnly(7, 30, 0),
+                            LimitePermitido = 3,
                             Nivel = 2,
                             Nome = "Pedro"
                         },
@@ -386,6 +393,7 @@ namespace EscalaMensal.Infrastructure.Migrations
                             DisponivelQuinta = true,
                             DisponivelSabado = true,
                             HoraPreferencial = new TimeOnly(7, 30, 0),
+                            LimitePermitido = 3,
                             Nivel = 2,
                             Nome = "Anna"
                         },
@@ -398,6 +406,7 @@ namespace EscalaMensal.Infrastructure.Migrations
                             DisponivelQuinta = true,
                             DisponivelSabado = true,
                             HoraPreferencial = new TimeOnly(7, 30, 0),
+                            LimitePermitido = 3,
                             Nivel = 1,
                             Nome = "Maria"
                         });
