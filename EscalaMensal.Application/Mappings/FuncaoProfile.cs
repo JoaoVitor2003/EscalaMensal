@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using EscalaMensal.Application.DTOs.Escala;
 using EscalaMensal.Application.DTOs.Funcao;
 using EscalaMensal.Domain.Entities;
 using System;
