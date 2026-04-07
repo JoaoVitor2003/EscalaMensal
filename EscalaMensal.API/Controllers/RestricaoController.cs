@@ -48,9 +48,8 @@ namespace EscalaMensal.API.Controllers
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> Remover(RestricaoDeleteDto dto)
+        public async Task<IActionResult> Remover(int id)
         {
-            var id = dto.Id;
             await _restricaoService.RemoverAsync(id);
             return NoContent();
         }

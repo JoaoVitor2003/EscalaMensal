@@ -42,9 +42,8 @@ namespace EscalaMensal.API.Controllers
         }
 
         [HttpDelete("{id}")]
-        public async Task<ActionResult> Remover(MissaDeleteDto dto)
+        public async Task<ActionResult> Remover(int id)
         {
-            var id = dto.Id;
             await _missasService.RemoverAsync(id);
             return NoContent();
         }
