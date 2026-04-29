@@ -22,7 +22,7 @@ namespace EscalaMensal.Domain.Entities
         {
             MissaId = missaId;
             FuncaoId = funcaoId;
-            UsuarioId = usuarioId;
+            UsuarioId = usuarioId == 0 ? null : usuarioId;
         }
 
         public void AtribuirUsuario(int usuarioId) => UsuarioId = usuarioId;

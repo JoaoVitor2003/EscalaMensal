@@ -49,7 +49,7 @@ namespace EscalaMensal.Application.Services
 
             Usuario? usuario = null;
 
-            if (itemMissaEntity.UsuarioId.HasValue)
+            if (itemMissaEntity.UsuarioId.HasValue && itemMissaEntity.UsuarioId != 0)
             {
                 usuario = await _usuarioRepository.ObterPorIdAsync(itemMissaEntity.UsuarioId.Value);
 

@@ -23,7 +23,7 @@ public class EscalaItemRepository : IItemMissaRepository
 
     public async Task AdicionarAsync(ItemMissa item)
     {
-        _context.ItensMissa.Add(item);
+        await _context.ItensMissa.AddAsync(item);
         await _context.SaveChangesAsync();
     }
 
