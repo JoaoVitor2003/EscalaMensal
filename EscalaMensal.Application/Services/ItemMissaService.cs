@@ -151,11 +151,8 @@ namespace EscalaMensal.Application.Services
                 (_, var u) when u.Cargo < funcao.Cargo
                     => $"Essa pessoa '{u.Nome}' não é um {funcao.Cargo} para servir nessa função.",
 
-                (1, var u) when u.Cargo == CargoEnum.Coroinha
-                    => "Coroinhas não podem assumir essa função.",
-
-                (6, var u) when u.Cargo == CargoEnum.Coroinha && u.Nivel < NivelEnum.Nivel2
-                    => "Coroinhas precisam ser Nível 2 para esta função.",
+                (_, var u) when u.Cargo == funcao.Cargo && u.Nivel < funcao.NivelMinimo
+            => $"O {u.Cargo} '{u.Nome}' precisa ser no mínimo {funcao.NivelMinimo} para esta função.",
 
                 _ => null
             };
