@@ -34,6 +34,14 @@ namespace EscalaMensal.API.Controllers
             return Ok(item);
         }
 
+        [HttpPut("atualizar-ordem")]
+        public async Task<IActionResult> AtualizarOrdem([FromBody] List<AtualizarOrdemItemMissaDto> itens)
+        {
+            await _itemMissaService.AtualizarOrdemAsync(itens);
+
+            return Ok();
+        }
+
         [HttpPut("{id}")]
         public async Task<ActionResult> Atualizar(int id, [FromBody] ItemMissaAtualizarDto item)
         {

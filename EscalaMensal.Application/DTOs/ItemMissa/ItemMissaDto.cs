@@ -20,5 +20,7 @@ namespace EscalaMensal.Application.DTOs.ItemMissa
         public FuncaoDto? Funcao { get; set; }
         public int? UsuarioId { get; set; }
         public UsuarioDto? Usuario { get; set; }
+        public int Ordem { get; set; }
+        public AtualizarOrdemItemMissaDto? OrdemDto { get; set; } = new AtualizarOrdemItemMissaDto { Ordem = 0 };
     }
 }

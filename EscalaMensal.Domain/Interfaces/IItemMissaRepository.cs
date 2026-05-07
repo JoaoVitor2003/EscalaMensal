@@ -12,6 +12,7 @@ namespace EscalaMensal.Domain.Interfaces
         Task<ItemMissa> ObterPorMissaIdAsync(int missaId);
         Task <bool> ExisteUsuarioNaMissaAsync(int missaId, int usuarioId);
         Task AdicionarAsync(ItemMissa item);
+        Task AtualizarOrdemItensMissa(List<ItemMissa> itens);
         Task AtualizarAsync(ItemMissa item);
         Task RemoverAsync(int id);
     }

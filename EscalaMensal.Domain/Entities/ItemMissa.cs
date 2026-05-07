@@ -16,6 +16,7 @@ namespace EscalaMensal.Domain.Entities
         public Missas? Missa { get; private set; }
         public int FuncaoId { get; private set; }
         public Funcao? Funcao { get; private set; }
+        public int Ordem { get; set; }
         public int? UsuarioId { get; private set; }
         public Usuario? Usuario { get; private set; }
         public ItemMissa(int missaId, int funcaoId, int? usuarioId = null)
@@ -23,6 +24,17 @@ namespace EscalaMensal.Domain.Entities
             MissaId = missaId;
             FuncaoId = funcaoId;
             UsuarioId = usuarioId == 0 ? null : usuarioId;
+        }
+
+        public ItemMissa(int id, int ordem)
+        {
+            Id = id;
+            Ordem = ordem;
+        }
+
+        public void AtualizarOrdem(int ordem)
+        {
+            Ordem = ordem;
         }
 
         public void AtribuirUsuario(int usuarioId) => UsuarioId = usuarioId;

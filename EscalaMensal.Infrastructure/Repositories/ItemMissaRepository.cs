@@ -47,4 +47,27 @@ public class EscalaItemRepository : IItemMissaRepository
     {
         return await _context.ItensMissa.AnyAsync(m => m.MissaId == missaId && m.UsuarioId == usuarioId);
     }
+
+    public async Task AtualizarOrdemItensMissa(
+    List<ItemMissa> itens)
+    {
+        var ids = itens
+            .Select(i => i.Id)
+            .ToList();
+
+        var entidades = await _context.ItensMissa
+            .Where(x => ids.Contains(x.Id))
+            .ToListAsync();
+
+        foreach (var entidade in entidades)
+        {
+            var itemAtualizado = itens
+                .First(i => i.Id == entidade.Id);
+
+            entidade.AtualizarOrdem(
+                itemAtualizado.Ordem);
+        }
+
+        await _context.SaveChangesAsync();
+    }
 }

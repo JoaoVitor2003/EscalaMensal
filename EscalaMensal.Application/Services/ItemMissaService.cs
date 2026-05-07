@@ -167,5 +167,16 @@ namespace EscalaMensal.Application.Services
         {
             await _itemMissaRepository.RemoverAsync(id);
         }
+
+        public async Task AtualizarOrdemAsync(List<AtualizarOrdemItemMissaDto> itens)
+        {
+            var entidades = itens
+                .Select(x => new ItemMissa(
+                    x.Id,
+                    x.Ordem))
+                .ToList();
+
+            await _itemMissaRepository.AtualizarOrdemItensMissa(entidades);
+        }
     }
 }

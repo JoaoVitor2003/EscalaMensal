@@ -9,6 +9,7 @@ namespace EscalaMensal.Domain.Interfaces
     {
         Task<ItemMissaDto> ObterPorMissaIdAsync(int escalaId);
         Task AdicionarAsync(ItemMissaAdicionarDto item);
+        Task AtualizarOrdemAsync(List<AtualizarOrdemItemMissaDto> dto);
         Task AtualizarAsync(ItemMissaAtualizarDto item);
         Task RemoverAsync(int id);
     }
