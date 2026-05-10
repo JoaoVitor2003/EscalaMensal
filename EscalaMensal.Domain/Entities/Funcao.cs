@@ -12,6 +12,7 @@ namespace EscalaMensal.Domain.Entities
         public int Id { get; private set; }
         public string Nome { get; private set; }
         public string Abreviacao { get; set; }
+        public bool EhMultipla { get; private set; } = false;
 
         public CargoEnum Cargo { get; set; }
         public NivelEnum NivelMinimo { get; set; }
