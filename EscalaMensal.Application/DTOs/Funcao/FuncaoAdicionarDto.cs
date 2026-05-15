@@ -11,7 +11,7 @@ namespace EscalaMensal.Application.DTOs.Funcao
     {
         public string Nome { get; set; }
         public string Abreviacao { get; set; }
-
+        public bool EhMultipla { get; set; }
         public CargoEnum Cargo { get; set; }
         public NivelEnum NivelMinimo { get; set; }
         public bool Obrigatoria { get; set; }
