@@ -47,6 +47,13 @@ namespace EscalaMensal.Application.Services
             var funcao = await _funcaoRepository.ObterPorIdAsync(itemMissaEntity.FuncaoId)
                          ?? throw new Exception("Função não encontrada.");
 
+            var jaExisteEssaFuncaoNaMissa = await _itemMissaRepository.ExisteFuncaoNaMissaAsync(itemMissaEntity.MissaId, funcao.Id);
+
+            if (jaExisteEssaFuncaoNaMissa && !funcao.EhMultipla)
+            {
+                throw new DomainException($"A função '{funcao.Nome}' não permite mais de uma escala nesta missa.");
+            }
+
             Usuario? usuario = null;
 
             if (itemMissaEntity.UsuarioId.HasValue && itemMissaEntity.UsuarioId != 0)
@@ -94,6 +101,13 @@ namespace EscalaMensal.Application.Services
             ItemMissa itemMissaEntity = _mapper.Map(item, itemMissaExistente);
             var funcao = await _funcaoRepository.ObterPorIdAsync(itemMissaEntity.FuncaoId)
                          ?? throw new Exception("Função não encontrada.");
+
+            var jaExisteEssaFuncaoNaMissa = await _itemMissaRepository.ExisteFuncaoNaMissaAsync(itemMissaEntity.MissaId, funcao.Id);
+
+            if (jaExisteEssaFuncaoNaMissa && !funcao.EhMultipla)
+            {
+                throw new DomainException($"A função '{funcao.Nome}' não permite mais de uma escala nesta missa.");
+            }
 
             Usuario? usuario = null;
 

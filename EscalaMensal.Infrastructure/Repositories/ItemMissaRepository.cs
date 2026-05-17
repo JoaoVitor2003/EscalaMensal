@@ -70,4 +70,9 @@ public class EscalaItemRepository : IItemMissaRepository
 
         await _context.SaveChangesAsync();
     }
+
+    public Task<bool> ExisteFuncaoNaMissaAsync(int missaId, int funcaoId)
+    {
+        return _context.ItensMissa.AnyAsync(m => m.MissaId == missaId && m.FuncaoId == funcaoId);
+    }
 }
