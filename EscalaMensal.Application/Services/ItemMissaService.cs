@@ -156,9 +156,6 @@ namespace EscalaMensal.Application.Services
         {
             string? erro = (funcao.Id, usuario) switch
             {
-                (_, null) when funcao.Obrigatoria
-                    => $"A função '{funcao.Nome}' é obrigatória.",
-
                 (_, null)
                     => null,
 

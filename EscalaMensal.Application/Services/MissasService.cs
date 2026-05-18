@@ -8,13 +8,15 @@ namespace EscalaMensal.Application.Services
     public class MissasService : IMissasService
     {
         private readonly IMissasRepository _missaRepository;
+        private readonly IFuncaoRepository _funcaoRepository;
         private readonly IMapper _mapper;
-        public MissasService(IMissasRepository missaRepository, IMapper mapper)
+        public MissasService(IMissasRepository missaRepository, IFuncaoRepository funcaoRepository, IMapper mapper)
         {
             _missaRepository = missaRepository;
+            _funcaoRepository = funcaoRepository;
             _mapper = mapper;
         }
-        public async Task AdicionarAsync(MissaAdicionarDto missa)
+        public async Task<MissasDto> AdicionarAsync(MissaAdicionarDto missa)
         {
             var missaEntity = _mapper.Map<Missas>(missa);
             var missaExistente = await _missaRepository.ExistePorDiaHorarioEscalaAsync(missa.Dia, missa.Horario, missa.EscalaId);
@@ -22,7 +24,15 @@ namespace EscalaMensal.Application.Services
             {
                 throw new Exception("Já existe uma missa cadastrada para o mesmo dia, horário nessa escala.");
             }
+
+            var funcoesObrigatorias = await _funcaoRepository.ObterObrigatoriasAsync();
+            foreach (var funcao in funcoesObrigatorias)
+            {
+                missaEntity.ItensMissa.Add(new ItemMissa(missaId: 0, funcaoId: funcao.Id));
+            }
+
             await _missaRepository.AdicionarAsync(missaEntity);
+            return _mapper.Map<MissasDto>(missaEntity);
         }
 
         public async Task AtualizarAsync(MissaAtualizarDto missa)

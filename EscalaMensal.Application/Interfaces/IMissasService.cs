@@ -11,7 +11,7 @@ namespace EscalaMensal.Domain.Interfaces
     public interface IMissasService
     {
         Task<MissasDto> ObterPorMissaIdAsync(int missaId);
-        Task AdicionarAsync(MissaAdicionarDto missa);
+        Task<MissasDto> AdicionarAsync(MissaAdicionarDto missa);
         Task AtualizarAsync(MissaAtualizarDto missa);
         Task RemoverAsync(int id);
     }

@@ -19,6 +19,11 @@ namespace EscalaMensal.Infrastructure.Repositories
             return await _context.Funcoes.ToListAsync();
         }
 
+        public async Task<List<Funcao>> ObterObrigatoriasAsync()
+        {
+            return await _context.Funcoes.Where(f => f.Obrigatoria).ToListAsync();
+        }
+
         public async Task<Funcao?> ObterPorIdAsync(int id)
         {
             return await _context.Funcoes.FindAsync(id);
