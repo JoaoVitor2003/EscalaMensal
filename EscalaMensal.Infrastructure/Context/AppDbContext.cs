@@ -33,8 +33,8 @@ namespace EscalaMensal.Infrastructure.Context
                 .HasForeignKey(u => u.UsuarioVinculadoId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            modelBuilder.Entity<Usuario>()
-                .Property(u => u.LimitePermitido)
+            modelBuilder.Entity<Escala>()
+                .Property(e => e.LimitePermitido)
                 .HasDefaultValue(3);
 
             modelBuilder.Entity<Escala>()

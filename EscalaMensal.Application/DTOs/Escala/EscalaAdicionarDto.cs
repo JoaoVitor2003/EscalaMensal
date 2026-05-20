@@ -10,5 +10,6 @@ namespace EscalaMensal.Application.DTOs.Escala
     {
         public DateOnly DataInicio { get; set; }
         public DateOnly DataFim { get; set; }
+        public int LimitePermitido { get; set; }
     }
 }

@@ -11,11 +11,22 @@ namespace EscalaMensal.Domain.Entities
         public int Id { get; private set; }
         public DateOnly DataInicio { get; private set; }
         public DateOnly DataFim { get; private set; }
+        public int LimitePermitido { get; private set; }
         public ICollection<Missas> Missas { get; private set; } = new List<Missas>();
-        public Escala(DateOnly dataInicio, DateOnly dataFim)
+        public Escala(DateOnly dataInicio, DateOnly dataFim, int limitePermitido)
         {
             DataInicio = dataInicio;
             DataFim = dataFim;
+            LimitePermitido = limitePermitido;
+        }
+
+        private Escala() { }
+
+        public void Atualizar(DateOnly dataInicio, DateOnly dataFim, int limitePermitido)
+        {
+            DataInicio = dataInicio;
+            DataFim = dataFim;
+            LimitePermitido = limitePermitido;
         }
 
         public Missas AdicionarMissa(DateOnly dia, TimeOnly horario)

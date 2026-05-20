@@ -13,12 +13,31 @@ public class EscalaItemRepository : IItemMissaRepository
         _context = context;
     }
 
+    public async Task<ItemMissa?> ObterPorIdAsync(int id)
+    {
+        return await _context.ItensMissa
+            .Include(i => i.Funcao)
+            .Include(i => i.Usuario)
+            .FirstOrDefaultAsync(e => e.Id == id);
+    }
+
     public async Task<ItemMissa?> ObterPorMissaIdAsync(int missaId)
     {
         return await _context.ItensMissa
             .Include(i => i.Funcao)
             .Include(i => i.Usuario)
             .FirstOrDefaultAsync(e => e.MissaId == missaId);
+    }
+
+    public async Task<int> QuantidadeDeEscalasDoUsuarioNaEscalaAsync(int escalaId, int usuarioId)
+    {
+        var missasIdsNaEscala = await _context.Missas
+            .Where(m => m.EscalaId == escalaId)
+            .Select(m => m.Id)
+            .ToListAsync();
+
+        return await _context.ItensMissa
+            .CountAsync(i => i.UsuarioId == usuarioId && missasIdsNaEscala.Contains(i.MissaId));
     }
 
     public async Task AdicionarAsync(ItemMissa item)

@@ -19,7 +19,6 @@ namespace EscalaMensal.Domain.Entities
         public bool DisponivelSabado { get; set; }
         public bool DisponivelQuarta { get; set; }
         public bool DisponivelQuinta { get; set; }
-        public int? LimitePermitido { get; private set; }
         public int? UsuarioVinculadoId { get; private set; }
         public Usuario? UsuarioVinculado { get; private set; }
         public int? DiasEscalados { get; set; }

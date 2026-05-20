@@ -9,9 +9,11 @@ namespace EscalaMensal.Domain.Interfaces
 {
     public interface IItemMissaRepository
     {
+        Task<ItemMissa?> ObterPorIdAsync(int id);
         Task<ItemMissa> ObterPorMissaIdAsync(int missaId);
         Task <bool> ExisteUsuarioNaMissaAsync(int missaId, int usuarioId);
         Task<bool> ExisteFuncaoNaMissaAsync(int missaId, int funcaoId);
+        Task<int> QuantidadeDeEscalasDoUsuarioNaEscalaAsync(int escalaId, int usuarioId);
         Task AdicionarAsync(ItemMissa item);
         Task AtualizarOrdemItensMissa(List<ItemMissa> itens);
         Task AtualizarAsync(ItemMissa item);
