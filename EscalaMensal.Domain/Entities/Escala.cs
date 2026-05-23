@@ -24,6 +24,29 @@ namespace EscalaMensal.Domain.Entities
 
         public void Atualizar(DateOnly dataInicio, DateOnly dataFim, int limitePermitido)
         {
+            if (dataInicio > dataFim)
+            {
+                throw new Exceptions.DomainException("A data de início não pode ser maior que a data de fim.");
+            }
+
+            if (Missas.Any(m => m.Dia < dataInicio || m.Dia > dataFim))
+            {
+                throw new Exceptions.DomainException("Não é possível atualizar a escala pois existem missas com datas fora do novo período definido.");
+            }
+
+            var maxEscalado = Missas
+                .SelectMany(m => m.ItensMissa)
+                .Where(i => i.UsuarioId != null)
+                .GroupBy(i => i.UsuarioId)
+                .Select(g => g.Count())
+                .DefaultIfEmpty(0)
+                .Max();
+
+            if (limitePermitido < maxEscalado)
+            {
+                throw new Exceptions.DomainException($"Não é possível reduzir o limite máximo para {limitePermitido}, pois existem usuários escalados {maxEscalado} vezes.");
+            }
+
             DataInicio = dataInicio;
             DataFim = dataFim;
             LimitePermitido = limitePermitido;
