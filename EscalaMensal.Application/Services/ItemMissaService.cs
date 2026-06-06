@@ -1,3 +1,4 @@
+using System.Linq;
 using AutoMapper;
 using EscalaMensal.Application.DTOs.ItemMissa;
 using EscalaMensal.Domain.Entities;
@@ -79,7 +80,7 @@ namespace EscalaMensal.Application.Services
                 var restricoes = await _restricaoRepository
                     .ObterPorUsuarioIdAsync(usuario.Id, missa.Dia.Month, missa.Dia.Year);
 
-                if (restricoes?.Count > 0)
+                if (restricoes?.Any(r => DateOnly.FromDateTime(r.Data) == missa.Dia) == true)
                 {
                     throw new DomainException(
                         $"O usuário '{usuario.Nome}' possui restrição para o dia {missa.Dia:dd/MM/yyyy}."
@@ -128,7 +129,7 @@ namespace EscalaMensal.Application.Services
                 var restricoes = await _restricaoRepository
                     .ObterPorUsuarioIdAsync(usuario.Id, missa.Dia.Month, missa.Dia.Year);
 
-                if (restricoes?.Count > 0)
+                if (restricoes?.Any(r => DateOnly.FromDateTime(r.Data) == missa.Dia) == true)
                 {
                     throw new DomainException($"O usuário '{usuario.Nome}' possui restrição para o dia {missa.Dia:dd/MM/yyyy}."
                     );
