@@ -163,7 +163,7 @@ namespace EscalaMensal.Application.Services
                 {
                     if (quantidadeEscalas >= escala.LimitePermitido) 
                     {
-                        throw new DomainException($"Limite atingido! Esta escala (ID {escala.Id}) permite no máximo {escala.LimitePermitido} participações por pessoa. O usuário já possui {quantidadeEscalas} escalas confirmadas nesta escala mensal.");
+                        throw new DomainException($"Limite atingido! Esta escala (ID {escala.Id}) permite no máximo {escala.LimitePermitido} participações por pessoa. O usuário já possui {quantidadeEscalas} missas confirmadas nesta escala mensal.");
                     }
                     return;
                 }
