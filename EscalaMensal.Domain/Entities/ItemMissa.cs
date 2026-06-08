@@ -37,7 +37,7 @@ namespace EscalaMensal.Domain.Entities
             Ordem = ordem;
         }
 
-        public void AtribuirUsuario(int usuarioId) => UsuarioId = usuarioId;
+        public void AtribuirUsuario(int? usuarioId) => UsuarioId = (usuarioId == 0 ? null : usuarioId);
         public void RemoverUsuario() => UsuarioId = null;
     }
 

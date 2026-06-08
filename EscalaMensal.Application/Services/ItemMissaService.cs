@@ -138,8 +138,8 @@ namespace EscalaMensal.Application.Services
 
             ValidarFuncaoUsuario(funcao, usuario);
 
-            itemMissaExistente.AtribuirUsuario(item.UsuarioId ?? 0);
-            
+            itemMissaExistente.AtribuirUsuario(item.UsuarioId);
+
             await _itemMissaRepository.AtualizarAsync(itemMissaExistente);
         }
 
