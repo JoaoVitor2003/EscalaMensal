@@ -1,5 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+using System;
+using System.Collections.Generic;     
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -26,7 +26,7 @@ namespace EscalaMensal.Domain.Entities
         {
             if (dataInicio > dataFim)
             {
-                throw new Exceptions.DomainException("A data de início não pode ser maior que a data de fim.");
+                throw new Exceptions.DomainException("A data de início não pode ser maior que a data de fim."); 
             }
 
             if (Missas.Any(m => m.Dia < dataInicio || m.Dia > dataFim))
@@ -54,6 +54,11 @@ namespace EscalaMensal.Domain.Entities
 
         public Missas AdicionarMissa(DateOnly dia, TimeOnly horario)
         {
+            if (dia < DataInicio || dia > DataFim)
+            {
+                throw new Exceptions.DomainException("A data da missa deve estar dentro do período da escala.");
+            }
+
             var missa = new Missas(dia, horario, this.Id);
             Missas.Add(missa);
             return missa;
