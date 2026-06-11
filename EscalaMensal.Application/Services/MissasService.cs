@@ -2,6 +2,7 @@ using AutoMapper;
 using EscalaMensal.Application.DTOs.Missa;
 using EscalaMensal.Domain.Entities;
 using EscalaMensal.Domain.Interfaces;
+using EscalaMensal.Domain.Exceptions;
 
 namespace EscalaMensal.Application.Services
 {
@@ -28,19 +29,19 @@ namespace EscalaMensal.Application.Services
             var escala = await _escalaRepository.ObterPorIdAsync(missa.EscalaId);
             if (escala == null)
             {
-                throw new Exception("Escala não encontrada.");
+                throw new DomainException("Escala não encontrada.");
             }
 
             if (missa.Dia < escala.DataInicio || missa.Dia > escala.DataFim)
             {
-                throw new Exception($"A data da missa ({missa.Dia.ToShortDateString()}) está fora do intervalo da escala ({escala.DataInicio.ToShortDateString()} até {escala.DataFim.ToShortDateString()}).");
+                throw new DomainException($"A data da missa ({missa.Dia.ToShortDateString()}) está fora do intervalo da escala ({escala.DataInicio.ToShortDateString()} até {escala.DataFim.ToShortDateString()}).");
             }
 
             var missaEntity = _mapper.Map<Missas>(missa);
             var missaExistente = await _missaRepository.ExistePorDiaHorarioEscalaAsync(missa.Dia, missa.Horario, missa.EscalaId);
             if (missaExistente)
             {
-                throw new Exception("Já existe uma missa cadastrada para o mesmo dia, horário nessa escala.");  
+                throw new DomainException("Já existe uma missa cadastrada para o mesmo dia, horário nessa escala.");  
             }
 
             var funcoesObrigatorias = await _funcaoRepository.ObterObrigatoriasAsync();
@@ -58,18 +59,18 @@ namespace EscalaMensal.Application.Services
             var escala = await _escalaRepository.ObterPorIdAsync(missa.EscalaId);
             if (escala == null)
             {
-                throw new Exception("Escala não encontrada.");
+                throw new DomainException("Escala não encontrada.");
             }
 
             if (missa.Dia < escala.DataInicio || missa.Dia > escala.DataFim)
             {
-                throw new Exception($"A data da missa ({missa.Dia.ToShortDateString()}) está fora do intervalo da escala ({escala.DataInicio.ToShortDateString()} até {escala.DataFim.ToShortDateString()}).");
+                throw new DomainException($"A data da missa ({missa.Dia.ToShortDateString()}) está fora do intervalo da escala ({escala.DataInicio.ToShortDateString()} até {escala.DataFim.ToShortDateString()}).");
             }
 
             var missaExistente = await _missaRepository.ExistePorDiaHorarioEscalaAsync(missa.Dia, missa.Horario, missa.EscalaId);
             if (missaExistente)
             {
-                throw new Exception("Já existe uma missa cadastrada para o mesmo dia, horário nessa escala.");  
+                throw new DomainException("Já existe uma missa cadastrada para o mesmo dia, horário nessa escala.");  
             }
             var missaEntity = _mapper.Map<Missas>(missa);
             await _missaRepository.AtualizarAsync(missaEntity);

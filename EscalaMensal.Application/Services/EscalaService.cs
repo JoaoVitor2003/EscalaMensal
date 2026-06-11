@@ -1,11 +1,12 @@
-﻿using AutoMapper;
-using EscalaMensal.Application.DTOs.Escala;
+using AutoMapper;
+using EscalaMensal.Application.DTOs.Escala;    
 using EscalaMensal.Domain.Entities;
 using EscalaMensal.Domain.Interfaces;
+using EscalaMensal.Domain.Exceptions;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace EscalaMensal.Application.Services
+namespace EscalaMensal.Application.Services    
 {
     public class EscalaService : IEscalaService
     {
@@ -44,7 +45,7 @@ namespace EscalaMensal.Application.Services
             var escala = await _escalaRepository.ObterPorIdAsync(escalaDto.Id);
 
             if (escala == null)
-                throw new Exception("Escala não encontrada.");
+                throw new DomainException("Escala não encontrada.");
 
             _mapper.Map(escalaDto, escala);
 

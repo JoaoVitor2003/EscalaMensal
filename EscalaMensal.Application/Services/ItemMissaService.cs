@@ -45,7 +45,7 @@ namespace EscalaMensal.Application.Services
             var itemMissaEntity = _mapper.Map<ItemMissa>(item);
 
             var funcao = await _funcaoRepository.ObterPorIdAsync(itemMissaEntity.FuncaoId)
-                         ?? throw new Exception("Função não encontrada.");
+                         ?? throw new DomainException("Função não encontrada.");
 
             var jaExisteEssaFuncaoNaMissa = await _itemMissaRepository.ExisteFuncaoNaMissaAsync(itemMissaEntity.MissaId, funcao.Id);
 
@@ -65,7 +65,7 @@ namespace EscalaMensal.Application.Services
                     if (await _itemMissaRepository.ExisteUsuarioNaMissaAsync(itemMissaEntity.MissaId, usuario.Id))
                     {
                         throw new DomainException(
-                            $"O usuário '{usuario.Nome}' já está escalado para outra função nesta missa."
+                            $"O usuário '{usuario.Nome}' já está escalado para outra função nesta missa."  
                         );
                     }
 
@@ -83,7 +83,7 @@ namespace EscalaMensal.Application.Services
                 if (restricoes?.Any(r => DateOnly.FromDateTime(r.Data) == missa.Dia) == true)
                 {
                     throw new DomainException(
-                        $"O usuário '{usuario.Nome}' possui restrição para o dia {missa.Dia:dd/MM/yyyy}."
+                        $"O usuário '{usuario.Nome}' possui restrição para o dia {missa.Dia:dd/MM/yyyy}."    
                     );
                 }
             }
@@ -93,16 +93,16 @@ namespace EscalaMensal.Application.Services
             await _itemMissaRepository.AdicionarAsync(itemMissaEntity);
         }
 
-        public async Task AtualizarAsync(ItemMissaAtualizarDto item)
+        public async Task UpdateAsync(ItemMissaAtualizarDto item)
         {
             var itemMissaExistente = await _itemMissaRepository.ObterPorIdAsync(item.Id);
             if (itemMissaExistente == null)
             {
-                throw new Exception($"Item da missa com ID {item.Id} não encontrado.");
+                throw new DomainException($"Item da missa com ID {item.Id} não encontrado.");
             }
             ItemMissa itemMissaEntity = _mapper.Map(item, itemMissaExistente);
             var funcao = await _funcaoRepository.ObterPorIdAsync(itemMissaEntity.FuncaoId)
-                         ?? throw new Exception("Função não encontrada.");
+                         ?? throw new DomainException("Função não encontrada.");
 
             Usuario? usuario = null;
 
@@ -115,10 +115,10 @@ namespace EscalaMensal.Application.Services
                     if (await _itemMissaRepository.ExisteUsuarioNaMissaAsync(itemMissaEntity.MissaId, usuario.Id))
                     {
                         throw new DomainException(
-                            $"O usuário '{usuario.Nome}' já está escalado para outra função nesta missa."
+                            $"O usuário '{usuario.Nome}' já está escalado para outra função nesta missa."  
                         );
                     }
-                    await ValidarLimiteEscalaAsync(itemMissaEntity.MissaId, usuario.Id, itemMissaEntity.Id);
+                    await ValidarLimiteEscalaAsync(itemMissaEntity.MissaId, usuario.Id, itemMissaEntity.Id);    
                 }
             }
 
@@ -143,15 +143,15 @@ namespace EscalaMensal.Application.Services
             await _itemMissaRepository.AtualizarAsync(itemMissaExistente);
         }
 
-        private async Task ValidarLimiteEscalaAsync(int missaId, int usuarioId, int? itemMissaId = null)
+        private async Task ValidarLimiteEscalaAsync(int missaId, int usuarioId, int? itemMissaId = null)        
         {
             var missaInfo = await _missaRepository.ObterPorMissaIdAsync(missaId);
-            
+
             var escala = await _escalaRepository.ObterPorIdAsync(missaInfo.EscalaId);
-            
-            if (escala == null) 
+
+            if (escala == null)
             {
-                throw new Exception("Escala não encontrada.");
+                throw new DomainException("Escala não encontrada.");
             }
 
             var quantidadeEscalas = await _itemMissaRepository.QuantidadeDeEscalasDoUsuarioNaEscalaAsync(missaInfo.EscalaId, usuarioId);
@@ -161,11 +161,18 @@ namespace EscalaMensal.Application.Services
                 var itemExistente = await _itemMissaRepository.ObterPorIdAsync(itemMissaId.Value);
                 if (itemExistente?.UsuarioId == usuarioId)
                 {
-                    if (quantidadeEscalas >= escala.LimitePermitido) 
+                    if (quantidadeEscalas >= escala.LimitePermitido)
                     {
-                        throw new DomainException($"Limite atingido! Esta escala (ID {escala.Id}) permite no máximo {escala.LimitePermitido} participações por pessoa. O usuário já possui {quantidadeEscalas} missas confirmadas nesta escala mensal.");
+                        throw new DomainException($"Limite atingido! Esta escala permite no máximo {escala.LimitePermitido} participações por pessoa. O usuário já possui {quantidadeEscalas} missas confirmadas nesta escala mensal.");
                     }
                     return;
+                }
+            }
+            else 
+            {
+                if (quantidadeEscalas >= escala.LimitePermitido)
+                {
+                    throw new DomainException($"Limite atingido! Esta escala permite no máximo {escala.LimitePermitido} participações por pessoa. O usuário já possui {quantidadeEscalas} missas confirmadas nesta escala mensal.");
                 }
             }
         }
@@ -181,7 +188,7 @@ namespace EscalaMensal.Application.Services
                     => $"Essa pessoa '{u.Nome}' não é um {funcao.Cargo} para servir nessa função.",
 
                 (_, var u) when u.Cargo == funcao.Cargo && u.Nivel < funcao.NivelMinimo
-            => $"O {u.Cargo} '{u.Nome}' precisa ser no mínimo {funcao.NivelMinimo} para esta função.",
+            => $"O {u.Cargo} '{u.Nome}' precisa ser no mínimo {funcao.NivelMinimo} para esta função.",       
 
                 _ => null
             };
@@ -204,6 +211,11 @@ namespace EscalaMensal.Application.Services
                 .ToList();
 
             await _itemMissaRepository.AtualizarOrdemItensMissa(entidades);
+        }
+
+        public async Task AtualizarAsync(ItemMissaAtualizarDto item)
+        {
+            await UpdateAsync(item);
         }
     }
 }
