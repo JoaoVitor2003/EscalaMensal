@@ -188,7 +188,7 @@ namespace EscalaMensal.Application.Services
                     => $"Essa pessoa '{u.Nome}' não é um {funcao.Cargo} para servir nessa função.",
 
                 (_, var u) when u.Cargo == funcao.Cargo && u.Nivel < funcao.NivelMinimo
-            => $"O {u.Cargo} '{u.Nome}' precisa ser no mínimo {funcao.NivelMinimo} para esta função.",       
+            => $"O {u.Cargo} '{u.Nome}' precisa ser no mínimo {funcao.NivelMinimo.ToString().Replace("Nivel", "Ní­vel ")} para esta função.",       
 
                 _ => null
             };
