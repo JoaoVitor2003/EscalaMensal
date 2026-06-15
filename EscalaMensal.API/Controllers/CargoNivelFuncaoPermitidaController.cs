@@ -1,4 +1,5 @@
-﻿using EscalaMensal.Domain.Entities;
+﻿using EscalaMensal.Application.DTOs.CargoNivel;
+using EscalaMensal.Domain.Entities;
 using EscalaMensal.Domain.Enums;
 using EscalaMensal.Domain.Interfaces;
 using Microsoft.AspNetCore.Mvc;
@@ -28,6 +29,20 @@ namespace EscalaMensal.API.Controllers
         {
             var todas = await _service.ObterTodasAsync();
             return Ok(todas);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Adicionar([FromBody] CargoNivelAdicionarDto dto)
+        {
+            await _service.AdicionarAsync(dto.Cargo, dto.Nivel, dto.FuncaoId);
+            return Ok();
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Remover(int id)
+        {
+            await _service.RemoverAsync(id);
+            return NoContent();
         }
     }
 }

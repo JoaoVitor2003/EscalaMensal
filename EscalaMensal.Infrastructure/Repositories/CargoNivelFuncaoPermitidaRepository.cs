@@ -1,7 +1,7 @@
 ﻿using EscalaMensal.Domain.Entities;
 using EscalaMensal.Domain.Enums;
 using EscalaMensal.Domain.Interfaces;
-using EscalaMensal.Infrastructure.Context;
+using EscalaMensal.Infrastructure.Context;        
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
@@ -32,6 +32,22 @@ namespace EscalaMensal.Infrastructure.Repositories
             return await _context.CargoNivelFuncaoPermitidas
                 .Include(c => c.Funcao)
                 .ToListAsync();
+        }
+
+        public async Task AdicionarAsync(CargoNivelFuncaoPermitida cargoNivel)
+        {
+            _context.CargoNivelFuncaoPermitidas.Add(cargoNivel);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task RemoverAsync(int id)
+        {
+            var entity = await _context.CargoNivelFuncaoPermitidas.FindAsync(id);
+            if (entity != null)
+            {
+                _context.CargoNivelFuncaoPermitidas.Remove(entity);
+                await _context.SaveChangesAsync();
+            }
         }
     }
 }

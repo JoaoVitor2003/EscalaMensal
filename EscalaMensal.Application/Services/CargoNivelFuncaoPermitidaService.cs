@@ -24,5 +24,16 @@ namespace EscalaMensal.Application.Services
         {
             return await _repository.ObterTodasAsync();
         }
+
+        public async Task AdicionarAsync(CargoEnum cargo, NivelEnum nivel, int funcaoId)
+        {
+            var cargoNivel = new CargoNivelFuncaoPermitida(cargo, nivel, funcaoId);
+            await _repository.AdicionarAsync(cargoNivel);
+        }
+
+        public async Task RemoverAsync(int id)
+        {
+            await _repository.RemoverAsync(id);
+        }
     }
 }

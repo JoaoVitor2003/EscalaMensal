@@ -9,5 +9,7 @@ namespace EscalaMensal.Domain.Interfaces
     {
         Task<List<Funcao>> ObterFuncoesPermitidasAsync(CargoEnum cargo, NivelEnum nivel);
         Task<List<CargoNivelFuncaoPermitida>> ObterTodasAsync();
+        Task AdicionarAsync(CargoEnum cargo, NivelEnum nivel, int funcaoId);
+        Task RemoverAsync(int id);
     }
 }
