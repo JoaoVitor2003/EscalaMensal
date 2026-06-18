@@ -1,11 +1,12 @@
-ï»¿using AutoMapper;
-using EscalaMensal.Application.DTOs.Usuario;
+using AutoMapper;
+using EscalaMensal.Application.DTOs.Usuario;     
 using EscalaMensal.Domain.Entities;
 using EscalaMensal.Domain.Interfaces;
+using EscalaMensal.Domain.Exceptions;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace EscalaMensal.Application.Services
+namespace EscalaMensal.Application.Services      
 {
     public class UsuarioService : IUsuarioService
     {
@@ -40,10 +41,15 @@ namespace EscalaMensal.Application.Services
             await _usuarioRepository.AdicionarAsync(usuarioEntity);
         }
 
-        public async Task AtualizarAsync(UsuarioAtualizarDto usuario)
+        public async Task AtualizarAsync(UsuarioAtualizarDto usuarioDto)
         {
-            var usuarioEntity = _mapper.Map<Usuario>(usuario);
-            await _usuarioRepository.AtualizarAsync(usuarioEntity);
+            var usuario = await _usuarioRepository.ObterPorIdAsync(usuarioDto.Id);
+
+            if (usuario == null)
+                throw new DomainException("Usuário não encontrado.");
+
+            _mapper.Map(usuarioDto, usuario);
+            await _usuarioRepository.AtualizarAsync(usuario);
         }
 
         public async Task RemoverAsync(int id)

@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using EscalaMensal.Application.DTOs.Usuario;
 using EscalaMensal.Domain.Entities;
 using System;
@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace EscalaMensal.Application.Mappings
+namespace EscalaMensal.Application.Mappings 
 {
     public class UsuarioProfile : Profile
     {
@@ -15,6 +15,7 @@ namespace EscalaMensal.Application.Mappings
         {
             CreateMap<Usuario, UsuarioDto>();
             CreateMap<UsuarioAdicionarDto, Usuario>();
+            CreateMap<UsuarioAtualizarDto, Usuario>();
         }
     }
 }
