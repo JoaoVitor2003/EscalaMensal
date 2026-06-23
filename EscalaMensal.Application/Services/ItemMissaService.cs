@@ -19,9 +19,10 @@ namespace EscalaMensal.Application.Services
         private readonly IEscalaRepository _escalaRepository;
         private readonly IMissasRepository _missaRepository;
         private readonly IRestricaoRepository _restricaoRepository;
+        private readonly ICargoNivelFuncaoPermitidaRepository _cargoNivelFuncaoPermitidaRepository;
         private readonly IMapper _mapper;
 
-        public ItemMissaService(IItemMissaRepository itemMissaRepository, IFuncaoRepository funcaoRepository, IUsuarioRepository usuarioRepository, IEscalaRepository escalaRepository, IMissasRepository missaRepository, IRestricaoRepository restricaoRepository, IMapper mapper)
+        public ItemMissaService(IItemMissaRepository itemMissaRepository, IFuncaoRepository funcaoRepository, IUsuarioRepository usuarioRepository, IEscalaRepository escalaRepository, IMissasRepository missaRepository, IRestricaoRepository restricaoRepository, ICargoNivelFuncaoPermitidaRepository cargoNivelFuncaoPermitidaRepository, IMapper mapper)
         {
             _itemMissaRepository = itemMissaRepository;
             _funcaoRepository = funcaoRepository;
@@ -29,6 +30,7 @@ namespace EscalaMensal.Application.Services
             _escalaRepository = escalaRepository;
             _missaRepository = missaRepository;
             _restricaoRepository = restricaoRepository;
+            _cargoNivelFuncaoPermitidaRepository = cargoNivelFuncaoPermitidaRepository;
             _mapper = mapper;
         }
 
@@ -88,7 +90,7 @@ namespace EscalaMensal.Application.Services
                 }
             }
 
-            ValidarFuncaoUsuario(funcao, usuario);
+            await ValidarFuncaoUsuarioAsync(funcao, usuario);
 
             await _itemMissaRepository.AdicionarAsync(itemMissaEntity);
         }
@@ -136,7 +138,7 @@ namespace EscalaMensal.Application.Services
                 }
             }
 
-            ValidarFuncaoUsuario(funcao, usuario);
+            await ValidarFuncaoUsuarioAsync(funcao, usuario);
 
             itemMissaExistente.AtribuirUsuario(item.UsuarioId);
 
@@ -177,24 +179,32 @@ namespace EscalaMensal.Application.Services
             }
         }
 
-        private static void ValidarFuncaoUsuario(Funcao funcao, Usuario? usuario)
+        private async Task ValidarFuncaoUsuarioAsync(Funcao funcao, Usuario? usuario)
         {
-            string? erro = (funcao.Id, usuario) switch
+            if (usuario == null)
             {
-                (_, null)
-                    => null,
+                return;
+            }
 
-                (_, var u) when u.Cargo < funcao.Cargo
-                    => $"Essa pessoa '{u.Nome}' não é um {funcao.Cargo} para servir nessa função.",
+            if (usuario.Cargo == CargoEnum.Coroinha && funcao.Cargo == CargoEnum.Cerimoniario)
+            {
+                throw new DomainException($"Essa pessoa '{usuario.Nome}' não é um {funcao.Cargo} para servir nessa função.");
+            }
 
-                (_, var u) when u.Cargo == funcao.Cargo && u.Nivel < funcao.NivelMinimo
-            => $"O {u.Cargo} '{u.Nome}' precisa ser no mínimo {funcao.NivelMinimo.ToString().Replace("Nivel", "Ní­vel ")} para esta função.",       
+            var todasPermissoes = await _cargoNivelFuncaoPermitidaRepository.ObterTodasAsync();
 
-                _ => null
-            };
+            var temPermissao = todasPermissoes.Any(p => 
+                p.Cargo == usuario.Cargo && 
+                p.Nivel <= usuario.Nivel && 
+                p.FuncaoId == funcao.Id
+            );
 
-            if (erro != null)
-                throw new DomainException(erro);
+            if (!temPermissao)
+            {
+                throw new DomainException(
+                    $"'{usuario.Nome}' não tem permissão para a função '{funcao.Nome}' com base no seu cargo ({usuario.Cargo}) e nível ({usuario.Nivel.ToString().Replace("Nivel", "Nível")})."
+                );
+            }
         }
 
         public async Task RemoverAsync(int id)
