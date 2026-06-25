@@ -194,9 +194,8 @@ namespace EscalaMensal.Application.Services
             var todasPermissoes = await _cargoNivelFuncaoPermitidaRepository.ObterTodasAsync();
 
             var temPermissao = todasPermissoes.Any(p => 
-                p.Cargo == usuario.Cargo && 
-                p.Nivel <= usuario.Nivel && 
-                p.FuncaoId == funcao.Id
+                p.FuncaoId == funcao.Id &&
+                ((p.Cargo == usuario.Cargo && p.Nivel <= usuario.Nivel) || (p.Cargo < usuario.Cargo))
             );
 
             if (!temPermissao)
