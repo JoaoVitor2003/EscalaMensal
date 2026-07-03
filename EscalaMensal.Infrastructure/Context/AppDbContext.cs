@@ -1,4 +1,4 @@
-﻿using EscalaMensal.Domain.Entities;
+using EscalaMensal.Domain.Entities;
 using EscalaMensal.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -22,6 +22,7 @@ namespace EscalaMensal.Infrastructure.Context
         public DbSet<Restricao> Restricoes { get; set; }
         public DbSet<CargoNivelFuncaoPermitida> CargoNivelFuncaoPermitidas { get; set; }
         public DbSet<HistoricoEscala> HistoricosEscala { get; set; }
+        public DbSet<Configuracao> Configuracoes { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -153,6 +154,9 @@ namespace EscalaMensal.Infrastructure.Context
                 }
             );
 
+            modelBuilder.Entity<Configuracao>().HasData(
+                new Configuracao("MaxNivel", "3")
+            );
         }
 
     }

@@ -1,4 +1,4 @@
-﻿using EscalaMensal.Application.DTOs.CargoNivel;
+using EscalaMensal.Application.DTOs.CargoNivel;
 using EscalaMensal.Domain.Entities;
 using EscalaMensal.Domain.Enums;
 using EscalaMensal.Domain.Interfaces;
@@ -43,6 +43,34 @@ namespace EscalaMensal.API.Controllers
         {
             await _service.RemoverAsync(id);
             return NoContent();
+        }
+
+        [HttpGet("max-nivel")]
+        public async Task<IActionResult> ObterMaxNivel()
+        {
+            var max = await _service.ObterMaxNivelAsync();
+            return Ok(max);
+        }
+
+        [HttpPost("max-nivel/incrementar")]
+        public async Task<IActionResult> IncrementarNivel()
+        {
+            var max = await _service.IncrementarNivelAsync();
+            return Ok(max);
+        }
+
+        [HttpPost("max-nivel/remover")]
+        public async Task<IActionResult> RemoverNivelMaisAlto()
+        {
+            await _service.RemoverNivelMaisAltoAsync();
+            return Ok();
+        }
+
+        [HttpPost("max-nivel/desfazer")]
+        public async Task<IActionResult> DesfazerRemocaoNivel()
+        {
+            await _service.DesfazerRemocaoNivelAsync();
+            return Ok();
         }
     }
 }

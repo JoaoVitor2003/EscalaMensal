@@ -33,6 +33,7 @@ builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
 builder.Services.AddScoped<IFuncaoRepository, FuncaoRepository>();
 builder.Services.AddScoped<IHistoricoEscalaRepository, HistoricoEscalaRepository>();
 builder.Services.AddScoped<ICargoNivelFuncaoPermitidaRepository, CargoNivelFuncaoPermitidaRepository>();
+builder.Services.AddScoped<IConfiguracaoRepository, ConfiguracaoRepository>();
 builder.Services.AddScoped<IMissasRepository, MissasRepository>();
 
 builder.Services.AddScoped<IUsuarioService, UsuarioService>();

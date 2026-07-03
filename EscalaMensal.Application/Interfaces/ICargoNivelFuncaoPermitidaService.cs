@@ -1,4 +1,4 @@
-﻿using EscalaMensal.Domain.Entities;
+using EscalaMensal.Domain.Entities;
 using EscalaMensal.Domain.Enums;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -11,5 +11,9 @@ namespace EscalaMensal.Domain.Interfaces
         Task<List<CargoNivelFuncaoPermitida>> ObterTodasAsync();
         Task AdicionarAsync(CargoEnum cargo, NivelEnum nivel, int funcaoId);
         Task RemoverAsync(int id);
+        Task<int> ObterMaxNivelAsync();
+        Task<int> IncrementarNivelAsync();
+        Task RemoverNivelMaisAltoAsync();
+        Task DesfazerRemocaoNivelAsync();
     }
 }
