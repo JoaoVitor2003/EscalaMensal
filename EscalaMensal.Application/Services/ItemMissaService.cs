@@ -79,15 +79,7 @@ namespace EscalaMensal.Application.Services
 
             if (usuario != null)
             {
-                var restricoes = await _restricaoRepository
-                    .ObterPorUsuarioIdAsync(usuario.Id, missa.Dia.Month, missa.Dia.Year);
-
-                if (restricoes?.Any(r => DateOnly.FromDateTime(r.Data) == missa.Dia) == true)
-                {
-                    throw new DomainException(
-                        $"O usuário '{usuario.Nome}' possui restrição para o dia {missa.Dia:dd/MM/yyyy}."    
-                    );
-                }
+                await ValidarRestricaoEDisponibilidadeDiaAsync(usuario, missa);
             }
 
             await ValidarFuncaoUsuarioAsync(funcao, usuario);
@@ -128,14 +120,7 @@ namespace EscalaMensal.Application.Services
 
             if (usuario != null)
             {
-                var restricoes = await _restricaoRepository
-                    .ObterPorUsuarioIdAsync(usuario.Id, missa.Dia.Month, missa.Dia.Year);
-
-                if (restricoes?.Any(r => DateOnly.FromDateTime(r.Data) == missa.Dia) == true)
-                {
-                    throw new DomainException($"O usuário '{usuario.Nome}' possui restrição para o dia {missa.Dia:dd/MM/yyyy}."
-                    );
-                }
+                await ValidarRestricaoEDisponibilidadeDiaAsync(usuario, missa);
             }
 
             await ValidarFuncaoUsuarioAsync(funcao, usuario);
@@ -143,6 +128,40 @@ namespace EscalaMensal.Application.Services
             itemMissaExistente.AtribuirUsuario(item.UsuarioId);
 
             await _itemMissaRepository.AtualizarAsync(itemMissaExistente);
+        }
+
+        private async Task ValidarRestricaoEDisponibilidadeDiaAsync(Usuario usuario, Missas missa)
+        {
+            var restricoes = await _restricaoRepository
+                .ObterPorUsuarioIdAsync(usuario.Id, missa.Dia.Month, missa.Dia.Year);
+
+            if (restricoes?.Any(r => DateOnly.FromDateTime(r.Data) == missa.Dia) == true)
+            {
+                throw new DomainException(
+                    $"O usuário '{usuario.Nome}' possui restrição para o dia {missa.Dia:dd/MM/yyyy}."
+                );
+            }
+
+            if (missa.Dia.DayOfWeek == DayOfWeek.Wednesday && !usuario.DisponivelQuarta)
+            {
+                throw new DomainException(
+                    $"O usuário '{usuario.Nome}' não está disponível para servir de quarta-feira."
+                );
+            }
+
+            if (missa.Dia.DayOfWeek == DayOfWeek.Thursday && !usuario.DisponivelQuinta)
+            {
+                throw new DomainException(
+                    $"O usuário '{usuario.Nome}' não está disponível para servir de quinta-feira."
+                );
+            }
+
+            if (missa.Dia.DayOfWeek == DayOfWeek.Saturday && !usuario.DisponivelSabado)
+            {
+                throw new DomainException(
+                    $"O usuário '{usuario.Nome}' não está disponível para servir de sábado."
+                );
+            }
         }
 
         private async Task ValidarLimiteEscalaAsync(int missaId, int usuarioId, int? itemMissaId = null)        
