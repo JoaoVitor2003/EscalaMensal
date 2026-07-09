@@ -1,4 +1,4 @@
-﻿using EscalaMensal.Application.DTOs.Restricao;
+using EscalaMensal.Application.DTOs.Restricao;
 using EscalaMensal.Domain.Enums;
 using System;
 using System.Collections.Generic;
@@ -16,9 +16,7 @@ namespace EscalaMensal.Application.DTOs.Usuario
         public CargoEnum Cargo { get; set; }
         public NivelEnum Nivel { get; set; }
         public TimeOnly? HoraPreferencial { get; set; }
-        public bool DisponivelSabado { get; set; }
-        public bool DisponivelQuarta { get; set; }
-        public bool DisponivelQuinta { get; set; }
+        public List<DayOfWeek> DiasDisponiveis { get; set; } = new List<DayOfWeek>();
         public int? UsuarioVinculadoId { get; set; } = null;
     }
 }

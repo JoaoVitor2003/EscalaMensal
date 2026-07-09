@@ -142,24 +142,22 @@ namespace EscalaMensal.Application.Services
                 );
             }
 
-            if (missa.Dia.DayOfWeek == DayOfWeek.Wednesday && !usuario.DisponivelQuarta)
+            if (!usuario.DiasDisponiveis.Contains(missa.Dia.DayOfWeek))
             {
-                throw new DomainException(
-                    $"O usuário '{usuario.Nome}' não está disponível para servir de quarta-feira."
-                );
-            }
+                string diaSemanaPt = missa.Dia.DayOfWeek switch
+                {
+                    DayOfWeek.Sunday => "domingo",
+                    DayOfWeek.Monday => "segunda-feira",
+                    DayOfWeek.Tuesday => "terça-feira",
+                    DayOfWeek.Wednesday => "quarta-feira",
+                    DayOfWeek.Thursday => "quinta-feira",
+                    DayOfWeek.Friday => "sexta-feira",
+                    DayOfWeek.Saturday => "sábado",
+                    _ => missa.Dia.DayOfWeek.ToString()
+                };
 
-            if (missa.Dia.DayOfWeek == DayOfWeek.Thursday && !usuario.DisponivelQuinta)
-            {
                 throw new DomainException(
-                    $"O usuário '{usuario.Nome}' não está disponível para servir de quinta-feira."
-                );
-            }
-
-            if (missa.Dia.DayOfWeek == DayOfWeek.Saturday && !usuario.DisponivelSabado)
-            {
-                throw new DomainException(
-                    $"O usuário '{usuario.Nome}' não está disponível para servir de sábado."
+                    $"O usuário '{usuario.Nome}' não está disponível para servir de {diaSemanaPt}."
                 );
             }
         }

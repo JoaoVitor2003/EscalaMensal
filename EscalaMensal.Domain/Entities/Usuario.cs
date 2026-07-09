@@ -1,4 +1,4 @@
-﻿using EscalaMensal.Domain.Enums;
+using EscalaMensal.Domain.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,11 +15,18 @@ namespace EscalaMensal.Domain.Entities
 
         public CargoEnum Cargo { get; private set; }
         public NivelEnum Nivel { get; private set; }
-        public TimeOnly? HoraPreferencial { get; set; }
-        public bool DisponivelSabado { get; set; }
-        public bool DisponivelQuarta { get; set; }
-        public bool DisponivelQuinta { get; set; }
-        public int? UsuarioVinculadoId { get; private set; }
+         public TimeOnly? HoraPreferencial { get; set; }
+         public string DiasDisponiveisRaw { get; set; } = "";
+ 
+         [System.ComponentModel.DataAnnotations.Schema.NotMapped]
+         public List<DayOfWeek> DiasDisponiveis
+         {
+             get => string.IsNullOrEmpty(DiasDisponiveisRaw)
+                 ? new List<DayOfWeek>()
+                 : DiasDisponiveisRaw.Split(',').Select(Enum.Parse<DayOfWeek>).ToList();
+             set => DiasDisponiveisRaw = string.Join(",", value);
+         }
+         public int? UsuarioVinculadoId { get; private set; }
         public Usuario? UsuarioVinculado { get; private set; }
         public int? DiasEscalados { get; set; }
         public ICollection<Restricao> Restricoes { get; private set; } = new List<Restricao>();
