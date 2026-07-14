@@ -15,7 +15,7 @@ namespace EscalaMensal.Application.DTOs.Usuario
         public bool Ativo { get; set; } = true;
         public CargoEnum Cargo { get; set; }
         public NivelEnum Nivel { get; set; }
-        public TimeOnly? HoraPreferencial { get; set; }
+        public List<TimeOnly> HorasPreferenciais { get; set; } = new List<TimeOnly>();
         public List<DayOfWeek> DiasDisponiveis { get; set; } = new List<DayOfWeek>();
         public int? UsuarioVinculadoId { get; set; } = null;
     }

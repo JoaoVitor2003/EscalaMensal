@@ -15,7 +15,16 @@ namespace EscalaMensal.Domain.Entities
 
         public CargoEnum Cargo { get; private set; }
         public NivelEnum Nivel { get; private set; }
-         public TimeOnly? HoraPreferencial { get; set; }
+         public string HorasPreferenciaisRaw { get; set; } = "";
+
+         [System.ComponentModel.DataAnnotations.Schema.NotMapped]
+         public List<TimeOnly> HorasPreferenciais
+         {
+             get => string.IsNullOrEmpty(HorasPreferenciaisRaw)
+                 ? new List<TimeOnly>()
+                 : HorasPreferenciaisRaw.Split(',').Select(TimeOnly.Parse).ToList();
+             set => HorasPreferenciaisRaw = string.Join(",", value.Select(t => t.ToString("HH:mm")));
+         }
          public string DiasDisponiveisRaw { get; set; } = "";
  
          [System.ComponentModel.DataAnnotations.Schema.NotMapped]
