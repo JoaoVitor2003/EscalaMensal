@@ -79,7 +79,7 @@ namespace EscalaMensal.Application.Services
 
             if (usuario != null)
             {
-                await ValidarRestricaoEDisponibilidadeDiaAsync(usuario, missa);
+                await ValidarRestricaoEDisponibilidadeDiaEHorarioAsync(usuario, missa);
             }
 
             await ValidarFuncaoUsuarioAsync(funcao, usuario);
@@ -120,7 +120,7 @@ namespace EscalaMensal.Application.Services
 
             if (usuario != null)
             {
-                await ValidarRestricaoEDisponibilidadeDiaAsync(usuario, missa);
+                await ValidarRestricaoEDisponibilidadeDiaEHorarioAsync(usuario, missa);
             }
 
             await ValidarFuncaoUsuarioAsync(funcao, usuario);
@@ -130,7 +130,7 @@ namespace EscalaMensal.Application.Services
             await _itemMissaRepository.AtualizarAsync(itemMissaExistente);
         }
 
-        private async Task ValidarRestricaoEDisponibilidadeDiaAsync(Usuario usuario, Missas missa)
+        private async Task ValidarRestricaoEDisponibilidadeDiaEHorarioAsync(Usuario usuario, Missas missa)
         {
             var restricoes = await _restricaoRepository
                 .ObterPorUsuarioIdAsync(usuario.Id, missa.Dia.Month, missa.Dia.Year);
@@ -158,6 +158,13 @@ namespace EscalaMensal.Application.Services
 
                 throw new DomainException(
                     $"O usuário '{usuario.Nome}' não está disponível para servir de {diaSemanaPt}."
+                );
+            }
+
+            if (!usuario.HorasPreferenciais.Any(h => h.Hour == missa.Horario.Hour && h.Minute == missa.Horario.Minute))
+            {
+                throw new DomainException(
+                    $"O usuário '{usuario.Nome}' não está disponível para servir no horário das {missa.Horario:HH:mm}."
                 );
             }
         }
