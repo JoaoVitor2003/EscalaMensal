@@ -1,30 +1,28 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace EscalaMensal.Domain.Entities
 {
     public class HistoricoEscala
     {
         public int Id { get; private set; }
+        public int EscalaOriginalId { get; private set; }
+        public DateOnly DataInicio { get; private set; }
+        public DateOnly DataFim { get; private set; }
+        public int LimitePermitido { get; private set; }
+        public DateTime DataFinalizacao { get; private set; }
 
-        public DateTime Data { get; private set; }
+        public ICollection<HistoricoMissa> HistoricoMissas { get; private set; } = new List<HistoricoMissa>();
 
-        public int UsuarioId { get; private set; }
-        public Usuario Usuario { get; private set; }
-
-        public int FuncaoId { get; private set; }
-        public Funcao Funcao { get; private set; }
-
-
-        public HistoricoEscala(int usuarioId, int funcaoId, DateTime data) 
+        public HistoricoEscala(int escalaOriginalId, DateOnly dataInicio, DateOnly dataFim, int limitePermitido, DateTime dataFinalizacao)
         {
-            UsuarioId = usuarioId;
-            FuncaoId = funcaoId;
-            Data = data;
+            EscalaOriginalId = escalaOriginalId;
+            DataInicio = dataInicio;
+            DataFim = dataFim;
+            LimitePermitido = limitePermitido;
+            DataFinalizacao = dataFinalizacao;
         }
-    }
 
+        private HistoricoEscala() { }
+    }
 }

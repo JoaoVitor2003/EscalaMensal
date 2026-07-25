@@ -1,4 +1,4 @@
-﻿using EscalaMensal.Domain.Entities;
+using EscalaMensal.Domain.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,6 +12,8 @@ namespace EscalaMensal.Domain.Interfaces
         Task<List<HistoricoEscala>> ObterPorMesAnoAsync(int mes, int ano);
         Task<List<HistoricoEscala>> ObterPorUsuarioIdAsync(int usuarioId);
         Task AdicionarAsync(HistoricoEscala historico);
+        Task<List<HistoricoEscala>> ObterTodosPorEscalaOriginalIdAsync(int escalaOriginalId);
+        Task RemoverAsync(int id);
     }
-
 }
+

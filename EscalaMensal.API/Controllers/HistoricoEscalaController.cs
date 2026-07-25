@@ -1,4 +1,4 @@
-﻿using EscalaMensal.Domain.Entities;
+using EscalaMensal.Domain.Entities;
 using EscalaMensal.Domain.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
@@ -35,5 +35,20 @@ namespace EscalaMensal.API.Controllers
             await _service.AdicionarAsync(historico);
             return Ok();
         }
+
+        [HttpPost("finalizar/{escalaId}")]
+        public async Task<IActionResult> Finalizar(int escalaId)
+        {
+            try
+            {
+                await _service.FinalizarEscalaAsync(escalaId);
+                return Ok(new { message = "Escala finalizada com sucesso!" });
+            }
+            catch (System.Exception ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
+        }
     }
 }
+

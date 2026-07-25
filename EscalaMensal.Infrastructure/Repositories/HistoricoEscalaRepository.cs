@@ -1,4 +1,4 @@
-﻿using EscalaMensal.Domain.Entities;
+using EscalaMensal.Domain.Entities;
 using EscalaMensal.Domain.Interfaces;
 using EscalaMensal.Infrastructure.Context;
 using Microsoft.EntityFrameworkCore;
@@ -17,18 +17,27 @@ namespace EscalaMensal.Infrastructure.Repositories
         public async Task<List<HistoricoEscala>> ObterPorMesAnoAsync(int mes, int ano)
         {
             return await _context.HistoricosEscala
-                .Where(h => h.Data.Month == mes && h.Data.Year == ano)
-                .Include(h => h.Usuario)
-                .Include(h => h.Funcao)
+                .Include(h => h.HistoricoMissas)
+                    .ThenInclude(m => m.HistoricoItensMissa)
+                    .ThenInclude(i => i.Usuario)
+                .Include(h => h.HistoricoMissas)
+                    .ThenInclude(m => m.HistoricoItensMissa)
+                    .ThenInclude(i => i.Funcao)
+                .Where(h => h.DataInicio.Month == mes && h.DataInicio.Year == ano)
                 .ToListAsync();
         }
 
         public async Task<List<HistoricoEscala>> ObterPorUsuarioIdAsync(int usuarioId)
         {
             return await _context.HistoricosEscala
-                .Where(h => h.UsuarioId == usuarioId)
-                .Include(h => h.Funcao)
-                .OrderByDescending(h => h.Data)
+                .Include(h => h.HistoricoMissas)
+                    .ThenInclude(m => m.HistoricoItensMissa)
+                    .ThenInclude(i => i.Usuario)
+                .Include(h => h.HistoricoMissas)
+                    .ThenInclude(m => m.HistoricoItensMissa)
+                    .ThenInclude(i => i.Funcao)
+                .Where(h => h.HistoricoMissas.Any(m => m.HistoricoItensMissa.Any(i => i.UsuarioId == usuarioId)))
+                .OrderByDescending(h => h.DataFinalizacao)
                 .ToListAsync();
         }
 
@@ -37,5 +46,25 @@ namespace EscalaMensal.Infrastructure.Repositories
             await _context.HistoricosEscala.AddAsync(historico);
             await _context.SaveChangesAsync();
         }
+
+        public async Task<List<HistoricoEscala>> ObterTodosPorEscalaOriginalIdAsync(int escalaOriginalId)
+        {
+            return await _context.HistoricosEscala
+                .Include(h => h.HistoricoMissas)
+                    .ThenInclude(m => m.HistoricoItensMissa)
+                .Where(h => h.EscalaOriginalId == escalaOriginalId)
+                .ToListAsync();
+        }
+
+        public async Task RemoverAsync(int id)
+        {
+            var historico = await _context.HistoricosEscala.FindAsync(id);
+            if (historico != null)
+            {
+                _context.HistoricosEscala.Remove(historico);
+                await _context.SaveChangesAsync();
+            }
+        }
     }
 }
+

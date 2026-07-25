@@ -22,6 +22,8 @@ namespace EscalaMensal.Infrastructure.Context
         public DbSet<Restricao> Restricoes { get; set; }
         public DbSet<CargoNivelFuncaoPermitida> CargoNivelFuncaoPermitidas { get; set; }
         public DbSet<HistoricoEscala> HistoricosEscala { get; set; }
+        public DbSet<HistoricoMissa> HistoricosMissa { get; set; }
+        public DbSet<HistoricoItemMissa> HistoricosItemMissa { get; set; }
         public DbSet<Configuracao> Configuracoes { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -57,15 +59,27 @@ namespace EscalaMensal.Infrastructure.Context
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<HistoricoEscala>()
-                .HasOne(h => h.Usuario)
+                .HasMany(h => h.HistoricoMissas)
+                .WithOne(m => m.HistoricoEscala)
+                .HasForeignKey(m => m.HistoricoEscalaId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<HistoricoMissa>()
+                .HasMany(m => m.HistoricoItensMissa)
+                .WithOne(i => i.HistoricoMissa)
+                .HasForeignKey(i => i.HistoricoMissaId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<HistoricoItemMissa>()
+                .HasOne(i => i.Usuario)
                 .WithMany()
-                .HasForeignKey(h => h.UsuarioId)
+                .HasForeignKey(i => i.UsuarioId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            modelBuilder.Entity<HistoricoEscala>()
-                .HasOne(h => h.Funcao)
+            modelBuilder.Entity<HistoricoItemMissa>()
+                .HasOne(i => i.Funcao)
                 .WithMany()
-                .HasForeignKey(h => h.FuncaoId)
+                .HasForeignKey(i => i.FuncaoId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<CargoNivelFuncaoPermitida>()
