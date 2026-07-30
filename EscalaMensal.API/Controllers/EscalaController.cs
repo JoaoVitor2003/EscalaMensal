@@ -1,4 +1,4 @@
-﻿using EscalaMensal.Application.DTOs.Escala;
+using EscalaMensal.Application.DTOs.Escala;
 using EscalaMensal.Domain.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
@@ -61,6 +61,18 @@ namespace EscalaMensal.API.Controllers
         {
             await _escalaService.RemoverAsync(id);
             return NoContent();
+        }
+
+        [HttpGet("{id}/exportar-excel")]
+        public async Task<IActionResult> ExportarExcel(int id)
+        {
+            var escala = await _escalaService.ObterPorIdAsync(id);
+            if (escala == null)
+                return NotFound();
+
+            byte[] fileBytes = _escalaService.GerarPlanilhaExcel(escala);
+            var fileName = $"escala_{escala.DataInicio:yyyy_MM_dd}_a_{escala.DataFim:yyyy_MM_dd}.xlsx";
+            return File(fileBytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
         }
     }
 }

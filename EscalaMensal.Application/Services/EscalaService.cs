@@ -1,10 +1,17 @@
 using AutoMapper;
 using EscalaMensal.Application.DTOs.Escala;    
+using EscalaMensal.Application.DTOs.ItemMissa;
+using EscalaMensal.Application.DTOs.Missa;
 using EscalaMensal.Domain.Entities;
 using EscalaMensal.Domain.Interfaces;
 using EscalaMensal.Domain.Exceptions;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using System;
+using System.Linq;
+using System.Globalization;
+using System.IO;
+using ClosedXML.Excel;
 
 namespace EscalaMensal.Application.Services    
 {
@@ -63,6 +70,145 @@ namespace EscalaMensal.Application.Services
 
             var dto = _mapper.Map<EscalaDto>(escala);
             return dto;
+        }
+
+        public byte[] GerarPlanilhaExcel(EscalaDto escala)
+        {
+            if (escala == null) return Array.Empty<byte>();
+
+            using (var workbook = new XLWorkbook())
+            {
+                var worksheet = workbook.Worksheets.Add("Escala de Missas");
+                worksheet.ShowGridLines = true;
+                
+                var culture = new CultureInfo("pt-BR");
+
+                worksheet.Cell(1, 1).Value = $"ESCALA DE MISSAS #{escala.Id}";
+                worksheet.Cell(1, 1).Style.Font.Bold = true;
+                worksheet.Cell(1, 1).Style.Font.FontSize = 14;
+
+                worksheet.Cell(2, 1).Value = $"Período: {escala.DataInicio.ToString("dd/MM/yyyy", culture)} a {escala.DataFim.ToString("dd/MM/yyyy", culture)}";
+                worksheet.Cell(2, 1).Style.Font.Italic = true;
+                worksheet.Cell(3, 1).Value = $"Limite de vezes para servir: {escala.LimitePermitido}";
+                worksheet.Cell(3, 1).Style.Font.Italic = true;
+
+                var missasPorDia = escala.Missas
+                    .Where(m => m != null)
+                    .GroupBy(m => m.Dia)
+                    .OrderBy(g => g.Key)
+                    .ToList();
+
+                var maxMissasNumDia = missasPorDia
+                    .Select(g => g.Count())
+                    .DefaultIfEmpty(0)
+                    .Max();
+
+                if (maxMissasNumDia == 0)
+                {
+                    using (var ms = new MemoryStream())
+                    {
+                        workbook.SaveAs(ms);
+                        return ms.ToArray();
+                    }
+                }
+
+                int currentRow = 5;
+
+                foreach (var grupoDia in missasPorDia)
+                {
+                    var data = grupoDia.Key;
+                    var diaSemana = culture.TextInfo.ToTitleCase(data.ToString("dddd", culture));
+                    var textoData = $"{data.ToString("dd/MM/yyyy", culture)} - {diaSemana}";
+
+                    var missasDoDia = grupoDia.OrderBy(m => m.Horario).ToList();
+                    int numMissasDia = missasDoDia.Count;
+                    int colunasUsadasDia = numMissasDia * 2;
+
+                    int colunasParaMesclar = Math.Max(2, colunasUsadasDia);
+                    var rangeData = worksheet.Range(currentRow, 1, currentRow, colunasParaMesclar);
+                    rangeData.Merge();
+                    rangeData.Value = textoData;
+                    rangeData.Style.Font.Bold = true;
+                    rangeData.Style.Font.FontSize = 11;
+                    rangeData.Style.Fill.BackgroundColor = XLColor.FromHtml("#D3D3D3"); // Cinza claro
+                    rangeData.Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
+                    rangeData.Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+                    rangeData.Style.Border.InsideBorder = XLBorderStyleValues.Thin;
+                    
+                    currentRow++;
+
+                    for (int j = 0; j < numMissasDia; j++)
+                    {
+                        int startCol = j * 2 + 1;
+                        int endCol = startCol + 1;
+                        var rangeHorario = worksheet.Range(currentRow, startCol, currentRow, endCol);
+                        rangeHorario.Merge();
+                        rangeHorario.Value = missasDoDia[j].Horario.ToString("HH:mm", culture);
+                        rangeHorario.Style.Font.Bold = true;
+                        rangeHorario.Style.Fill.BackgroundColor = XLColor.FromHtml("#EAEAEA"); // Cinza muito claro
+                        rangeHorario.Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
+                        rangeHorario.Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+                    }
+                    
+                    if (colunasParaMesclar > colunasUsadasDia)
+                    {
+                        worksheet.Range(currentRow, colunasUsadasDia + 1, currentRow, colunasParaMesclar).Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+                    }
+
+                    currentRow++;
+
+                    var maxItensDia = missasDoDia
+                        .Select(m => m.ItensMissa?.Count ?? 0)
+                        .DefaultIfEmpty(0)
+                        .Max();
+
+                    for (int i = 0; i < maxItensDia; i++)
+                    {
+                        for (int j = 0; j < numMissasDia; j++)
+                        {
+                            var missa = missasDoDia[j];
+                            int colFuncao = j * 2 + 1;
+                            int colNome = colFuncao + 1;
+
+                            var cellFuncao = worksheet.Cell(currentRow, colFuncao);
+                            var cellNome = worksheet.Cell(currentRow, colNome);
+
+                            cellFuncao.Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+                            cellNome.Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+
+                            var itensMissaOrdenados = (missa.ItensMissa ?? new List<ItemMissaDto>())
+                                .OrderBy(item => item.Ordem)
+                                .ToList();
+
+                            if (i < itensMissaOrdenados.Count)
+                            {
+                                var item = itensMissaOrdenados[i];
+                                cellFuncao.Value = item?.Funcao?.Abreviacao ?? "";
+                                cellFuncao.Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
+                                
+                                cellNome.Value = item?.Usuario?.Nome ?? "-";
+                                cellNome.Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Left;
+                            }
+                            else
+                            {
+                                cellFuncao.Value = string.Empty;
+                                cellNome.Value = string.Empty;
+                            }
+                        }
+                        currentRow++;
+                    }
+
+                    currentRow++;
+                }
+
+                worksheet.Columns().AdjustToContents();
+
+                using (var ms = new MemoryStream())
+                {
+                    workbook.SaveAs(ms);
+                    return ms.ToArray();
+                }
+            }
         }
     }
 }
