@@ -25,6 +25,7 @@ namespace EscalaMensal.Infrastructure.Context
         public DbSet<HistoricoMissa> HistoricosMissa { get; set; }
         public DbSet<HistoricoItemMissa> HistoricosItemMissa { get; set; }
         public DbSet<Configuracao> Configuracoes { get; set; }
+        public DbSet<HorarioFixo> HorariosFixos { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -170,6 +171,13 @@ namespace EscalaMensal.Infrastructure.Context
 
             modelBuilder.Entity<Configuracao>().HasData(
                 new Configuracao("MaxNivel", "3")
+            );
+
+            modelBuilder.Entity<HorarioFixo>().HasData(
+                new { Id = 1, Horario = new TimeOnly(7, 30) },
+                new { Id = 2, Horario = new TimeOnly(9, 0) },
+                new { Id = 3, Horario = new TimeOnly(11, 0) },
+                new { Id = 4, Horario = new TimeOnly(19, 0) }
             );
         }
 

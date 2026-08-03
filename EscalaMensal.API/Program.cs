@@ -1,6 +1,7 @@
 using EscalaMensal.Application.DTOs.Funcao;
 using EscalaMensal.Application.Mappings;
 using EscalaMensal.Application.Services;
+using EscalaMensal.Application.Interfaces;
 using EscalaMensal.Domain.Interfaces;
 using EscalaMensal.Infrastructure.Context;
 using EscalaMensal.Infrastructure.Repositories;
@@ -35,6 +36,7 @@ builder.Services.AddScoped<IHistoricoEscalaRepository, HistoricoEscalaRepository
 builder.Services.AddScoped<ICargoNivelFuncaoPermitidaRepository, CargoNivelFuncaoPermitidaRepository>();
 builder.Services.AddScoped<IConfiguracaoRepository, ConfiguracaoRepository>();
 builder.Services.AddScoped<IMissasRepository, MissasRepository>();
+builder.Services.AddScoped<IHorarioFixoRepository, HorarioFixoRepository>();
 
 builder.Services.AddScoped<IUsuarioService, UsuarioService>();
 builder.Services.AddScoped<IRestricaoService, RestricaoService>();
@@ -44,6 +46,7 @@ builder.Services.AddScoped<IFuncaoService, FuncaoService>();
 builder.Services.AddScoped<IEscalaService, EscalaService>();
 builder.Services.AddScoped<ICargoNivelFuncaoPermitidaService, CargoNivelFuncaoPermitidaService>();
 builder.Services.AddScoped<IMissasService, MissasService>();
+builder.Services.AddScoped<IHorarioFixoService, HorarioFixoService>();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
@@ -52,6 +55,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddAutoMapper(typeof(MissaProfile));
 builder.Services.AddAutoMapper(typeof(ItemMissaProfile));
 builder.Services.AddAutoMapper(typeof(FuncaoDto));
+builder.Services.AddAutoMapper(typeof(HorarioFixoProfile));
 
 builder.Services.AddCors(options =>
 {
