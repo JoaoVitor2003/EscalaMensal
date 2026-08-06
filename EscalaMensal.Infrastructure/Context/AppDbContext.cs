@@ -125,15 +125,9 @@ namespace EscalaMensal.Infrastructure.Context
                     Cargo = CargoEnum.Coroinha,
                     NivelMinimo = NivelEnum.Nivel2
                 },
-                new Funcao(6, "Ceroferario 1", false)
+                new Funcao(6, "Ceroferário", false)
                 {
-                    Abreviacao = "Ce1",
-                    Cargo = CargoEnum.Coroinha,
-                    NivelMinimo = NivelEnum.Nivel3
-                },
-                new Funcao(7, "Ceroferario 2", false)
-                {
-                    Abreviacao = "Ce2",
+                    Abreviacao = "Ce",
                     Cargo = CargoEnum.Coroinha,
                     NivelMinimo = NivelEnum.Nivel3
                 },
