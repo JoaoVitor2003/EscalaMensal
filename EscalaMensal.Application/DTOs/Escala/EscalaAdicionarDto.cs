@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,5 +11,6 @@ namespace EscalaMensal.Application.DTOs.Escala
         public DateOnly DataInicio { get; set; }
         public DateOnly DataFim { get; set; }
         public int LimitePermitido { get; set; }
+        public bool CriarMissasPadrao { get; set; }
     }
 }

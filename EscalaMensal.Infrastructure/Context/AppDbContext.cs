@@ -26,6 +26,7 @@ namespace EscalaMensal.Infrastructure.Context
         public DbSet<HistoricoItemMissa> HistoricosItemMissa { get; set; }
         public DbSet<Configuracao> Configuracoes { get; set; }
         public DbSet<HorarioFixo> HorariosFixos { get; set; }
+        public DbSet<MissaPadrao> MissasPadrao { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

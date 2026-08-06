@@ -19,11 +19,15 @@ namespace EscalaMensal.Application.Services
     {
         private readonly IEscalaRepository _escalaRepository;
         private readonly IMapper _mapper;
+        private readonly IMissaPadraoRepository _missaPadraoRepository;
+        private readonly IFuncaoRepository _funcaoRepository;
 
-        public EscalaService(IEscalaRepository escalaRepository, IMapper mapper)
+        public EscalaService(IEscalaRepository escalaRepository, IMapper mapper, IMissaPadraoRepository missaPadraoRepository, IFuncaoRepository funcaoRepository)
         {
             _escalaRepository = escalaRepository;
             _mapper = mapper;
+            _missaPadraoRepository = missaPadraoRepository;
+            _funcaoRepository = funcaoRepository;
         }
 
         public async Task<EscalaDto?> ObterPorMesAnoAsync(int mes, int ano)
@@ -44,6 +48,31 @@ namespace EscalaMensal.Application.Services
         public async Task AdicionarAsync(EscalaAdicionarDto escala)
         {
             var novaEscalaEntity = _mapper.Map<Escala>(escala);
+
+            if (escala.CriarMissasPadrao)
+            {
+                var missasPadrao = await _missaPadraoRepository.ObterTodasAsync();
+                var funcoesObrigatorias = await _funcaoRepository.ObterObrigatoriasAsync();
+
+                var dataAtual = escala.DataInicio;
+                while (dataAtual <= escala.DataFim)
+                {
+                    var diaSemana = dataAtual.DayOfWeek;
+                    var templatesDoDia = missasPadrao.Where(m => m.DiaSemana == diaSemana).ToList();
+
+                    foreach (var template in templatesDoDia)
+                    {
+                        var missa = novaEscalaEntity.AdicionarMissa(dataAtual, template.Horario);
+                        foreach (var funcao in funcoesObrigatorias)
+                        {
+                            missa.ItensMissa.Add(new ItemMissa(missaId: 0, funcaoId: funcao.Id));
+                        }
+                    }
+
+                    dataAtual = dataAtual.AddDays(1);
+                }
+            }
+
             await _escalaRepository.AdicionarAsync(novaEscalaEntity);
         }
 

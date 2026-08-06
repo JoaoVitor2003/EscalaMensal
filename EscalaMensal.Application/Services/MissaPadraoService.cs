@@ -1,0 +1,46 @@
+using AutoMapper;
+using EscalaMensal.Application.DTOs.MissaPadrao;
+using EscalaMensal.Application.Interfaces;
+using EscalaMensal.Domain.Entities;
+using EscalaMensal.Domain.Interfaces;
+using EscalaMensal.Domain.Exceptions;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+
+namespace EscalaMensal.Application.Services
+{
+    public class MissaPadraoService : IMissaPadraoService
+    {
+        private readonly IMissaPadraoRepository _missaPadraoRepository;
+        private readonly IMapper _mapper;
+
+        public MissaPadraoService(IMissaPadraoRepository missaPadraoRepository, IMapper mapper)
+        {
+            _missaPadraoRepository = missaPadraoRepository;
+            _mapper = mapper;
+        }
+
+        public async Task<List<MissaPadraoDto>> ObterTodasAsync()
+        {
+            var entities = await _missaPadraoRepository.ObterTodasAsync();
+            return _mapper.Map<List<MissaPadraoDto>>(entities);
+        }
+
+        public async Task AdicionarAsync(MissaPadraoAdicionarDto dto)
+        {
+            var existe = await _missaPadraoRepository.ExistePorDiaHorarioAsync(dto.DiaSemana, dto.Horario);
+            if (existe)
+            {
+                throw new DomainException("Já existe uma missa padrão cadastrada para esse dia da semana e horário.");
+            }
+
+            var entity = _mapper.Map<MissaPadrao>(dto);
+            await _missaPadraoRepository.AdicionarAsync(entity);
+        }
+
+        public async Task RemoverAsync(int id)
+        {
+            await _missaPadraoRepository.RemoverAsync(id);
+        }
+    }
+}

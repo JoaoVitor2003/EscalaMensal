@@ -37,6 +37,7 @@ builder.Services.AddScoped<ICargoNivelFuncaoPermitidaRepository, CargoNivelFunca
 builder.Services.AddScoped<IConfiguracaoRepository, ConfiguracaoRepository>();
 builder.Services.AddScoped<IMissasRepository, MissasRepository>();
 builder.Services.AddScoped<IHorarioFixoRepository, HorarioFixoRepository>();
+builder.Services.AddScoped<IMissaPadraoRepository, MissaPadraoRepository>();
 
 builder.Services.AddScoped<IUsuarioService, UsuarioService>();
 builder.Services.AddScoped<IRestricaoService, RestricaoService>();
@@ -47,6 +48,7 @@ builder.Services.AddScoped<IEscalaService, EscalaService>();
 builder.Services.AddScoped<ICargoNivelFuncaoPermitidaService, CargoNivelFuncaoPermitidaService>();
 builder.Services.AddScoped<IMissasService, MissasService>();
 builder.Services.AddScoped<IHorarioFixoService, HorarioFixoService>();
+builder.Services.AddScoped<IMissaPadraoService, MissaPadraoService>();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
@@ -56,6 +58,7 @@ builder.Services.AddAutoMapper(typeof(MissaProfile));
 builder.Services.AddAutoMapper(typeof(ItemMissaProfile));
 builder.Services.AddAutoMapper(typeof(FuncaoDto));
 builder.Services.AddAutoMapper(typeof(HorarioFixoProfile));
+builder.Services.AddAutoMapper(typeof(MissaPadraoProfile));
 
 builder.Services.AddCors(options =>
 {
