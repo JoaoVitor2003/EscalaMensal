@@ -38,6 +38,24 @@ namespace EscalaMensal.Application.Services
             await _missaPadraoRepository.AdicionarAsync(entity);
         }
 
+        public async Task AtualizarAsync(int id, MissaPadraoAdicionarDto dto)
+        {
+            var missaPadrao = await _missaPadraoRepository.ObterPorIdAsync(id);
+            if (missaPadrao == null)
+            {
+                throw new DomainException("Missa padrão não encontrada.");
+            }
+
+            var todas = await _missaPadraoRepository.ObterTodasAsync();
+            if (todas.Any(m => m.Id != id && m.DiaSemana == dto.DiaSemana && m.Horario == dto.Horario))
+            {
+                throw new DomainException("Já existe uma missa padrão cadastrada para esse dia da semana e horário.");
+            }
+
+            missaPadrao.Atualizar(dto.DiaSemana, dto.Horario);
+            await _missaPadraoRepository.AtualizarAsync(missaPadrao);
+        }
+
         public async Task RemoverAsync(int id)
         {
             await _missaPadraoRepository.RemoverAsync(id);

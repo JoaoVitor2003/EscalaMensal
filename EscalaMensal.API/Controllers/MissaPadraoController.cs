@@ -31,6 +31,13 @@ namespace EscalaMensal.API.Controllers
             return Ok();
         }
 
+        [HttpPut("{id}")]
+        public async Task<ActionResult> Atualizar(int id, [FromBody] MissaPadraoAdicionarDto dto)
+        {
+            await _service.AtualizarAsync(id, dto);
+            return NoContent();
+        }
+
         [HttpDelete("{id}")]
         public async Task<ActionResult> Remover(int id)
         {

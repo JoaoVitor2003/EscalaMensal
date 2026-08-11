@@ -28,6 +28,12 @@ namespace EscalaMensal.Infrastructure.Repositories
             await _context.SaveChangesAsync();
         }
 
+        public async Task AtualizarAsync(MissaPadrao missaPadrao)
+        {
+            _context.MissasPadrao.Update(missaPadrao);
+            await _context.SaveChangesAsync();
+        }
+
         public async Task RemoverAsync(int id)
         {
             var entity = await _context.MissasPadrao.FindAsync(id);

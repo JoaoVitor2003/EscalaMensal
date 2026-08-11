@@ -9,6 +9,7 @@ namespace EscalaMensal.Domain.Interfaces
     {
         Task<List<MissaPadrao>> ObterTodasAsync();
         Task AdicionarAsync(MissaPadrao missaPadrao);
+        Task AtualizarAsync(MissaPadrao missaPadrao);
         Task RemoverAsync(int id);
         Task<MissaPadrao?> ObterPorIdAsync(int id);
         Task<bool> ExistePorDiaHorarioAsync(DayOfWeek diaSemana, TimeOnly horario);

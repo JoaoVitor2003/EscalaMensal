@@ -8,6 +8,7 @@ namespace EscalaMensal.Application.Interfaces
     {
         Task<List<MissaPadraoDto>> ObterTodasAsync();
         Task AdicionarAsync(MissaPadraoAdicionarDto dto);
+        Task AtualizarAsync(int id, MissaPadraoAdicionarDto dto);
         Task RemoverAsync(int id);
     }
 }

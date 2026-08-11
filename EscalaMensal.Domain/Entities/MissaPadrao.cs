@@ -14,6 +14,12 @@ namespace EscalaMensal.Domain.Entities
             Horario = horario;
         }
 
+        public void Atualizar(DayOfWeek diaSemana, TimeOnly horario)
+        {
+            DiaSemana = diaSemana;
+            Horario = horario;
+        }
+
         // Construtor para o EF Core
         protected MissaPadrao() { }
     }
