@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using EscalaMensal.Application.DTOs.Escala;
 using EscalaMensal.Application.DTOs.Restricao;
 using EscalaMensal.Domain.Entities;
@@ -14,7 +14,14 @@ namespace EscalaMensal.Application.Mappings
     {
         public RestricaoProfile()
         {
-            CreateMap<Restricao, RestricaoDto>();
+            CreateMap<Restricao, RestricaoDto>()
+                .AfterMap((src, dest) =>
+                {
+                    if (dest.Usuario != null)
+                    {
+                        dest.Usuario.Restricoes = null;
+                    }
+                });
             CreateMap<RestricaoAdicionarDto, Restricao>();
             CreateMap<RestricaoAtualizarDto, Restricao>();
             CreateMap<EscalaDeleteDto, Escala>();

@@ -1,4 +1,4 @@
-﻿using EscalaMensal.Domain.Exceptions;
+using EscalaMensal.Domain.Exceptions;
 using System.Net;
 
 public class ExceptionHandlingMiddleware
@@ -22,6 +22,7 @@ public class ExceptionHandlingMiddleware
         }
         catch (Exception ex)
         {
+            Console.WriteLine($"ERRO INTERNO DETECTADO: {ex}");
             await HandleExceptionAsync(context, "Ocorreu um erro interno no servidor.", HttpStatusCode.InternalServerError);
         }
     }
