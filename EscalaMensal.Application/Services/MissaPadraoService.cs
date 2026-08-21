@@ -52,7 +52,7 @@ namespace EscalaMensal.Application.Services
                 throw new DomainException("Já existe uma missa padrão cadastrada para esse dia da semana e horário.");
             }
 
-            missaPadrao.Atualizar(dto.DiaSemana, dto.Horario);
+            missaPadrao.Atualizar(dto.DiaSemana, dto.Horario, dto.CriarFuncoesPadrao);
             await _missaPadraoRepository.AtualizarAsync(missaPadrao);
         }
 

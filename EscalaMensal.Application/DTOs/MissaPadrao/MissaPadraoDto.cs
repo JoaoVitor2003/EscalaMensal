@@ -7,5 +7,6 @@ namespace EscalaMensal.Application.DTOs.MissaPadrao
         public int Id { get; set; }
         public DayOfWeek DiaSemana { get; set; }
         public TimeOnly Horario { get; set; }
+        public bool CriarFuncoesPadrao { get; set; }
     }
 }

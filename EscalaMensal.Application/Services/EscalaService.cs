@@ -63,9 +63,12 @@ namespace EscalaMensal.Application.Services
                     foreach (var template in templatesDoDia)
                     {
                         var missa = novaEscalaEntity.AdicionarMissa(dataAtual, template.Horario);
-                        foreach (var funcao in funcoesObrigatorias)
+                        if (template.CriarFuncoesPadrao)
                         {
-                            missa.ItensMissa.Add(new ItemMissa(missaId: 0, funcaoId: funcao.Id));
+                            foreach (var funcao in funcoesObrigatorias)
+                            {
+                                missa.ItensMissa.Add(new ItemMissa(missaId: 0, funcaoId: funcao.Id));
+                            }
                         }
                     }
 
