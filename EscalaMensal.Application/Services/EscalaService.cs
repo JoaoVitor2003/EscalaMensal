@@ -233,7 +233,18 @@ namespace EscalaMensal.Application.Services
                     currentRow++;
                 }
 
-                worksheet.Columns().AdjustToContents();
+                int totalColumns = maxMissasNumDia * 2;
+                for (int col = 1; col <= totalColumns; col++)
+                {
+                    if (col % 2 != 0)
+                    {
+                        worksheet.Column(col).Width = 6;
+                    }
+                    else
+                    {
+                        worksheet.Column(col).AdjustToContents();
+                    }
+                }
 
                 using (var ms = new MemoryStream())
                 {
