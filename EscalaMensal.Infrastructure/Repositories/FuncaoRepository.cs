@@ -1,4 +1,4 @@
-﻿using EscalaMensal.Domain.Entities;
+using EscalaMensal.Domain.Entities;
 using EscalaMensal.Domain.Interfaces;
 using EscalaMensal.Infrastructure.Context;
 using Microsoft.EntityFrameworkCore;
@@ -27,6 +27,11 @@ namespace EscalaMensal.Infrastructure.Repositories
         public async Task<Funcao?> ObterPorIdAsync(int id)
         {
             return await _context.Funcoes.FindAsync(id);
+        }
+
+        public async Task<List<Funcao>> ObterPorIdsAsync(List<int> ids)
+        {
+            return await _context.Funcoes.Where(f => ids.Contains(f.Id)).ToListAsync();
         }
 
         public async Task AdicionarAsync(Funcao funcao)

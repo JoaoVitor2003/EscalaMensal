@@ -1,4 +1,4 @@
-﻿using EscalaMensal.Domain.Entities;
+using EscalaMensal.Domain.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,6 +12,7 @@ namespace EscalaMensal.Domain.Interfaces
         Task<List<Funcao>> ObterTodasAsync();
         Task<List<Funcao>> ObterObrigatoriasAsync();
         Task<Funcao?> ObterPorIdAsync(int id);
+        Task<List<Funcao>> ObterPorIdsAsync(List<int> ids);
         Task AdicionarAsync(Funcao funcao);
         Task AtualizarAsync(Funcao funcao);
         Task RemoverAsync(int id);

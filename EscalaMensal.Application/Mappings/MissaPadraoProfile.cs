@@ -9,7 +9,8 @@ namespace EscalaMensal.Application.Mappings
         public MissaPadraoProfile()
         {
             CreateMap<MissaPadrao, MissaPadraoDto>();
-            CreateMap<MissaPadraoAdicionarDto, MissaPadrao>();
+            CreateMap<MissaPadraoAdicionarDto, MissaPadrao>()
+                .ForMember(dest => dest.Funcoes, opt => opt.Ignore());
         }
     }
 }

@@ -12,11 +12,13 @@ namespace EscalaMensal.Application.Services
     public class MissaPadraoService : IMissaPadraoService
     {
         private readonly IMissaPadraoRepository _missaPadraoRepository;
+        private readonly IFuncaoRepository _funcaoRepository;
         private readonly IMapper _mapper;
 
-        public MissaPadraoService(IMissaPadraoRepository missaPadraoRepository, IMapper mapper)
+        public MissaPadraoService(IMissaPadraoRepository missaPadraoRepository, IFuncaoRepository funcaoRepository, IMapper mapper)
         {
             _missaPadraoRepository = missaPadraoRepository;
+            _funcaoRepository = funcaoRepository;
             _mapper = mapper;
         }
 
@@ -34,7 +36,14 @@ namespace EscalaMensal.Application.Services
                 throw new DomainException("Já existe uma missa padrão cadastrada para esse dia da semana e horário.");
             }
 
-            var entity = _mapper.Map<MissaPadrao>(dto);
+            var entity = new MissaPadrao(dto.DiaSemana, dto.Horario, dto.CriarFuncoesPadrao);
+
+            if (!dto.CriarFuncoesPadrao && dto.FuncoesIds != null && dto.FuncoesIds.Count > 0)
+            {
+                var funcoes = await _funcaoRepository.ObterPorIdsAsync(dto.FuncoesIds);
+                entity.AtualizarFuncoes(funcoes);
+            }
+
             await _missaPadraoRepository.AdicionarAsync(entity);
         }
 
@@ -53,6 +62,17 @@ namespace EscalaMensal.Application.Services
             }
 
             missaPadrao.Atualizar(dto.DiaSemana, dto.Horario, dto.CriarFuncoesPadrao);
+
+            if (!dto.CriarFuncoesPadrao && dto.FuncoesIds != null)
+            {
+                var funcoes = await _funcaoRepository.ObterPorIdsAsync(dto.FuncoesIds);
+                missaPadrao.AtualizarFuncoes(funcoes);
+            }
+            else
+            {
+                missaPadrao.Funcoes.Clear();
+            }
+
             await _missaPadraoRepository.AtualizarAsync(missaPadrao);
         }
 

@@ -19,7 +19,7 @@ namespace EscalaMensal.Infrastructure.Repositories
 
         public async Task<List<MissaPadrao>> ObterTodasAsync()
         {
-            return await _context.MissasPadrao.ToListAsync();
+            return await _context.MissasPadrao.Include(m => m.Funcoes).ToListAsync();
         }
 
         public async Task AdicionarAsync(MissaPadrao missaPadrao)
@@ -46,7 +46,7 @@ namespace EscalaMensal.Infrastructure.Repositories
 
         public async Task<MissaPadrao?> ObterPorIdAsync(int id)
         {
-            return await _context.MissasPadrao.FindAsync(id);
+            return await _context.MissasPadrao.Include(m => m.Funcoes).FirstOrDefaultAsync(m => m.Id == id);
         }
 
         public async Task<bool> ExistePorDiaHorarioAsync(DayOfWeek diaSemana, TimeOnly horario)

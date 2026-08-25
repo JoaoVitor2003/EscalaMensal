@@ -88,6 +88,10 @@ namespace EscalaMensal.Infrastructure.Context
                 .HasIndex(c => new { c.Cargo, c.Nivel, c.FuncaoId })
                 .IsUnique();
 
+            modelBuilder.Entity<MissaPadrao>()
+                .HasMany(m => m.Funcoes)
+                .WithMany();
+
             modelBuilder.Entity<Usuario>().HasData(
     new { Id = 1, Nome = "João", Nivel = NivelEnum.Nivel3, Cargo = CargoEnum.Cerimoniario, Ativo = true, HorasPreferenciaisRaw = "10:00", DiasDisponiveisRaw = "Saturday", LimitePermitido = 3 },
     new { Id = 2, Nome = "Pedro", Nivel = NivelEnum.Nivel2, Cargo = CargoEnum.Cerimoniario, Ativo = false, HorasPreferenciaisRaw = "07:30", DiasDisponiveisRaw = "Wednesday,Thursday,Saturday", LimitePermitido = 3 },

@@ -70,6 +70,13 @@ namespace EscalaMensal.Application.Services
                                 missa.ItensMissa.Add(new ItemMissa(missaId: 0, funcaoId: funcao.Id));
                             }
                         }
+                        else
+                        {
+                            foreach (var funcao in template.Funcoes)
+                            {
+                                missa.ItensMissa.Add(new ItemMissa(missaId: 0, funcaoId: funcao.Id));
+                            }
+                        }
                     }
 
                     dataAtual = dataAtual.AddDays(1);
