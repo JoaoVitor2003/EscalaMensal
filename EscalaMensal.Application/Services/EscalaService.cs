@@ -225,7 +225,7 @@ namespace EscalaMensal.Application.Services
                                 cellFuncao.Value = item?.Funcao?.Abreviacao ?? "";
                                 cellFuncao.Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
                                 
-                                cellNome.Value = item?.Usuario?.Nome ?? "-";
+                                cellNome.Value = item?.Membro?.Nome ?? "-";
                                 cellNome.Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Left;
                             }
                             else

@@ -1,12 +1,12 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace EscalaMensal.Application.DTOs.Escala
+namespace EscalaMensal.Application.DTOs.Membro
 {
-    public class UsuarioDeleteDto
+    public class MembroDeleteDto
     {
         public int Id { get; set; }
     }

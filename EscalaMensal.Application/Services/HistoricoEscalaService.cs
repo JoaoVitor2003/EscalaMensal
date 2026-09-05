@@ -29,9 +29,9 @@ namespace EscalaMensal.Application.Services
             return dtos;
         }
 
-        public async Task<List<HistoricoEscalaDto>> ObterPorUsuarioIdAsync(int usuarioId)
+        public async Task<List<HistoricoEscalaDto>> ObterPorMembroIdAsync(int membroId)
         {
-            var historicos = await _historicoEscalaRepository.ObterPorUsuarioIdAsync(usuarioId);
+            var historicos = await _historicoEscalaRepository.ObterPorMembroIdAsync(membroId);
             var dtos = _mapper.Map<List<HistoricoEscalaDto>>(historicos);
             return dtos;
         }
@@ -91,8 +91,8 @@ namespace EscalaMensal.Application.Services
                         item.FuncaoId,
                         item.Funcao?.Nome ?? "N/A",
                         item.Funcao?.Abreviacao ?? "N/A",
-                        item.UsuarioId,
-                        item.Usuario?.Nome,
+                        item.MembroId,
+                        item.Membro?.Nome,
                         item.Ordem
                     );
 
@@ -146,7 +146,7 @@ namespace EscalaMensal.Application.Services
                     }
 
                     if (item.FuncaoId != histItem.FuncaoId ||
-                        item.UsuarioId != histItem.UsuarioId ||
+                        item.MembroId != histItem.MembroId ||
                         item.Ordem != histItem.Ordem)
                     {
                         return false;

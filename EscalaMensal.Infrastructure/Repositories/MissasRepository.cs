@@ -1,4 +1,4 @@
-﻿using EscalaMensal.Domain.Entities;
+using EscalaMensal.Domain.Entities;
 using EscalaMensal.Domain.Interfaces;
 using EscalaMensal.Infrastructure.Context;
 using Microsoft.EntityFrameworkCore;
@@ -41,7 +41,7 @@ namespace EscalaMensal.Infrastructure.Repositories
                     .Include(m => m.ItensMissa)
                     .ThenInclude(f => f.Funcao)
                     .Include(m => m.ItensMissa)
-                    .ThenInclude(u => u.Usuario)
+                    .ThenInclude(u => u.Membro)
                     .FirstAsync(m => m.Id == missaId);
         }
 

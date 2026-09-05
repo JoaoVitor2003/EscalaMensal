@@ -30,7 +30,7 @@ builder.Services.AddControllers();
 builder.Services.AddScoped<IEscalaRepository, EscalaRepository>();
 builder.Services.AddScoped<IRestricaoRepository, RestricaoRepository>();
 builder.Services.AddScoped<IItemMissaRepository, EscalaItemRepository>();
-builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
+builder.Services.AddScoped<IMembroRepository, MembroRepository>();
 builder.Services.AddScoped<IFuncaoRepository, FuncaoRepository>();
 builder.Services.AddScoped<IHistoricoEscalaRepository, HistoricoEscalaRepository>();
 builder.Services.AddScoped<ICargoNivelFuncaoPermitidaRepository, CargoNivelFuncaoPermitidaRepository>();
@@ -39,7 +39,7 @@ builder.Services.AddScoped<IMissasRepository, MissasRepository>();
 builder.Services.AddScoped<IHorarioFixoRepository, HorarioFixoRepository>();
 builder.Services.AddScoped<IMissaPadraoRepository, MissaPadraoRepository>();
 
-builder.Services.AddScoped<IUsuarioService, UsuarioService>();
+builder.Services.AddScoped<IMembroService, MembroService>();
 builder.Services.AddScoped<IRestricaoService, RestricaoService>();
 builder.Services.AddScoped<IItemMissaService, ItemMissaService>();
 builder.Services.AddScoped<IHistoricoEscalaService, HistoricoEscalaService>();
@@ -59,6 +59,7 @@ builder.Services.AddAutoMapper(typeof(ItemMissaProfile));
 builder.Services.AddAutoMapper(typeof(FuncaoDto));
 builder.Services.AddAutoMapper(typeof(HorarioFixoProfile));
 builder.Services.AddAutoMapper(typeof(MissaPadraoProfile));
+builder.Services.AddAutoMapper(typeof(MembroProfile));
 
 builder.Services.AddCors(options =>
 {

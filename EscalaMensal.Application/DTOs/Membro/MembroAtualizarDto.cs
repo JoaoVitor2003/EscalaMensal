@@ -6,21 +6,17 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace EscalaMensal.Application.DTOs.Usuario
+namespace EscalaMensal.Application.DTOs.Membro
 {
-    public class UsuarioDto
+    public class MembroAtualizarDto
     {
         public int Id { get; set; }
         public string Nome { get; set; }
-        public bool Ativo { get; set; }
-
+        public bool Ativo { get; set; } = true;
         public CargoEnum Cargo { get; set; }
         public NivelEnum Nivel { get; set; }
         public List<TimeOnly> HorasPreferenciais { get; set; } = new List<TimeOnly>();
         public List<DayOfWeek> DiasDisponiveis { get; set; } = new List<DayOfWeek>();
-        public int? UsuarioVinculadoId { get; set; }
-        public UsuarioDto? UsuarioVinculado { get; set; }
-        public int? DiasEscalados { get; set; }
-        public ICollection<RestricaoDto> Restricoes { get; set; } = new List<RestricaoDto>();
+        public int? MembroVinculadoId { get; set; } = null;
     }
 }

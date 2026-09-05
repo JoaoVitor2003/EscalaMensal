@@ -1,5 +1,5 @@
-﻿using EscalaMensal.Application.DTOs.Funcao;
-using EscalaMensal.Application.DTOs.Usuario;
+using EscalaMensal.Application.DTOs.Funcao;
+using EscalaMensal.Application.DTOs.Membro;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,7 +11,7 @@ namespace EscalaMensal.Application.DTOs.HistoricoEscala
     public class HistoricoEscalaAdicionarDto
     {
         public DateTime Data { get; set; }
-        public int UsuarioId { get; set; }
+        public int MembroId { get; set; }
         public int FuncaoId { get; set; }
     }
 }

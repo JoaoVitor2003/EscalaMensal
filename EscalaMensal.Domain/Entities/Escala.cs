@@ -36,15 +36,15 @@ namespace EscalaMensal.Domain.Entities
 
             var maxEscalado = Missas
                 .SelectMany(m => m.ItensMissa)
-                .Where(i => i.UsuarioId != null)
-                .GroupBy(i => i.UsuarioId)
+                .Where(i => i.MembroId != null)
+                .GroupBy(i => i.MembroId)
                 .Select(g => g.Count())
                 .DefaultIfEmpty(0)
                 .Max();
 
             if (limitePermitido < maxEscalado)
             {
-                throw new Exceptions.DomainException($"Não é possível reduzir o limite máximo para {limitePermitido}, pois existem usuários escalados {maxEscalado} vezes.");
+                throw new Exceptions.DomainException($"Não é possível reduzir o limite máximo para {limitePermitido}, pois existem membros escalados {maxEscalado} vezes.");
             }
 
             DataInicio = dataInicio;

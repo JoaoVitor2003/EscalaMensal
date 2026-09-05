@@ -15,18 +15,18 @@ namespace EscalaMensal.Application.Services
     {
         private readonly IItemMissaRepository _itemMissaRepository;
         private readonly IFuncaoRepository _funcaoRepository;
-        private readonly IUsuarioRepository _usuarioRepository;
+        private readonly IMembroRepository _membroRepository;
         private readonly IEscalaRepository _escalaRepository;
         private readonly IMissasRepository _missaRepository;
         private readonly IRestricaoRepository _restricaoRepository;
         private readonly ICargoNivelFuncaoPermitidaRepository _cargoNivelFuncaoPermitidaRepository;
         private readonly IMapper _mapper;
 
-        public ItemMissaService(IItemMissaRepository itemMissaRepository, IFuncaoRepository funcaoRepository, IUsuarioRepository usuarioRepository, IEscalaRepository escalaRepository, IMissasRepository missaRepository, IRestricaoRepository restricaoRepository, ICargoNivelFuncaoPermitidaRepository cargoNivelFuncaoPermitidaRepository, IMapper mapper)
+        public ItemMissaService(IItemMissaRepository itemMissaRepository, IFuncaoRepository funcaoRepository, IMembroRepository membroRepository, IEscalaRepository escalaRepository, IMissasRepository missaRepository, IRestricaoRepository restricaoRepository, ICargoNivelFuncaoPermitidaRepository cargoNivelFuncaoPermitidaRepository, IMapper mapper)
         {
             _itemMissaRepository = itemMissaRepository;
             _funcaoRepository = funcaoRepository;
-            _usuarioRepository = usuarioRepository;
+            _membroRepository = membroRepository;
             _escalaRepository = escalaRepository;
             _missaRepository = missaRepository;
             _restricaoRepository = restricaoRepository;
@@ -56,33 +56,33 @@ namespace EscalaMensal.Application.Services
                 throw new DomainException($"A função '{funcao.Nome}' não permite mais de uma escala nesta missa.");
             }
 
-            Usuario? usuario = null;
+            Membro? membro = null;
 
-            if (itemMissaEntity.UsuarioId.HasValue && itemMissaEntity.UsuarioId != 0)
+            if (itemMissaEntity.MembroId.HasValue && itemMissaEntity.MembroId != 0)
             {
-                usuario = await _usuarioRepository.ObterPorIdAsync(itemMissaEntity.UsuarioId.Value);
+                membro = await _membroRepository.ObterPorIdAsync(itemMissaEntity.MembroId.Value);
 
-                if (usuario != null)
+                if (membro != null)
                 {
-                    if (await _itemMissaRepository.ExisteUsuarioNaMissaAsync(itemMissaEntity.MissaId, usuario.Id))
+                    if (await _itemMissaRepository.ExisteMembroNaMissaAsync(itemMissaEntity.MissaId, membro.Id))
                     {
                         throw new DomainException(
-                            $"O usuário '{usuario.Nome}' já está escalado para outra função nesta missa."  
+                            $"O membro '{membro.Nome}' já está escalado para outra função nesta missa."
                         );
                     }
 
-                    await ValidarLimiteEscalaAsync(itemMissaEntity.MissaId, usuario.Id);
+                    await ValidarLimiteEscalaAsync(itemMissaEntity.MissaId, membro.Id);
                 }
             }
 
             var missa = await _missaRepository.ObterPorMissaIdAsync(itemMissaEntity.MissaId);
 
-            if (usuario != null)
+            if (membro != null)
             {
-                await ValidarRestricaoEDisponibilidadeDiaEHorarioAsync(usuario, missa);
+                await ValidarRestricaoEDisponibilidadeDiaEHorarioAsync(membro, missa);
             }
 
-            await ValidarFuncaoUsuarioAsync(funcao, usuario);
+            await ValidarFuncaoMembroAsync(funcao, membro);
 
             await _itemMissaRepository.AdicionarAsync(itemMissaEntity);
         }
@@ -98,51 +98,51 @@ namespace EscalaMensal.Application.Services
             var funcao = await _funcaoRepository.ObterPorIdAsync(itemMissaEntity.FuncaoId)
                          ?? throw new DomainException("Função não encontrada.");
 
-            Usuario? usuario = null;
+            Membro? membro = null;
 
-            if (itemMissaEntity.UsuarioId.HasValue && itemMissaEntity.UsuarioId != 0)
+            if (itemMissaEntity.MembroId.HasValue && itemMissaEntity.MembroId != 0)
             {
-                usuario = await _usuarioRepository.ObterPorIdAsync(itemMissaEntity.UsuarioId.Value);
+                membro = await _membroRepository.ObterPorIdAsync(itemMissaEntity.MembroId.Value);
 
-                if (usuario != null)
+                if (membro != null)
                 {
-                    if (await _itemMissaRepository.ExisteUsuarioNaMissaAsync(itemMissaEntity.MissaId, usuario.Id))
+                    if (await _itemMissaRepository.ExisteMembroNaMissaAsync(itemMissaEntity.MissaId, membro.Id))
                     {
                         throw new DomainException(
-                            $"O usuário '{usuario.Nome}' já está escalado para outra função nesta missa."  
+                            $"O membro '{membro.Nome}' já está escalado para outra função nesta missa."
                         );
                     }
-                    await ValidarLimiteEscalaAsync(itemMissaEntity.MissaId, usuario.Id, itemMissaEntity.Id);    
+                    await ValidarLimiteEscalaAsync(itemMissaEntity.MissaId, membro.Id, itemMissaEntity.Id);
                 }
             }
 
             var missa = await _missaRepository.ObterPorMissaIdAsync(itemMissaEntity.MissaId);
 
-            if (usuario != null)
+            if (membro != null)
             {
-                await ValidarRestricaoEDisponibilidadeDiaEHorarioAsync(usuario, missa);
+                await ValidarRestricaoEDisponibilidadeDiaEHorarioAsync(membro, missa);
             }
 
-            await ValidarFuncaoUsuarioAsync(funcao, usuario);
+            await ValidarFuncaoMembroAsync(funcao, membro);
 
-            itemMissaExistente.AtribuirUsuario(item.UsuarioId);
+            itemMissaExistente.AtribuirMembro(item.MembroId);
 
             await _itemMissaRepository.AtualizarAsync(itemMissaExistente);
         }
 
-        private async Task ValidarRestricaoEDisponibilidadeDiaEHorarioAsync(Usuario usuario, Missas missa)
+        private async Task ValidarRestricaoEDisponibilidadeDiaEHorarioAsync(Membro membro, Missas missa)
         {
             var restricoes = await _restricaoRepository
-                .ObterPorUsuarioIdAsync(usuario.Id, missa.Dia.Month, missa.Dia.Year);
+                .ObterPorMembroIdAsync(membro.Id, missa.Dia.Month, missa.Dia.Year);
 
             if (restricoes?.Any(r => DateOnly.FromDateTime(r.Data) == missa.Dia) == true)
             {
                 throw new DomainException(
-                    $"O usuário '{usuario.Nome}' possui restrição para o dia {missa.Dia:dd/MM/yyyy}."
+                    $"O membro '{membro.Nome}' possui restrição para o dia {missa.Dia:dd/MM/yyyy}."
                 );
             }
 
-            if (!usuario.DiasDisponiveis.Contains(missa.Dia.DayOfWeek))
+            if (!membro.DiasDisponiveis.Contains(missa.Dia.DayOfWeek))
             {
                 string diaSemanaPt = missa.Dia.DayOfWeek switch
                 {
@@ -157,19 +157,19 @@ namespace EscalaMensal.Application.Services
                 };
 
                 throw new DomainException(
-                    $"O usuário '{usuario.Nome}' não está disponível para servir de {diaSemanaPt}."
+                    $"O membro '{membro.Nome}' não está disponível para servir de {diaSemanaPt}."
                 );
             }
 
-            if (!usuario.HorasPreferenciais.Any(h => h.Hour == missa.Horario.Hour && h.Minute == missa.Horario.Minute))
+            if (!membro.HorasPreferenciais.Any(h => h.Hour == missa.Horario.Hour && h.Minute == missa.Horario.Minute))
             {
                 throw new DomainException(
-                    $"O usuário '{usuario.Nome}' não está disponível para servir no horário das {missa.Horario:HH:mm}."
+                    $"O membro '{membro.Nome}' não está disponível para servir no horário das {missa.Horario:HH:mm}."
                 );
             }
         }
 
-        private async Task ValidarLimiteEscalaAsync(int missaId, int usuarioId, int? itemMissaId = null)        
+        private async Task ValidarLimiteEscalaAsync(int missaId, int membroId, int? itemMissaId = null)
         {
             var missaInfo = await _missaRepository.ObterPorMissaIdAsync(missaId);
 
@@ -180,16 +180,16 @@ namespace EscalaMensal.Application.Services
                 throw new DomainException("Escala não encontrada.");
             }
 
-            var quantidadeEscalas = await _itemMissaRepository.QuantidadeDeEscalasDoUsuarioNaEscalaAsync(missaInfo.EscalaId, usuarioId);
+            var quantidadeEscalas = await _itemMissaRepository.QuantidadeDeEscalasDoMembroNaEscalaAsync(missaInfo.EscalaId, membroId);
 
             if (itemMissaId.HasValue)
             {
                 var itemExistente = await _itemMissaRepository.ObterPorIdAsync(itemMissaId.Value);
-                if (itemExistente?.UsuarioId == usuarioId)
+                if (itemExistente?.MembroId == membroId)
                 {
                     if (quantidadeEscalas >= escala.LimitePermitido)
                     {
-                        throw new DomainException($"Limite atingido! Esta escala permite no máximo {escala.LimitePermitido} participações por pessoa. O usuário já possui {quantidadeEscalas} missas confirmadas nesta escala mensal.");
+                        throw new DomainException($"Limite atingido! Esta escala permite no máximo {escala.LimitePermitido} participações por pessoa. O membro já possui {quantidadeEscalas} missas confirmadas nesta escala mensal.");
                     }
                     return;
                 }
@@ -198,34 +198,34 @@ namespace EscalaMensal.Application.Services
             {
                 if (quantidadeEscalas >= escala.LimitePermitido)
                 {
-                    throw new DomainException($"Limite atingido! Esta escala permite no máximo {escala.LimitePermitido} participações por pessoa. O usuário já possui {quantidadeEscalas} missas confirmadas nesta escala mensal.");
+                    throw new DomainException($"Limite atingido! Esta escala permite no máximo {escala.LimitePermitido} participações por pessoa. O membro já possui {quantidadeEscalas} missas confirmadas nesta escala mensal.");
                 }
             }
         }
 
-        private async Task ValidarFuncaoUsuarioAsync(Funcao funcao, Usuario? usuario)
+        private async Task ValidarFuncaoMembroAsync(Funcao funcao, Membro? membro)
         {
-            if (usuario == null)
+            if (membro == null)
             {
                 return;
             }
 
-            if (usuario.Cargo == CargoEnum.Coroinha && funcao.Cargo == CargoEnum.Cerimoniario)
+            if (membro.Cargo == CargoEnum.Coroinha && funcao.Cargo == CargoEnum.Cerimoniario)
             {
-                throw new DomainException($"Essa pessoa '{usuario.Nome}' não é um {funcao.Cargo} para servir nessa função.");
+                throw new DomainException($"Essa pessoa '{membro.Nome}' não é um {funcao.Cargo} para servir nessa função.");
             }
 
             var todasPermissoes = await _cargoNivelFuncaoPermitidaRepository.ObterTodasAsync();
 
             var temPermissao = todasPermissoes.Any(p => 
                 p.FuncaoId == funcao.Id &&
-                ((p.Cargo == usuario.Cargo && p.Nivel <= usuario.Nivel) || (p.Cargo < usuario.Cargo))
+                ((p.Cargo == membro.Cargo && p.Nivel <= membro.Nivel) || (p.Cargo < membro.Cargo))
             );
 
             if (!temPermissao)
             {
                 throw new DomainException(
-                    $"'{usuario.Nome}' não tem permissão para a função '{funcao.Nome}' com base no seu cargo ({usuario.Cargo}) e nível ({usuario.Nivel.ToString().Replace("Nivel", "Nível")})."
+                    $"'{membro.Nome}' não tem permissão para a função '{funcao.Nome}' com base no seu cargo ({membro.Cargo}) e nível ({membro.Nivel.ToString().Replace("Nivel", "Nível")})."
                 );
             }
         }

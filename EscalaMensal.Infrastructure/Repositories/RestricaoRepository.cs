@@ -1,4 +1,4 @@
-﻿using EscalaMensal.Domain.Entities;
+using EscalaMensal.Domain.Entities;
 using EscalaMensal.Domain.Interfaces;
 using EscalaMensal.Infrastructure.Context;
 using Microsoft.EntityFrameworkCore;
@@ -18,14 +18,14 @@ namespace EscalaMensal.Infrastructure.Repositories
         {
             return await _context.Restricoes
                 .Where(r => r.Data.Month == mes && r.Data.Year == ano)
-                .Include(r => r.Usuario)
+                .Include(r => r.Membro)
                 .ToListAsync();
         }
 
-        public async Task<List<Restricao>> ObterPorUsuarioIdAsync(int usuarioId, int mes, int ano)
+        public async Task<List<Restricao>> ObterPorMembroIdAsync(int membroId, int mes, int ano)
         {
             return await _context.Restricoes
-                .Where(r => r.UsuarioId == usuarioId && r.Data.Month == mes && r.Data.Year == ano)
+                .Where(r => r.MembroId == membroId && r.Data.Month == mes && r.Data.Year == ano)
                 .ToListAsync();
         }
 

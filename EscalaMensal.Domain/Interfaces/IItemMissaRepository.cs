@@ -1,4 +1,4 @@
-﻿using EscalaMensal.Domain.Entities;
+using EscalaMensal.Domain.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,9 +11,9 @@ namespace EscalaMensal.Domain.Interfaces
     {
         Task<ItemMissa?> ObterPorIdAsync(int id);
         Task<ItemMissa> ObterPorMissaIdAsync(int missaId);
-        Task <bool> ExisteUsuarioNaMissaAsync(int missaId, int usuarioId);
+        Task<bool> ExisteMembroNaMissaAsync(int missaId, int membroId);
         Task<bool> ExisteFuncaoNaMissaAsync(int missaId, int funcaoId);
-        Task<int> QuantidadeDeEscalasDoUsuarioNaEscalaAsync(int escalaId, int usuarioId);
+        Task<int> QuantidadeDeEscalasDoMembroNaEscalaAsync(int escalaId, int membroId);
         Task AdicionarAsync(ItemMissa item);
         Task AtualizarOrdemItensMissa(List<ItemMissa> itens);
         Task AtualizarAsync(ItemMissa item);

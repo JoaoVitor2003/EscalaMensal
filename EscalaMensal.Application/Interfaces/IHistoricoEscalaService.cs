@@ -8,7 +8,7 @@ namespace EscalaMensal.Domain.Interfaces
     public interface IHistoricoEscalaService
     {
         Task<List<HistoricoEscalaDto>> ObterPorMesAnoAsync(int mes, int ano);
-        Task<List<HistoricoEscalaDto>> ObterPorUsuarioIdAsync(int usuarioId);
+        Task<List<HistoricoEscalaDto>> ObterPorMembroIdAsync(int membroId);
         Task AdicionarAsync(HistoricoEscala Adicionar);
         Task FinalizarEscalaAsync(int escalaId);
     }

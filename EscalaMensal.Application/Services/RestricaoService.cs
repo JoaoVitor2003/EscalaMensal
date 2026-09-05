@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using EscalaMensal.Application.DTOs.Restricao;
 using EscalaMensal.Domain.Entities;
 using EscalaMensal.Domain.Interfaces;
@@ -25,9 +25,9 @@ namespace EscalaMensal.Application.Services
             return restricoesDto;
         }
 
-        public async Task<List<RestricaoDto>> ObterPorUsuarioIdAsync(int usuarioId, int mes, int ano)
+        public async Task<List<RestricaoDto>> ObterPorMembroIdAsync(int membroId, int mes, int ano)
         {
-            var restricoes = await _restricaoRepository.ObterPorUsuarioIdAsync(usuarioId, mes, ano);
+            var restricoes = await _restricaoRepository.ObterPorMembroIdAsync(membroId, mes, ano);
             var restricoesDto = _mapper.Map<List<RestricaoDto>>(restricoes);
             return restricoesDto;
         }

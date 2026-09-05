@@ -1,6 +1,6 @@
-﻿using EscalaMensal.Application.DTOs.Funcao;
+using EscalaMensal.Application.DTOs.Funcao;
 using EscalaMensal.Application.DTOs.Missa;
-using EscalaMensal.Application.DTOs.Usuario;
+using EscalaMensal.Application.DTOs.Membro;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,6 +14,6 @@ namespace EscalaMensal.Application.DTOs.ItemMissa
     {
         public int MissaId { get; set; }
         public int FuncaoId { get; set; }
-        public int? UsuarioId { get; set; }
+        public int? MembroId { get; set; }
     }
 }

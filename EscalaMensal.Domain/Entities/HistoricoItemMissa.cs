@@ -17,21 +17,21 @@ namespace EscalaMensal.Domain.Entities
         public string FuncaoNome { get; private set; }
         public string FuncaoAbreviacao { get; private set; }
 
-        public int? UsuarioId { get; private set; }
-        public Usuario? Usuario { get; private set; }
-        public string? UsuarioNome { get; private set; }
+        public int? MembroId { get; private set; }
+        public Membro? Membro { get; private set; }
+        public string? MembroNome { get; private set; }
 
         public int Ordem { get; private set; }
 
-        public HistoricoItemMissa(int itemMissaOriginalId, int historicoMissaId, int funcaoId, string funcaoNome, string funcaoAbreviacao, int? usuarioId, string? usuarioNome, int ordem)
+        public HistoricoItemMissa(int itemMissaOriginalId, int historicoMissaId, int funcaoId, string funcaoNome, string funcaoAbreviacao, int? membroId, string? membroNome, int ordem)
         {
             ItemMissaOriginalId = itemMissaOriginalId;
             HistoricoMissaId = historicoMissaId;
             FuncaoId = funcaoId;
             FuncaoNome = funcaoNome;
             FuncaoAbreviacao = funcaoAbreviacao;
-            UsuarioId = usuarioId;
-            UsuarioNome = usuarioNome;
+            MembroId = membroId;
+            MembroNome = membroNome;
             Ordem = ordem;
         }
 

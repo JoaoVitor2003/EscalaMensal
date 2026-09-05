@@ -19,7 +19,7 @@ namespace EscalaMensal.Infrastructure.Repositories
             return await _context.HistoricosEscala
                 .Include(h => h.HistoricoMissas)
                     .ThenInclude(m => m.HistoricoItensMissa)
-                    .ThenInclude(i => i.Usuario)
+                    .ThenInclude(i => i.Membro)
                 .Include(h => h.HistoricoMissas)
                     .ThenInclude(m => m.HistoricoItensMissa)
                     .ThenInclude(i => i.Funcao)
@@ -27,16 +27,16 @@ namespace EscalaMensal.Infrastructure.Repositories
                 .ToListAsync();
         }
 
-        public async Task<List<HistoricoEscala>> ObterPorUsuarioIdAsync(int usuarioId)
+        public async Task<List<HistoricoEscala>> ObterPorMembroIdAsync(int membroId)
         {
             return await _context.HistoricosEscala
                 .Include(h => h.HistoricoMissas)
                     .ThenInclude(m => m.HistoricoItensMissa)
-                    .ThenInclude(i => i.Usuario)
+                    .ThenInclude(i => i.Membro)
                 .Include(h => h.HistoricoMissas)
                     .ThenInclude(m => m.HistoricoItensMissa)
                     .ThenInclude(i => i.Funcao)
-                .Where(h => h.HistoricoMissas.Any(m => m.HistoricoItensMissa.Any(i => i.UsuarioId == usuarioId)))
+                .Where(h => h.HistoricoMissas.Any(m => m.HistoricoItensMissa.Any(i => i.MembroId == membroId)))
                 .OrderByDescending(h => h.DataFinalizacao)
                 .ToListAsync();
         }

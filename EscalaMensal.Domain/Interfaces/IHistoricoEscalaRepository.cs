@@ -10,7 +10,7 @@ namespace EscalaMensal.Domain.Interfaces
     public interface IHistoricoEscalaRepository
     {
         Task<List<HistoricoEscala>> ObterPorMesAnoAsync(int mes, int ano);
-        Task<List<HistoricoEscala>> ObterPorUsuarioIdAsync(int usuarioId);
+        Task<List<HistoricoEscala>> ObterPorMembroIdAsync(int membroId);
         Task AdicionarAsync(HistoricoEscala historico);
         Task<List<HistoricoEscala>> ObterTodosPorEscalaOriginalIdAsync(int escalaOriginalId);
         Task RemoverAsync(int id);

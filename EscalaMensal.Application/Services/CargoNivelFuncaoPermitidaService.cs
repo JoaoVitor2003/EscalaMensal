@@ -13,7 +13,7 @@ namespace EscalaMensal.Application.Services
     {
         private readonly ICargoNivelFuncaoPermitidaRepository _repository;
         private readonly IConfiguracaoRepository _configuracaoRepository;
-        private readonly IUsuarioRepository _usuarioRepository;
+        private readonly IMembroRepository _membroRepository;
         private readonly IFuncaoRepository _funcaoRepository;
 
         private static List<CargoNivelFuncaoPermitida> _backupPermissoesDeletadas = new();
@@ -22,12 +22,12 @@ namespace EscalaMensal.Application.Services
         public CargoNivelFuncaoPermitidaService(
             ICargoNivelFuncaoPermitidaRepository repository,
             IConfiguracaoRepository configuracaoRepository,
-            IUsuarioRepository usuarioRepository,
+            IMembroRepository membroRepository,
             IFuncaoRepository funcaoRepository)
         {
             _repository = repository;
             _configuracaoRepository = configuracaoRepository;
-            _usuarioRepository = usuarioRepository;
+            _membroRepository = membroRepository;
             _funcaoRepository = funcaoRepository;
         }
 
@@ -76,10 +76,10 @@ namespace EscalaMensal.Application.Services
                 throw new DomainException("Não é possível remover níveis abaixo do nível 3.");
             }
 
-            var users = await _usuarioRepository.ObterTodosAsync();
+            var users = await _membroRepository.ObterTodosAsync();
             if (users != null && users.Any(u => (int)u.Nivel == maxNivel))
             {
-                throw new DomainException($"Não é possível remover o nível {maxNivel} pois existem usuários associados a ele.");
+                throw new DomainException($"Não é possível remover o nível {maxNivel} pois existem membros associados a ele.");
             }
 
             var funcs = await _funcaoRepository.ObterTodasAsync();

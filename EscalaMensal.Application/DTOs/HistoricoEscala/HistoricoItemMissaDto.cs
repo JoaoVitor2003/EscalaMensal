@@ -1,6 +1,6 @@
 using System;
 using EscalaMensal.Application.DTOs.Funcao;
-using EscalaMensal.Application.DTOs.Usuario;
+using EscalaMensal.Application.DTOs.Membro;
 
 namespace EscalaMensal.Application.DTOs.HistoricoEscala
 {
@@ -15,9 +15,9 @@ namespace EscalaMensal.Application.DTOs.HistoricoEscala
         public string FuncaoNome { get; set; }
         public string FuncaoAbreviacao { get; set; }
 
-        public int? UsuarioId { get; set; }
-        public UsuarioDto? Usuario { get; set; }
-        public string? UsuarioNome { get; set; }
+        public int? MembroId { get; set; }
+        public MembroDto? Membro { get; set; }
+        public string? MembroNome { get; set; }
 
         public int Ordem { get; set; }
     }

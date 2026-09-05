@@ -14,7 +14,7 @@ namespace EscalaMensal.Infrastructure.Context
     {
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
-        public DbSet<Usuario> Usuarios { get; set; }
+        public DbSet<Membro> Membros { get; set; }
         public DbSet<Escala> Escalas { get; set; }
         public DbSet<Missas> Missas { get; set; }
         public DbSet<ItemMissa> ItensMissa { get; set; }
@@ -32,10 +32,10 @@ namespace EscalaMensal.Infrastructure.Context
         {
             base.OnModelCreating(modelBuilder);
 
-            modelBuilder.Entity<Usuario>()
-                .HasOne(u => u.UsuarioVinculado)
+            modelBuilder.Entity<Membro>()
+                .HasOne(u => u.MembroVinculado)
                 .WithMany()
-                .HasForeignKey(u => u.UsuarioVinculadoId)
+                .HasForeignKey(u => u.MembroVinculadoId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Escala>()
@@ -55,9 +55,9 @@ namespace EscalaMensal.Infrastructure.Context
                 .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<ItemMissa>()
-                .HasOne(i => i.Usuario)
+                .HasOne(i => i.Membro)
                 .WithMany()
-                .HasForeignKey(i => i.UsuarioId)
+                .HasForeignKey(i => i.MembroId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<HistoricoEscala>()
@@ -73,9 +73,9 @@ namespace EscalaMensal.Infrastructure.Context
                 .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<HistoricoItemMissa>()
-                .HasOne(i => i.Usuario)
+                .HasOne(i => i.Membro)
                 .WithMany()
-                .HasForeignKey(i => i.UsuarioId)
+                .HasForeignKey(i => i.MembroId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<HistoricoItemMissa>()
@@ -92,7 +92,7 @@ namespace EscalaMensal.Infrastructure.Context
                 .HasMany(m => m.Funcoes)
                 .WithMany();
 
-            modelBuilder.Entity<Usuario>().HasData(
+            modelBuilder.Entity<Membro>().HasData(
     new { Id = 1, Nome = "João", Nivel = NivelEnum.Nivel3, Cargo = CargoEnum.Cerimoniario, Ativo = true, HorasPreferenciaisRaw = "10:00", DiasDisponiveisRaw = "Saturday", LimitePermitido = 3 },
     new { Id = 2, Nome = "Pedro", Nivel = NivelEnum.Nivel2, Cargo = CargoEnum.Cerimoniario, Ativo = false, HorasPreferenciaisRaw = "07:30", DiasDisponiveisRaw = "Wednesday,Thursday,Saturday", LimitePermitido = 3 },
     new { Id = 3, Nome = "Anna", Nivel = NivelEnum.Nivel2, Cargo = CargoEnum.Cerimoniario, Ativo = false, HorasPreferenciaisRaw = "07:30", DiasDisponiveisRaw = "Wednesday,Thursday,Saturday", LimitePermitido = 3 },

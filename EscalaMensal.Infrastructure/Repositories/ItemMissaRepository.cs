@@ -1,4 +1,4 @@
-﻿using EscalaMensal.Domain.Entities;
+using EscalaMensal.Domain.Entities;
 using EscalaMensal.Domain.Interfaces;
 using EscalaMensal.Infrastructure.Context;
 using Microsoft.EntityFrameworkCore;
@@ -17,7 +17,7 @@ public class EscalaItemRepository : IItemMissaRepository
     {
         return await _context.ItensMissa
             .Include(i => i.Funcao)
-            .Include(i => i.Usuario)
+            .Include(i => i.Membro)
             .FirstOrDefaultAsync(e => e.Id == id);
     }
 
@@ -25,11 +25,11 @@ public class EscalaItemRepository : IItemMissaRepository
     {
         return await _context.ItensMissa
             .Include(i => i.Funcao)
-            .Include(i => i.Usuario)
+            .Include(i => i.Membro)
             .FirstOrDefaultAsync(e => e.MissaId == missaId);
     }
 
-    public async Task<int> QuantidadeDeEscalasDoUsuarioNaEscalaAsync(int escalaId, int usuarioId)
+    public async Task<int> QuantidadeDeEscalasDoMembroNaEscalaAsync(int escalaId, int membroId)
     {
         var missasIdsNaEscala = await _context.Missas
             .Where(m => m.EscalaId == escalaId)
@@ -37,7 +37,7 @@ public class EscalaItemRepository : IItemMissaRepository
             .ToListAsync();
 
         return await _context.ItensMissa
-            .CountAsync(i => i.UsuarioId == usuarioId && missasIdsNaEscala.Contains(i.MissaId));
+            .CountAsync(i => i.MembroId == membroId && missasIdsNaEscala.Contains(i.MissaId));
     }
 
     public async Task AdicionarAsync(ItemMissa item)
@@ -62,9 +62,9 @@ public class EscalaItemRepository : IItemMissaRepository
         }
     }
 
-    public async Task<bool> ExisteUsuarioNaMissaAsync(int missaId, int usuarioId)
+    public async Task<bool> ExisteMembroNaMissaAsync(int missaId, int membroId)
     {
-        return await _context.ItensMissa.AnyAsync(m => m.MissaId == missaId && m.UsuarioId == usuarioId);
+        return await _context.ItensMissa.AnyAsync(m => m.MissaId == missaId && m.MembroId == membroId);
     }
 
     public async Task AtualizarOrdemItensMissa(

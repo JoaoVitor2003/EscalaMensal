@@ -17,9 +17,9 @@ namespace EscalaMensal.Application.Mappings
             CreateMap<Restricao, RestricaoDto>()
                 .AfterMap((src, dest) =>
                 {
-                    if (dest.Usuario != null)
+                    if (dest.Membro != null)
                     {
-                        dest.Usuario.Restricoes = null;
+                        dest.Membro.Restricoes = null;
                     }
                 });
             CreateMap<RestricaoAdicionarDto, Restricao>();

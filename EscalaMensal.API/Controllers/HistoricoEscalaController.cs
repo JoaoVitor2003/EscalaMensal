@@ -22,10 +22,17 @@ namespace EscalaMensal.API.Controllers
             return Ok(historicos);
         }
 
+        [HttpGet("por-membro/{membroId}")]
+        public async Task<IActionResult> ObterPorMembroId(int membroId)
+        {
+            var historicos = await _service.ObterPorMembroIdAsync(membroId);
+            return Ok(historicos);
+        }
+
         [HttpGet("por-usuario/{usuarioId}")]
         public async Task<IActionResult> ObterPorUsuarioId(int usuarioId)
         {
-            var historicos = await _service.ObterPorUsuarioIdAsync(usuarioId);
+            var historicos = await _service.ObterPorMembroIdAsync(usuarioId);
             return Ok(historicos);
         }
 

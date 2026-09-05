@@ -1,4 +1,4 @@
-﻿using EscalaMensal.Domain.Utils;
+using EscalaMensal.Domain.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,13 +17,13 @@ namespace EscalaMensal.Domain.Entities
         public int FuncaoId { get; private set; }
         public Funcao? Funcao { get; private set; }
         public int Ordem { get; set; }
-        public int? UsuarioId { get; private set; }
-        public Usuario? Usuario { get; private set; }
-        public ItemMissa(int missaId, int funcaoId, int? usuarioId = null)
+        public int? MembroId { get; private set; }
+        public Membro? Membro { get; private set; }
+        public ItemMissa(int missaId, int funcaoId, int? membroId = null)
         {
             MissaId = missaId;
             FuncaoId = funcaoId;
-            UsuarioId = usuarioId == 0 ? null : usuarioId;
+            MembroId = membroId == 0 ? null : membroId;
         }
 
         public ItemMissa(int id, int ordem)
@@ -37,8 +37,8 @@ namespace EscalaMensal.Domain.Entities
             Ordem = ordem;
         }
 
-        public void AtribuirUsuario(int? usuarioId) => UsuarioId = (usuarioId == 0 ? null : usuarioId);
-        public void RemoverUsuario() => UsuarioId = null;
+        public void AtribuirMembro(int? membroId) => MembroId = (membroId == 0 ? null : membroId);
+        public void RemoverMembro() => MembroId = null;
     }
 
 }

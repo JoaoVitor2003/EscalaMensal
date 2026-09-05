@@ -1,4 +1,4 @@
-﻿using EscalaMensal.Application.DTOs.Usuario;
+using EscalaMensal.Application.DTOs.Membro;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,7 +10,7 @@ namespace EscalaMensal.Application.DTOs.Restricao
     public class RestricaoAtualizarDto
     {
         public int Id { get; set; }
-        public int UsuarioId { get; set; }
+        public int MembroId { get; set; }
         public DateTime Data { get; set; }
     }
 }

@@ -1,4 +1,4 @@
-﻿using EscalaMensal.Application.DTOs.Escala;
+using EscalaMensal.Application.DTOs.Escala;
 using EscalaMensal.Application.DTOs.Restricao;
 using EscalaMensal.Domain.Interfaces;
 using Microsoft.AspNetCore.Mvc;
@@ -23,10 +23,17 @@ namespace EscalaMensal.API.Controllers
             return Ok(restricoes);
         }
 
+        [HttpGet("membro/{membroId}/mes/{mes}/ano/{ano}")]
+        public async Task<IActionResult> ObterPorMembro(int membroId, int mes, int ano)
+        {
+            var restricoes = await _restricaoService.ObterPorMembroIdAsync(membroId, mes, ano);
+            return Ok(restricoes);
+        }
+
         [HttpGet("usuario/{usuarioId}/mes/{mes}/ano/{ano}")]
         public async Task<IActionResult> ObterPorUsuario(int usuarioId, int mes, int ano)
         {
-            var restricoes = await _restricaoService.ObterPorUsuarioIdAsync(usuarioId, mes, ano);
+            var restricoes = await _restricaoService.ObterPorMembroIdAsync(usuarioId, mes, ano);
             return Ok(restricoes);
         }
 
