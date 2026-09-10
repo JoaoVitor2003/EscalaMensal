@@ -27,6 +27,7 @@ namespace EscalaMensal.Infrastructure.Context
         public DbSet<Configuracao> Configuracoes { get; set; }
         public DbSet<HorarioFixo> HorariosFixos { get; set; }
         public DbSet<MissaPadrao> MissasPadrao { get; set; }
+        public DbSet<Usuario> Usuarios { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -178,6 +179,24 @@ namespace EscalaMensal.Infrastructure.Context
                 new { Id = 3, Horario = new TimeOnly(11, 0) },
                 new { Id = 4, Horario = new TimeOnly(19, 0) }
             );
+
+            modelBuilder.Entity<Usuario>(entity =>
+            {
+                entity.HasKey(u => u.Id);
+                entity.Property(u => u.Nome).IsRequired().HasMaxLength(100);
+                entity.Property(u => u.Email).IsRequired().HasMaxLength(150);
+                entity.HasIndex(u => u.Email).IsUnique();
+                entity.Property(u => u.Telefone).IsRequired().HasMaxLength(20);
+                entity.Property(u => u.SenhaHash).IsRequired().HasMaxLength(255);
+                entity.Property(u => u.StatusAprovacao).IsRequired();
+                entity.Property(u => u.Perfil).IsRequired();
+                entity.Property(u => u.DataCriacao).IsRequired();
+
+                entity.HasOne(u => u.AprovadoPor)
+                      .WithMany()
+                      .HasForeignKey(u => u.AprovadoPorId)
+                      .OnDelete(DeleteBehavior.Restrict);
+            });
         }
 
     }

@@ -5,6 +5,7 @@ using EscalaMensal.Application.Interfaces;
 using EscalaMensal.Domain.Interfaces;
 using EscalaMensal.Infrastructure.Context;
 using EscalaMensal.Infrastructure.Repositories;
+using EscalaMensal.Application.Security;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -38,6 +39,9 @@ builder.Services.AddScoped<IConfiguracaoRepository, ConfiguracaoRepository>();
 builder.Services.AddScoped<IMissasRepository, MissasRepository>();
 builder.Services.AddScoped<IHorarioFixoRepository, HorarioFixoRepository>();
 builder.Services.AddScoped<IMissaPadraoRepository, MissaPadraoRepository>();
+builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
+
+builder.Services.AddSingleton<IPasswordHasher, BCryptPasswordHasher>();
 
 builder.Services.AddScoped<IMembroService, MembroService>();
 builder.Services.AddScoped<IRestricaoService, RestricaoService>();
@@ -49,6 +53,7 @@ builder.Services.AddScoped<ICargoNivelFuncaoPermitidaService, CargoNivelFuncaoPe
 builder.Services.AddScoped<IMissasService, MissasService>();
 builder.Services.AddScoped<IHorarioFixoService, HorarioFixoService>();
 builder.Services.AddScoped<IMissaPadraoService, MissaPadraoService>();
+builder.Services.AddScoped<IUsuarioService, UsuarioService>();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
