@@ -8,6 +8,7 @@ namespace EscalaMensal.Application.Interfaces
     {
         Task<UsuarioRespostaDto> SolicitarAcessoAsync(SolicitarAcessoDto dto);
         Task<List<UsuarioRespostaDto>> ObterPendentesAsync();
+        Task<List<UsuarioRespostaDto>> ObterTodosAsync();
         Task<UsuarioRespostaDto?> ObterPorIdAsync(int id);
         Task AprovarUsuarioAsync(int usuarioId, int aprovadorId);
         Task RejeitarUsuarioAsync(int usuarioId, int aprovadorId);

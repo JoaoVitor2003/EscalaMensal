@@ -63,6 +63,13 @@ namespace EscalaMensal.API.Controllers
             return Ok(pendentes);
         }
 
+        [HttpGet("usuarios")]
+        public async Task<ActionResult<List<UsuarioRespostaDto>>> ObterTodos()
+        {
+            var usuarios = await _usuarioService.ObterTodosAsync();
+            return Ok(usuarios);
+        }
+
         [HttpPost("{id}/aprovar")]
         public async Task<ActionResult> Aprovar(int id, [FromQuery] int aprovadorId = 1)
         {

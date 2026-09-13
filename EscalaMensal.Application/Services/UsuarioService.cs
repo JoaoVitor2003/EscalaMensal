@@ -68,6 +68,21 @@ namespace EscalaMensal.Application.Services
             }).ToList();
         }
 
+        public async Task<List<UsuarioRespostaDto>> ObterTodosAsync()
+        {
+            var usuarios = await _usuarioRepository.ObterTodosAsync();
+            return usuarios.Select(u => new UsuarioRespostaDto
+            {
+                Id = u.Id,
+                Nome = u.Nome,
+                Email = u.Email,
+                Telefone = u.Telefone,
+                StatusAprovacao = u.StatusAprovacao,
+                Perfil = u.Perfil,
+                DataCriacao = u.DataCriacao
+            }).ToList();
+        }
+
         public async Task<UsuarioRespostaDto?> ObterPorIdAsync(int id)
         {
             var usuario = await _usuarioRepository.ObterPorIdAsync(id);
