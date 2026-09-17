@@ -42,6 +42,7 @@ builder.Services.AddScoped<IMissaPadraoRepository, MissaPadraoRepository>();
 builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
 
 builder.Services.AddSingleton<IPasswordHasher, BCryptPasswordHasher>();
+builder.Services.AddScoped<ITokenService, TokenService>();
 
 builder.Services.AddScoped<IMembroService, MembroService>();
 builder.Services.AddScoped<IRestricaoService, RestricaoService>();

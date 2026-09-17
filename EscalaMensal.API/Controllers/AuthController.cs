@@ -97,5 +97,28 @@ namespace EscalaMensal.API.Controllers
                 return BadRequest(new { mensagem = ex.Message });
             }
         }
+
+        [HttpPost("login")]
+        public async Task<ActionResult<LoginRespostaDto>> Login([FromBody] LoginDto dto)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var resultado = await _usuarioService.AutenticarAsync(dto);
+
+            if (!resultado.Sucesso)
+            {
+                if (resultado.Status.HasValue)
+                {
+                    return StatusCode(403, resultado);
+                }
+
+                return Unauthorized(resultado);
+            }
+
+            return Ok(resultado);
+        }
     }
 }

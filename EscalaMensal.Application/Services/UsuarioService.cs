@@ -14,11 +14,16 @@ namespace EscalaMensal.Application.Services
     {
         private readonly IUsuarioRepository _usuarioRepository;
         private readonly IPasswordHasher _passwordHasher;
+        private readonly ITokenService _tokenService;
 
-        public UsuarioService(IUsuarioRepository usuarioRepository, IPasswordHasher passwordHasher)
+        public UsuarioService(
+            IUsuarioRepository usuarioRepository, 
+            IPasswordHasher passwordHasher,
+            ITokenService tokenService)
         {
             _usuarioRepository = usuarioRepository;
             _passwordHasher = passwordHasher;
+            _tokenService = tokenService;
         }
 
         public async Task<UsuarioRespostaDto> SolicitarAcessoAsync(SolicitarAcessoDto dto)
@@ -118,6 +123,80 @@ namespace EscalaMensal.Application.Services
 
             usuario.Rejeitar(aprovadorId);
             await _usuarioRepository.AtualizarAsync(usuario);
+        }
+
+        public async Task<LoginRespostaDto> AutenticarAsync(LoginDto dto)
+        {
+            if (string.IsNullOrWhiteSpace(dto.Email) || string.IsNullOrWhiteSpace(dto.Senha))
+            {
+                return new LoginRespostaDto
+                {
+                    Sucesso = false,
+                    Mensagem = "E-mail e senha são obrigatórios."
+                };
+            }
+
+            var usuario = await _usuarioRepository.ObterPorEmailAsync(dto.Email);
+            if (usuario == null)
+            {
+                return new LoginRespostaDto
+                {
+                    Sucesso = false,
+                    Mensagem = "E-mail ou senha incorretos."
+                };
+            }
+
+            var senhaValida = _passwordHasher.VerifyPassword(dto.Senha, usuario.SenhaHash);
+            if (!senhaValida)
+            {
+                return new LoginRespostaDto
+                {
+                    Sucesso = false,
+                    Mensagem = "E-mail ou senha incorretos."
+                };
+            }
+
+            // Validação de Status de Aprovação
+            if (usuario.StatusAprovacao == Domain.Enums.StatusAprovacaoEnum.Pendente)
+            {
+                return new LoginRespostaDto
+                {
+                    Sucesso = false,
+                    Status = usuario.StatusAprovacao,
+                    Mensagem = "Seu cadastro ainda está aguardando aprovação do administrador. Por favor, aguarde a liberação para acessar o sistema."
+                };
+            }
+
+            if (usuario.StatusAprovacao == Domain.Enums.StatusAprovacaoEnum.Rejeitado)
+            {
+                return new LoginRespostaDto
+                {
+                    Sucesso = false,
+                    Status = usuario.StatusAprovacao,
+                    Mensagem = "Sua solicitação de acesso não foi aprovada pela administração do sistema."
+                };
+            }
+
+            // Usuário aprovado - gerar token JWT
+            var token = _tokenService.GerarToken(usuario);
+
+            return new LoginRespostaDto
+            {
+                Sucesso = true,
+                Token = token,
+                Status = usuario.StatusAprovacao,
+                Mensagem = "Login realizado com sucesso!",
+                Usuario = new UsuarioRespostaDto
+                {
+                    Id = usuario.Id,
+                    Nome = usuario.Nome,
+                    Email = usuario.Email,
+                    Telefone = usuario.Telefone,
+                    StatusAprovacao = usuario.StatusAprovacao,
+                    Perfil = usuario.Perfil,
+                    DataCriacao = usuario.DataCriacao
+                }
+            };
         }
     }
 }
