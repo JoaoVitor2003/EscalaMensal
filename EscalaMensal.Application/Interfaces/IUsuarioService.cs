@@ -13,5 +13,7 @@ namespace EscalaMensal.Application.Interfaces
         Task AprovarUsuarioAsync(int usuarioId, int aprovadorId);
         Task RejeitarUsuarioAsync(int usuarioId, int aprovadorId);
         Task<LoginRespostaDto> AutenticarAsync(LoginDto dto);
+        Task<bool> ValidarSessaoAtivaAsync(int usuarioId, string sessaoId);
+        Task EncerrarSessaoAsync(int usuarioId);
     }
 }

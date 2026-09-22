@@ -29,7 +29,8 @@ namespace EscalaMensal.Application.Security
                 new Claim(ClaimTypes.Name, usuario.Nome),
                 new Claim(ClaimTypes.Email, usuario.Email),
                 new Claim(ClaimTypes.Role, usuario.Perfil.ToString()),
-                new Claim("Status", usuario.StatusAprovacao.ToString())
+                new Claim("Status", usuario.StatusAprovacao.ToString()),
+                new Claim("SessionId", usuario.SessaoAtivaId ?? string.Empty)
             };
 
             var token = new JwtSecurityToken(

@@ -191,6 +191,7 @@ namespace EscalaMensal.Infrastructure.Context
                 entity.Property(u => u.StatusAprovacao).IsRequired();
                 entity.Property(u => u.Perfil).IsRequired();
                 entity.Property(u => u.DataCriacao).IsRequired();
+                entity.Property(u => u.SessaoAtivaId).HasMaxLength(100);
 
                 entity.HasOne(u => u.AprovadoPor)
                       .WithMany()

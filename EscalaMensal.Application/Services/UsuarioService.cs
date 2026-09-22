@@ -177,7 +177,12 @@ namespace EscalaMensal.Application.Services
                 };
             }
 
-            // Usuário aprovado - gerar token JWT
+            // Usuário aprovado - gerar nova sessão única e persistir no banco (derrubando sessões anteriores)
+            var novaSessaoId = Guid.NewGuid().ToString();
+            usuario.IniciarNovaSessao(novaSessaoId);
+            await _usuarioRepository.AtualizarAsync(usuario);
+
+            // Gerar token JWT com a nova sessão vinculada
             var token = _tokenService.GerarToken(usuario);
 
             return new LoginRespostaDto
@@ -197,6 +202,25 @@ namespace EscalaMensal.Application.Services
                     DataCriacao = usuario.DataCriacao
                 }
             };
+        }
+
+        public async Task<bool> ValidarSessaoAtivaAsync(int usuarioId, string sessaoId)
+        {
+            var usuario = await _usuarioRepository.ObterPorIdAsync(usuarioId);
+            if (usuario == null)
+                return false;
+
+            return !string.IsNullOrEmpty(usuario.SessaoAtivaId) && usuario.SessaoAtivaId == sessaoId;
+        }
+
+        public async Task EncerrarSessaoAsync(int usuarioId)
+        {
+            var usuario = await _usuarioRepository.ObterPorIdAsync(usuarioId);
+            if (usuario != null)
+            {
+                usuario.EncerrarSessao();
+                await _usuarioRepository.AtualizarAsync(usuario);
+            }
         }
     }
 }

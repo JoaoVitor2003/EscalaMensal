@@ -16,6 +16,7 @@ namespace EscalaMensal.Domain.Entities
         public DateTime? DataAprovacao { get; private set; }
         public int? AprovadoPorId { get; private set; }
         public Usuario? AprovadoPor { get; private set; }
+        public string? SessaoAtivaId { get; private set; }
 
         public Usuario(string nome, string email, string telefone, string senhaHash, PerfilUsuarioEnum perfil = PerfilUsuarioEnum.Membro)
         {
@@ -53,6 +54,16 @@ namespace EscalaMensal.Domain.Entities
         {
             Nome = nome;
             Telefone = telefone;
+        }
+
+        public void IniciarNovaSessao(string sessaoId)
+        {
+            SessaoAtivaId = sessaoId;
+        }
+
+        public void EncerrarSessao()
+        {
+            SessaoAtivaId = null;
         }
     }
 }
