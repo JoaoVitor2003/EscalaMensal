@@ -1,5 +1,6 @@
 using EscalaMensal.Application.DTOs.Usuario;
 using EscalaMensal.Application.Interfaces;
+using EscalaMensal.Domain.Enums;
 using EscalaMensal.Domain.Exceptions;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -98,6 +99,27 @@ namespace EscalaMensal.API.Controllers
             catch (DomainException ex)
             {
                 return BadRequest(new { mensagem = ex.Message });
+            }
+        }
+
+        /// <summary>
+        /// Altera o perfil do usuário (ex: Normal para Premium, ou vice-versa).
+        /// </summary>
+        [HttpPut("{id}/perfil")]
+        public async Task<ActionResult> AlterarPerfil(int id, [FromBody] PerfilUsuarioEnum novoPerfil)
+        {
+            try
+            {
+                await _usuarioService.AlterarPerfilAsync(id, novoPerfil);
+                return Ok(new { mensagem = $"Perfil do usuário atualizado para {novoPerfil} com sucesso!" });
+            }
+            catch (DomainException ex)
+            {
+                return BadRequest(new { mensagem = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { mensagem = "Erro ao atualizar perfil do usuário.", detalhe = ex.Message });
             }
         }
 

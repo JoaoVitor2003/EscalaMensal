@@ -1,4 +1,5 @@
 using EscalaMensal.Application.DTOs.Usuario;
+using EscalaMensal.Domain.Enums;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -15,5 +16,6 @@ namespace EscalaMensal.Application.Interfaces
         Task<LoginRespostaDto> AutenticarAsync(LoginDto dto);
         Task<bool> ValidarSessaoAtivaAsync(int usuarioId, string sessaoId);
         Task EncerrarSessaoAsync(int usuarioId);
+        Task AlterarPerfilAsync(int usuarioId, PerfilUsuarioEnum novoPerfil);
     }
 }

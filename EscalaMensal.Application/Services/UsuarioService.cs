@@ -2,6 +2,7 @@ using EscalaMensal.Application.DTOs.Usuario;
 using EscalaMensal.Application.Interfaces;
 using EscalaMensal.Application.Security;
 using EscalaMensal.Domain.Entities;
+using EscalaMensal.Domain.Enums;
 using EscalaMensal.Domain.Exceptions;
 using EscalaMensal.Domain.Interfaces;
 using System.Collections.Generic;
@@ -221,6 +222,16 @@ namespace EscalaMensal.Application.Services
                 usuario.EncerrarSessao();
                 await _usuarioRepository.AtualizarAsync(usuario);
             }
+        }
+
+        public async Task AlterarPerfilAsync(int usuarioId, PerfilUsuarioEnum novoPerfil)
+        {
+            var usuario = await _usuarioRepository.ObterPorIdAsync(usuarioId);
+            if (usuario == null)
+                throw new DomainException("Usuário não encontrado.");
+
+            usuario.AlterarPerfil(novoPerfil);
+            await _usuarioRepository.AtualizarAsync(usuario);
         }
     }
 }
