@@ -11,17 +11,8 @@ using Microsoft.Extensions.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("AllowMyFrontendPolicy", policy =>
-    {
-        // Agora podemos voltar para a versão segura, especificando a origem
-        policy.WithOrigins("http://localhost:5173");
-        policy.WithOrigins("https://localhost:7185")
-              .AllowAnyHeader()
-              .AllowAnyMethod();
-    });
-});
+builder.Services.AddSignalR();
+
 
 builder.Services.AddDbContext<AppDbContext>(opt =>
     opt.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
@@ -73,16 +64,15 @@ builder.Services.AddCors(options =>
         policy => policy
             .AllowAnyHeader()
             .AllowAnyMethod()
-            .WithOrigins("https://localhost:7185", "http://localhost:5293"));
+            .WithOrigins("https://localhost:7185", "http://localhost:5293", "http://localhost:5173")
+            .AllowCredentials());
 });
 
 var app = builder.Build();
 
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 
-var policyName = "corsblazor";
-
-app.UseCors(policyName);
+app.UseCors("AllowBlazor");
 
 if (app.Environment.IsDevelopment())
 {
@@ -90,12 +80,9 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseCors("AllowMyFrontendPolicy");
-
 app.UseAuthorization();
 
-app.UseCors("AllowBlazor");
-
 app.MapControllers();
+app.MapHub<EscalaMensal.API.Hubs.EscalaHub>("/hubs/escala-colaborativa");
 
 app.Run();

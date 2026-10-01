@@ -28,6 +28,7 @@ namespace EscalaMensal.Infrastructure.Context
         public DbSet<HorarioFixo> HorariosFixos { get; set; }
         public DbSet<MissaPadrao> MissasPadrao { get; set; }
         public DbSet<Usuario> Usuarios { get; set; }
+        public DbSet<EscalaCompartilhamento> EscalaCompartilhamentos { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -196,6 +197,29 @@ namespace EscalaMensal.Infrastructure.Context
                 entity.HasOne(u => u.AprovadoPor)
                       .WithMany()
                       .HasForeignKey(u => u.AprovadoPorId)
+                      .OnDelete(DeleteBehavior.Restrict);
+            });
+
+            modelBuilder.Entity<EscalaCompartilhamento>(entity =>
+            {
+                entity.ToTable("EscalaCompartilhamentos");
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.CodigoAcesso).IsRequired().HasMaxLength(50);
+                entity.Property(e => e.DataCriacao).IsRequired();
+
+                entity.HasOne(e => e.Escala)
+                      .WithMany()
+                      .HasForeignKey(e => e.EscalaId)
+                      .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne(e => e.Usuario)
+                      .WithMany()
+                      .HasForeignKey(e => e.UsuarioId)
+                      .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne(e => e.CriadoPorUsuario)
+                      .WithMany()
+                      .HasForeignKey(e => e.CriadoPorUsuarioId)
                       .OnDelete(DeleteBehavior.Restrict);
             });
         }
