@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using EscalaMensal.Application.DTOs.Escala;
 using EscalaMensal.Domain.Entities;
+using EscalaMensal.Domain.Enums;
 using EscalaMensal.Infrastructure.Context;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -93,6 +94,20 @@ namespace EscalaMensal.API.Controllers
             if (usuario == null)
                 return NotFound(new { mensagem = "Usuário não encontrado." });
 
+            if (usuario.Perfil == PerfilUsuarioEnum.Normal)
+            {
+                return BadRequest(new { mensagem = "Apenas usuários com perfil Premium ou Administrador podem receber compartilhamento de escala." });
+            }
+
+            if (request.CriadoPorUsuarioId.HasValue)
+            {
+                var criador = await _context.Usuarios.FindAsync(request.CriadoPorUsuarioId.Value);
+                if (criador != null && criador.Perfil == PerfilUsuarioEnum.Normal)
+                {
+                    return BadRequest(new { mensagem = "Apenas administradores e usuários Premium podem compartilhar escalas." });
+                }
+            }
+
             var existente = await _context.EscalaCompartilhamentos
                 .FirstOrDefaultAsync(c => c.EscalaId == escalaId && c.UsuarioId == request.UsuarioId);
 
@@ -109,7 +124,7 @@ namespace EscalaMensal.API.Controllers
                 UsuarioId = request.UsuarioId,
                 Permissao = request.Permissao,
                 CodigoAcesso = Guid.NewGuid().ToString("N")[..10].ToUpper(),
-                CriadoPorUsuarioId = request.UsuarioId,
+                CriadoPorUsuarioId = request.CriadoPorUsuarioId ?? request.UsuarioId,
                 DataCriacao = DateTime.UtcNow
             };
 
@@ -146,6 +161,12 @@ namespace EscalaMensal.API.Controllers
             [FromQuery] int usuarioId, 
             [FromQuery] int perfil)
         {
+            // Usuários com perfil Normal não possuem acesso a escalas colaborativas
+            if (perfil == (int)PerfilUsuarioEnum.Normal)
+            {
+                return Ok(new List<EscalaCompartilhadaResumoDto>());
+            }
+
             var queryCompartilhamentos = _context.EscalaCompartilhamentos
                 .Include(c => c.Escala)
                 .Include(c => c.Usuario)
@@ -179,7 +200,7 @@ namespace EscalaMensal.API.Controllers
                     });
                 }
             }
-            else // Normal ou Premium: vê apenas as compartilhadas com ele (ou criadas por ele)
+            else // Premium: vê apenas as compartilhadas com ele (ou criadas por ele)
             {
                 var compartilhamentosUsuario = await queryCompartilhamentos
                     .Where(c => c.UsuarioId == usuarioId || c.CriadoPorUsuarioId == usuarioId)
@@ -221,6 +242,11 @@ namespace EscalaMensal.API.Controllers
             [FromQuery] int usuarioId, 
             [FromQuery] int perfil)
         {
+            if (perfil == (int)PerfilUsuarioEnum.Normal)
+            {
+                return Ok(new List<int>());
+            }
+
             if (perfil == 1) // Administrador: todas que foram compartilhadas com alguém
             {
                 var ids = await _context.EscalaCompartilhamentos
@@ -230,7 +256,7 @@ namespace EscalaMensal.API.Controllers
                     .ToListAsync();
                 return Ok(ids);
             }
-            else // Usuário comum: apenas as compartilhadas com ele ou criadas por ele
+            else // Usuário Premium: apenas as compartilhadas com ele ou criadas por ele
             {
                 var ids = await _context.EscalaCompartilhamentos
                     .Where(c => (c.UsuarioId == usuarioId || c.CriadoPorUsuarioId == usuarioId) && c.UsuarioId != null)
@@ -254,6 +280,32 @@ namespace EscalaMensal.API.Controllers
             var escala = await _context.Escalas.FindAsync(escalaId);
             if (escala == null)
                 return NotFound(new ValidarAcessoEscalaRespostaDto { TemAcesso = false, Mensagem = "Escala não encontrada." });
+
+            // 0. Bloqueio imediato para usuário com perfil Normal (3)
+            if (perfil.HasValue && perfil.Value == (int)PerfilUsuarioEnum.Normal)
+            {
+                return Ok(new ValidarAcessoEscalaRespostaDto
+                {
+                    TemAcesso = false,
+                    Permissao = "Nenhum",
+                    Mensagem = "Escalas ao vivo/compartilhadas são exclusivas para usuários com plano Premium ou Administrador."
+                });
+            }
+
+            // Se usuarioId for fornecido, verificar no banco se o usuário é Normal
+            if (usuarioId.HasValue)
+            {
+                var usuario = await _context.Usuarios.FindAsync(usuarioId.Value);
+                if (usuario != null && usuario.Perfil == PerfilUsuarioEnum.Normal)
+                {
+                    return Ok(new ValidarAcessoEscalaRespostaDto
+                    {
+                        TemAcesso = false,
+                        Permissao = "Nenhum",
+                        Mensagem = "Escalas ao vivo/compartilhadas são exclusivas para usuários com plano Premium ou Administrador."
+                    });
+                }
+            }
 
             // 1. Administrador (1) tem acesso total
             if (perfil.HasValue && perfil.Value == 1)
