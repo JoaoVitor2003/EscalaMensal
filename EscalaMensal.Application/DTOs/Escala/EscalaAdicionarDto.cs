@@ -12,5 +12,6 @@ namespace EscalaMensal.Application.DTOs.Escala
         public DateOnly DataFim { get; set; }
         public int LimitePermitido { get; set; }
         public bool CriarMissasPadrao { get; set; }
+        public int? CriadoPorUsuarioId { get; set; }
     }
 }

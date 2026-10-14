@@ -30,16 +30,16 @@ namespace EscalaMensal.Application.Services
             _funcaoRepository = funcaoRepository;
         }
 
-        public async Task<EscalaDto?> ObterPorMesAnoAsync(int mes, int ano)
+        public async Task<EscalaDto?> ObterPorMesAnoAsync(int mes, int ano, int? usuarioId = null, int? perfil = null)
         {
-            var escala = await _escalaRepository.ObterPorMesAnoAsync(mes, ano);
+            var escala = await _escalaRepository.ObterPorMesAnoAsync(mes, ano, usuarioId, perfil);
             var dto = _mapper.Map<EscalaDto>(escala);
             return dto;
         }
 
-        public async Task<List<EscalaDto>> ObterTodasAsync()
+        public async Task<List<EscalaDto>> ObterTodasAsync(int? usuarioId = null, int? perfil = null)
         {
-            var escalas = await _escalaRepository.ObterTodasAsync();
+            var escalas = await _escalaRepository.ObterTodasAsync(usuarioId, perfil);
             var dto = _mapper.Map<List<EscalaDto>>(escalas);
 
             return dto;
@@ -48,6 +48,10 @@ namespace EscalaMensal.Application.Services
         public async Task AdicionarAsync(EscalaAdicionarDto escala)
         {
             var novaEscalaEntity = _mapper.Map<Escala>(escala);
+            if (escala.CriadoPorUsuarioId.HasValue)
+            {
+                novaEscalaEntity.DefinirCriador(escala.CriadoPorUsuarioId.Value);
+            }
 
             if (escala.CriarMissasPadrao)
             {

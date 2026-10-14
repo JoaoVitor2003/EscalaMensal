@@ -38,25 +38,38 @@ namespace EscalaMensal.Infrastructure.Repositories
                 .FirstOrDefaultAsync(e => e.Id == id);
         }
 
-        public async Task<Escala?> ObterPorMesAnoAsync(int mes, int ano)
+        public async Task<Escala?> ObterPorMesAnoAsync(int mes, int ano, int? usuarioId = null, int? perfil = null)
         {
-            return await _context.Escalas
+            var query = _context.Escalas
                 .Include(e => e.Missas)
                     .ThenInclude(i => i.ItensMissa)
-                .Where(e => e.Missas.Any(i => i.Dia.Month == mes && i.Dia.Year == ano))
-                .FirstOrDefaultAsync();
+                .Where(e => e.Missas.Any(i => i.Dia.Month == mes && i.Dia.Year == ano));
+
+            if (usuarioId.HasValue && perfil != 1)
+            {
+                query = query.Where(e => e.CriadoPorUsuarioId == usuarioId.Value);
+            }
+
+            return await query.FirstOrDefaultAsync();
         }
 
-        public async Task<List<Escala>> ObterTodasAsync()
+        public async Task<List<Escala>> ObterTodasAsync(int? usuarioId = null, int? perfil = null)
         {
-            return await _context.Escalas
+            var query = _context.Escalas
                 .Include(e => e.Missas)
                     .ThenInclude(i => i.ItensMissa)
                     .ThenInclude(i => i.Funcao)
                 .Include(e => e.Missas)
                     .ThenInclude(i => i.ItensMissa)
                     .ThenInclude(i => i.Membro)
-                .ToListAsync();
+                .AsQueryable();
+
+            if (usuarioId.HasValue && perfil != 1)
+            {
+                query = query.Where(e => e.CriadoPorUsuarioId == usuarioId.Value);
+            }
+
+            return await query.ToListAsync();
         }
 
         public async Task RemoverAsync(int id)

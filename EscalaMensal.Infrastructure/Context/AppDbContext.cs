@@ -45,6 +45,12 @@ namespace EscalaMensal.Infrastructure.Context
                 .HasDefaultValue(3);
 
             modelBuilder.Entity<Escala>()
+                .HasOne(e => e.CriadoPorUsuario)
+                .WithMany()
+                .HasForeignKey(e => e.CriadoPorUsuarioId)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            modelBuilder.Entity<Escala>()
                 .HasMany(e => e.Missas)
                 .WithOne(m => m.Escala)
                 .HasForeignKey(m => m.EscalaId)

@@ -1,4 +1,4 @@
-﻿using EscalaMensal.Domain.Entities;
+using EscalaMensal.Domain.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,8 +9,8 @@ namespace EscalaMensal.Domain.Interfaces
 {
     public interface IEscalaRepository
     {
-        Task<Escala?> ObterPorMesAnoAsync(int mes, int ano);
-        Task<List<Escala>> ObterTodasAsync();
+        Task<Escala?> ObterPorMesAnoAsync(int mes, int ano, int? usuarioId = null, int? perfil = null);
+        Task<List<Escala>> ObterTodasAsync(int? usuarioId = null, int? perfil = null);
         Task<Escala?> ObterPorIdAsync(int id);
         Task AdicionarAsync(Escala escala);
         Task AtualizarAsync(Escala escala);

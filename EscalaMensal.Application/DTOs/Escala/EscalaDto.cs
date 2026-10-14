@@ -1,4 +1,4 @@
-﻿using EscalaMensal.Application.DTOs.Missa;
+using EscalaMensal.Application.DTOs.Missa;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,6 +13,7 @@ namespace EscalaMensal.Application.DTOs.Escala
         public DateOnly DataInicio { get; set; }
         public DateOnly DataFim { get; set; }
         public int LimitePermitido { get; set; }
+        public int? CriadoPorUsuarioId { get; set; }
         public ICollection<MissasDto> Missas { get; set; } = new List<MissasDto>();
     }
 }

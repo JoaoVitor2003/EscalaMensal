@@ -7,8 +7,8 @@ namespace EscalaMensal.Domain.Interfaces
 {
     public interface IEscalaService
     {
-        Task<EscalaDto?> ObterPorMesAnoAsync(int mes, int ano);
-        Task<List<EscalaDto>> ObterTodasAsync();
+        Task<EscalaDto?> ObterPorMesAnoAsync(int mes, int ano, int? usuarioId = null, int? perfil = null);
+        Task<List<EscalaDto>> ObterTodasAsync(int? usuarioId = null, int? perfil = null);
         Task<EscalaDto?> ObterPorIdAsync(int id);
         Task AdicionarAsync(EscalaAdicionarDto escala);
         Task AtualizarAsync(EscalaAtualizarDto escala);

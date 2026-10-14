@@ -16,9 +16,9 @@ namespace EscalaMensal.API.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<List<EscalaDto>>> ObterTodas()
+        public async Task<ActionResult<List<EscalaDto>>> ObterTodas([FromQuery] int? usuarioId, [FromQuery] int? perfil)
         {
-            var escalas = await _escalaService.ObterTodasAsync();
+            var escalas = await _escalaService.ObterTodasAsync(usuarioId, perfil);
 
             return Ok(escalas);
         }
@@ -32,9 +32,9 @@ namespace EscalaMensal.API.Controllers
         }
 
         [HttpGet("por-mes-ano")]
-        public async Task<ActionResult<EscalaDto>> ObterPorMesAno([FromQuery] int mes, [FromQuery] int ano)
+        public async Task<ActionResult<EscalaDto>> ObterPorMesAno([FromQuery] int mes, [FromQuery] int ano, [FromQuery] int? usuarioId, [FromQuery] int? perfil)
         {
-            var escala = await _escalaService.ObterPorMesAnoAsync(mes, ano);
+            var escala = await _escalaService.ObterPorMesAnoAsync(mes, ano, usuarioId, perfil);
             if (escala == null)
                 return NotFound();
 
@@ -57,8 +57,20 @@ namespace EscalaMensal.API.Controllers
         }
 
         [HttpDelete("{id}")]
-        public async Task<ActionResult> Remover(int id)
+        public async Task<ActionResult> Remover(int id, [FromQuery] int? usuarioId, [FromQuery] int? perfil)
         {
+            var escala = await _escalaService.ObterPorIdAsync(id);
+            if (escala == null)
+                return NotFound();
+
+            if (usuarioId.HasValue && perfil.HasValue && perfil.Value != 1)
+            {
+                if (escala.CriadoPorUsuarioId.HasValue && escala.CriadoPorUsuarioId.Value != usuarioId.Value)
+                {
+                    return Forbid();
+                }
+            }
+
             await _escalaService.RemoverAsync(id);
             return NoContent();
         }
