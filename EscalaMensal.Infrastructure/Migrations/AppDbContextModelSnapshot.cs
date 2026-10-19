@@ -78,6 +78,9 @@ namespace EscalaMensal.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<int?>("CriadoPorUsuarioId")
+                        .HasColumnType("int");
+
                     b.Property<DateOnly>("DataFim")
                         .HasColumnType("date");
 
@@ -89,9 +92,55 @@ namespace EscalaMensal.Infrastructure.Migrations
                         .HasColumnType("int")
                         .HasDefaultValue(3);
 
+                    b.Property<int?>("ParoquiaId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
+                    b.HasIndex("CriadoPorUsuarioId");
+
+                    b.HasIndex("ParoquiaId");
+
                     b.ToTable("Escalas");
+                });
+
+            modelBuilder.Entity("EscalaMensal.Domain.Entities.EscalaCompartilhamento", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("CodigoAcesso")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<int>("CriadoPorUsuarioId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("DataCriacao")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("EscalaId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Permissao")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("UsuarioId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CriadoPorUsuarioId");
+
+                    b.HasIndex("EscalaId");
+
+                    b.HasIndex("UsuarioId");
+
+                    b.ToTable("EscalaCompartilhamentos", (string)null);
                 });
 
             modelBuilder.Entity("EscalaMensal.Domain.Entities.Funcao", b =>
@@ -122,7 +171,12 @@ namespace EscalaMensal.Infrastructure.Migrations
                     b.Property<bool>("Obrigatoria")
                         .HasColumnType("bit");
 
+                    b.Property<int?>("ParoquiaId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("ParoquiaId");
 
                     b.ToTable("Funcoes");
 
@@ -350,7 +404,12 @@ namespace EscalaMensal.Infrastructure.Migrations
                     b.Property<TimeOnly>("Horario")
                         .HasColumnType("time");
 
+                    b.Property<int?>("ParoquiaId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("ParoquiaId");
 
                     b.ToTable("HorariosFixos");
 
@@ -443,9 +502,14 @@ namespace EscalaMensal.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int?>("ParoquiaId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
                     b.HasIndex("MembroVinculadoId");
+
+                    b.HasIndex("ParoquiaId");
 
                     b.ToTable("Membros");
 
@@ -509,7 +573,12 @@ namespace EscalaMensal.Infrastructure.Migrations
                     b.Property<TimeOnly>("Horario")
                         .HasColumnType("time");
 
+                    b.Property<int?>("ParoquiaId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("ParoquiaId");
 
                     b.ToTable("MissasPadrao");
                 });
@@ -538,6 +607,101 @@ namespace EscalaMensal.Infrastructure.Migrations
                     b.ToTable("Missas");
                 });
 
+            modelBuilder.Entity("EscalaMensal.Domain.Entities.Paroquia", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("Ativa")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Bairro")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("Cidade")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("CodigoAcesso")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<int>("CriadoPorUsuarioId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("DataCriacao")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Endereco")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<string>("Estado")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("Nome")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CodigoAcesso");
+
+                    b.HasIndex("CriadoPorUsuarioId");
+
+                    b.ToTable("Paroquias", (string)null);
+                });
+
+            modelBuilder.Entity("EscalaMensal.Domain.Entities.ReivindicacaoParoquia", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime?>("DataResposta")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("DataSolicitacao")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Justificativa")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("ParoquiaId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<string>("TelefoneContato")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<int>("UsuarioId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ParoquiaId");
+
+                    b.HasIndex("UsuarioId");
+
+                    b.ToTable("ReivindicacoesParoquia", (string)null);
+                });
+
             modelBuilder.Entity("EscalaMensal.Domain.Entities.Restricao", b =>
                 {
                     b.Property<int>("Id")
@@ -557,6 +721,46 @@ namespace EscalaMensal.Infrastructure.Migrations
                     b.HasIndex("MembroId");
 
                     b.ToTable("Restricoes");
+                });
+
+            modelBuilder.Entity("EscalaMensal.Domain.Entities.SolicitacaoAcessoParoquia", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime?>("DataResposta")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("DataSolicitacao")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Mensagem")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("ParoquiaId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("RespondidoPorUsuarioId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UsuarioId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ParoquiaId");
+
+                    b.HasIndex("RespondidoPorUsuarioId");
+
+                    b.HasIndex("UsuarioId");
+
+                    b.ToTable("SolicitacoesAcessoParoquia", (string)null);
                 });
 
             modelBuilder.Entity("EscalaMensal.Domain.Entities.Usuario", b =>
@@ -616,6 +820,42 @@ namespace EscalaMensal.Infrastructure.Migrations
                     b.ToTable("Usuarios");
                 });
 
+            modelBuilder.Entity("EscalaMensal.Domain.Entities.UsuarioParoquia", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("BloqueadoParaCodigo")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("DataUltimoBloqueio")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("DataVinculo")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("ParoquiaId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TentativasCodigoErrado")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UsuarioId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ParoquiaId");
+
+                    b.HasIndex("UsuarioId", "ParoquiaId")
+                        .IsUnique();
+
+                    b.ToTable("UsuarioParoquias", (string)null);
+                });
+
             modelBuilder.Entity("FuncaoMissaPadrao", b =>
                 {
                     b.Property<int>("FuncoesId")
@@ -640,6 +880,59 @@ namespace EscalaMensal.Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("Funcao");
+                });
+
+            modelBuilder.Entity("EscalaMensal.Domain.Entities.Escala", b =>
+                {
+                    b.HasOne("EscalaMensal.Domain.Entities.Usuario", "CriadoPorUsuario")
+                        .WithMany()
+                        .HasForeignKey("CriadoPorUsuarioId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("EscalaMensal.Domain.Entities.Paroquia", "Paroquia")
+                        .WithMany("Escalas")
+                        .HasForeignKey("ParoquiaId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.Navigation("CriadoPorUsuario");
+
+                    b.Navigation("Paroquia");
+                });
+
+            modelBuilder.Entity("EscalaMensal.Domain.Entities.EscalaCompartilhamento", b =>
+                {
+                    b.HasOne("EscalaMensal.Domain.Entities.Usuario", "CriadoPorUsuario")
+                        .WithMany()
+                        .HasForeignKey("CriadoPorUsuarioId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("EscalaMensal.Domain.Entities.Escala", "Escala")
+                        .WithMany()
+                        .HasForeignKey("EscalaId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("EscalaMensal.Domain.Entities.Usuario", "Usuario")
+                        .WithMany()
+                        .HasForeignKey("UsuarioId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.Navigation("CriadoPorUsuario");
+
+                    b.Navigation("Escala");
+
+                    b.Navigation("Usuario");
+                });
+
+            modelBuilder.Entity("EscalaMensal.Domain.Entities.Funcao", b =>
+                {
+                    b.HasOne("EscalaMensal.Domain.Entities.Paroquia", "Paroquia")
+                        .WithMany("Funcoes")
+                        .HasForeignKey("ParoquiaId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.Navigation("Paroquia");
                 });
 
             modelBuilder.Entity("EscalaMensal.Domain.Entities.HistoricoItemMissa", b =>
@@ -679,6 +972,16 @@ namespace EscalaMensal.Infrastructure.Migrations
                     b.Navigation("HistoricoEscala");
                 });
 
+            modelBuilder.Entity("EscalaMensal.Domain.Entities.HorarioFixo", b =>
+                {
+                    b.HasOne("EscalaMensal.Domain.Entities.Paroquia", "Paroquia")
+                        .WithMany("HorariosFixos")
+                        .HasForeignKey("ParoquiaId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.Navigation("Paroquia");
+                });
+
             modelBuilder.Entity("EscalaMensal.Domain.Entities.ItemMissa", b =>
                 {
                     b.HasOne("EscalaMensal.Domain.Entities.Funcao", "Funcao")
@@ -712,7 +1015,24 @@ namespace EscalaMensal.Infrastructure.Migrations
                         .HasForeignKey("MembroVinculadoId")
                         .OnDelete(DeleteBehavior.Restrict);
 
+                    b.HasOne("EscalaMensal.Domain.Entities.Paroquia", "Paroquia")
+                        .WithMany("Membros")
+                        .HasForeignKey("ParoquiaId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
                     b.Navigation("MembroVinculado");
+
+                    b.Navigation("Paroquia");
+                });
+
+            modelBuilder.Entity("EscalaMensal.Domain.Entities.MissaPadrao", b =>
+                {
+                    b.HasOne("EscalaMensal.Domain.Entities.Paroquia", "Paroquia")
+                        .WithMany("MissasPadrao")
+                        .HasForeignKey("ParoquiaId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.Navigation("Paroquia");
                 });
 
             modelBuilder.Entity("EscalaMensal.Domain.Entities.Missas", b =>
@@ -726,6 +1046,36 @@ namespace EscalaMensal.Infrastructure.Migrations
                     b.Navigation("Escala");
                 });
 
+            modelBuilder.Entity("EscalaMensal.Domain.Entities.Paroquia", b =>
+                {
+                    b.HasOne("EscalaMensal.Domain.Entities.Usuario", "CriadoPorUsuario")
+                        .WithMany()
+                        .HasForeignKey("CriadoPorUsuarioId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("CriadoPorUsuario");
+                });
+
+            modelBuilder.Entity("EscalaMensal.Domain.Entities.ReivindicacaoParoquia", b =>
+                {
+                    b.HasOne("EscalaMensal.Domain.Entities.Paroquia", "Paroquia")
+                        .WithMany()
+                        .HasForeignKey("ParoquiaId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("EscalaMensal.Domain.Entities.Usuario", "Usuario")
+                        .WithMany()
+                        .HasForeignKey("UsuarioId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Paroquia");
+
+                    b.Navigation("Usuario");
+                });
+
             modelBuilder.Entity("EscalaMensal.Domain.Entities.Restricao", b =>
                 {
                     b.HasOne("EscalaMensal.Domain.Entities.Membro", "Membro")
@@ -737,6 +1087,32 @@ namespace EscalaMensal.Infrastructure.Migrations
                     b.Navigation("Membro");
                 });
 
+            modelBuilder.Entity("EscalaMensal.Domain.Entities.SolicitacaoAcessoParoquia", b =>
+                {
+                    b.HasOne("EscalaMensal.Domain.Entities.Paroquia", "Paroquia")
+                        .WithMany()
+                        .HasForeignKey("ParoquiaId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("EscalaMensal.Domain.Entities.Usuario", "RespondidoPorUsuario")
+                        .WithMany()
+                        .HasForeignKey("RespondidoPorUsuarioId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("EscalaMensal.Domain.Entities.Usuario", "Usuario")
+                        .WithMany()
+                        .HasForeignKey("UsuarioId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Paroquia");
+
+                    b.Navigation("RespondidoPorUsuario");
+
+                    b.Navigation("Usuario");
+                });
+
             modelBuilder.Entity("EscalaMensal.Domain.Entities.Usuario", b =>
                 {
                     b.HasOne("EscalaMensal.Domain.Entities.Usuario", "AprovadoPor")
@@ -745,6 +1121,25 @@ namespace EscalaMensal.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("AprovadoPor");
+                });
+
+            modelBuilder.Entity("EscalaMensal.Domain.Entities.UsuarioParoquia", b =>
+                {
+                    b.HasOne("EscalaMensal.Domain.Entities.Paroquia", "Paroquia")
+                        .WithMany("UsuariosParoquia")
+                        .HasForeignKey("ParoquiaId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("EscalaMensal.Domain.Entities.Usuario", "Usuario")
+                        .WithMany()
+                        .HasForeignKey("UsuarioId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Paroquia");
+
+                    b.Navigation("Usuario");
                 });
 
             modelBuilder.Entity("FuncaoMissaPadrao", b =>
@@ -785,6 +1180,21 @@ namespace EscalaMensal.Infrastructure.Migrations
             modelBuilder.Entity("EscalaMensal.Domain.Entities.Missas", b =>
                 {
                     b.Navigation("ItensMissa");
+                });
+
+            modelBuilder.Entity("EscalaMensal.Domain.Entities.Paroquia", b =>
+                {
+                    b.Navigation("Escalas");
+
+                    b.Navigation("Funcoes");
+
+                    b.Navigation("HorariosFixos");
+
+                    b.Navigation("Membros");
+
+                    b.Navigation("MissasPadrao");
+
+                    b.Navigation("UsuariosParoquia");
                 });
 #pragma warning restore 612, 618
         }

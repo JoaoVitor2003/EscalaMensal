@@ -38,16 +38,21 @@ namespace EscalaMensal.Domain.Entities
         public int? MembroVinculadoId { get; private set; }
         public Membro? MembroVinculado { get; private set; }
         public int? DiasEscalados { get; set; }
+        public int? ParoquiaId { get; private set; }
+        public Paroquia? Paroquia { get; private set; }
         public ICollection<Restricao> Restricoes { get; private set; } = new List<Restricao>();
-        public Membro(string nome, NivelEnum nivel, CargoEnum cargo, int? membroVinculadoId = null)
+        public Membro(string nome, NivelEnum nivel, CargoEnum cargo, int? membroVinculadoId = null, int? paroquiaId = null)
         {
             Nome = nome;
             Nivel = nivel;
             Cargo = cargo;
             MembroVinculadoId = membroVinculadoId;
+            ParoquiaId = paroquiaId;
             Ativo = true;
         }
         public Membro() { }
+
+        public void DefinirParoquia(int paroquiaId) => ParoquiaId = paroquiaId;
 
         public void VincularMembro(int membroId) => MembroVinculadoId = membroId;
         public void DesvincularMembro() => MembroVinculadoId = null;

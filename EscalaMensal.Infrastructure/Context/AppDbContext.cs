@@ -29,6 +29,10 @@ namespace EscalaMensal.Infrastructure.Context
         public DbSet<MissaPadrao> MissasPadrao { get; set; }
         public DbSet<Usuario> Usuarios { get; set; }
         public DbSet<EscalaCompartilhamento> EscalaCompartilhamentos { get; set; }
+        public DbSet<Paroquia> Paroquias { get; set; }
+        public DbSet<UsuarioParoquia> UsuarioParoquias { get; set; }
+        public DbSet<SolicitacaoAcessoParoquia> SolicitacoesAcessoParoquia { get; set; }
+        public DbSet<ReivindicacaoParoquia> ReivindicacoesParoquia { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -228,6 +232,110 @@ namespace EscalaMensal.Infrastructure.Context
                       .HasForeignKey(e => e.CriadoPorUsuarioId)
                       .OnDelete(DeleteBehavior.Restrict);
             });
+
+            modelBuilder.Entity<Paroquia>(entity =>
+            {
+                entity.ToTable("Paroquias");
+                entity.HasKey(p => p.Id);
+                entity.Property(p => p.Nome).IsRequired().HasMaxLength(150);
+                entity.Property(p => p.Cidade).IsRequired().HasMaxLength(100);
+                entity.Property(p => p.Estado).IsRequired().HasMaxLength(50);
+                entity.Property(p => p.Bairro).HasMaxLength(100);
+                entity.Property(p => p.Endereco).HasMaxLength(255);
+                entity.Property(p => p.CodigoAcesso).IsRequired().HasMaxLength(50);
+                entity.HasIndex(p => p.CodigoAcesso);
+
+                entity.HasOne(p => p.CriadoPorUsuario)
+                      .WithMany()
+                      .HasForeignKey(p => p.CriadoPorUsuarioId)
+                      .OnDelete(DeleteBehavior.Restrict);
+            });
+
+            modelBuilder.Entity<UsuarioParoquia>(entity =>
+            {
+                entity.ToTable("UsuarioParoquias");
+                entity.HasKey(up => up.Id);
+                entity.HasIndex(up => new { up.UsuarioId, up.ParoquiaId }).IsUnique();
+
+                entity.HasOne(up => up.Usuario)
+                      .WithMany()
+                      .HasForeignKey(up => up.UsuarioId)
+                      .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne(up => up.Paroquia)
+                      .WithMany(p => p.UsuariosParoquia)
+                      .HasForeignKey(up => up.ParoquiaId)
+                      .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            modelBuilder.Entity<SolicitacaoAcessoParoquia>(entity =>
+            {
+                entity.ToTable("SolicitacoesAcessoParoquia");
+                entity.HasKey(s => s.Id);
+
+                entity.HasOne(s => s.Usuario)
+                      .WithMany()
+                      .HasForeignKey(s => s.UsuarioId)
+                      .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne(s => s.Paroquia)
+                      .WithMany()
+                      .HasForeignKey(s => s.ParoquiaId)
+                      .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne(s => s.RespondidoPorUsuario)
+                      .WithMany()
+                      .HasForeignKey(s => s.RespondidoPorUsuarioId)
+                      .OnDelete(DeleteBehavior.Restrict);
+            });
+
+            modelBuilder.Entity<ReivindicacaoParoquia>(entity =>
+            {
+                entity.ToTable("ReivindicacoesParoquia");
+                entity.HasKey(r => r.Id);
+                entity.Property(r => r.Justificativa).IsRequired();
+                entity.Property(r => r.TelefoneContato).IsRequired().HasMaxLength(50);
+
+                entity.HasOne(r => r.Usuario)
+                      .WithMany()
+                      .HasForeignKey(r => r.UsuarioId)
+                      .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne(r => r.Paroquia)
+                      .WithMany()
+                      .HasForeignKey(r => r.ParoquiaId)
+                      .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            modelBuilder.Entity<Funcao>()
+                .HasOne(f => f.Paroquia)
+                .WithMany(p => p.Funcoes)
+                .HasForeignKey(f => f.ParoquiaId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Membro>()
+                .HasOne(m => m.Paroquia)
+                .WithMany(p => p.Membros)
+                .HasForeignKey(m => m.ParoquiaId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Escala>()
+                .HasOne(e => e.Paroquia)
+                .WithMany(p => p.Escalas)
+                .HasForeignKey(e => e.ParoquiaId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<HorarioFixo>()
+                .HasOne(h => h.Paroquia)
+                .WithMany(p => p.HorariosFixos)
+                .HasForeignKey(h => h.ParoquiaId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<MissaPadrao>()
+                .HasOne(mp => mp.Paroquia)
+                .WithMany(p => p.MissasPadrao)
+                .HasForeignKey(mp => mp.ParoquiaId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
 
     }

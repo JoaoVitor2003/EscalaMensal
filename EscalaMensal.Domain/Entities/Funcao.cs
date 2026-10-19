@@ -1,4 +1,4 @@
-﻿using EscalaMensal.Domain.Enums;
+using EscalaMensal.Domain.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,11 +12,13 @@ namespace EscalaMensal.Domain.Entities
         public int Id { get; private set; }
         public string Nome { get; private set; }
         public string Abreviacao { get; set; }
-        public bool EhMultipla { get; private set; } = false;
+        public bool EhMultipla { get; set; } = false;
 
         public CargoEnum Cargo { get; set; }
         public NivelEnum NivelMinimo { get; set; }
         public bool Obrigatoria { get; set; }
+        public int? ParoquiaId { get; set; }
+        public Paroquia? Paroquia { get; set; }
 
         public Funcao(string nome) => Nome = nome;
 

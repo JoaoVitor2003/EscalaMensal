@@ -14,19 +14,27 @@ namespace EscalaMensal.Domain.Entities
         public int LimitePermitido { get; private set; }
         public int? CriadoPorUsuarioId { get; private set; }
         public Usuario? CriadoPorUsuario { get; private set; }
+        public int? ParoquiaId { get; private set; }
+        public Paroquia? Paroquia { get; private set; }
         public ICollection<Missas> Missas { get; private set; } = new List<Missas>();
 
-        public Escala(DateOnly dataInicio, DateOnly dataFim, int limitePermitido, int? criadoPorUsuarioId = null)
+        public Escala(DateOnly dataInicio, DateOnly dataFim, int limitePermitido, int? criadoPorUsuarioId = null, int? paroquiaId = null)
         {
             DataInicio = dataInicio;
             DataFim = dataFim;
             LimitePermitido = limitePermitido;
             CriadoPorUsuarioId = criadoPorUsuarioId;
+            ParoquiaId = paroquiaId;
         }
 
         public void DefinirCriador(int usuarioId)
         {
             CriadoPorUsuarioId = usuarioId;
+        }
+
+        public void DefinirParoquia(int paroquiaId)
+        {
+            ParoquiaId = paroquiaId;
         }
 
         private Escala() { }
