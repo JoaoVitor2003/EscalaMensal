@@ -17,5 +17,6 @@ namespace EscalaMensal.Application.DTOs.Membro
         public List<TimeOnly> HorasPreferenciais { get; set; } = new List<TimeOnly>();
         public List<DayOfWeek> DiasDisponiveis { get; set; } = new List<DayOfWeek>();
         public int? MembroVinculadoId { get; set; } = null;
+        public int? ParoquiaId { get; set; }
     }
 }

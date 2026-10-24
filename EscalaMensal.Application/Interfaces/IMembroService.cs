@@ -11,7 +11,7 @@ namespace EscalaMensal.Domain.Interfaces
     public interface IMembroService
     {
         Task<MembroDto?> ObterPorIdAsync(int id);
-        Task<List<MembroDto>> ObterTodosAsync();
+        Task<List<MembroDto>> ObterTodosAsync(int? paroquiaId = null);
         Task AdicionarAsync(MembroAdicionarDto membro);
         Task AtualizarAsync(MembroAtualizarDto membro);
         Task RemoverAsync(int id);

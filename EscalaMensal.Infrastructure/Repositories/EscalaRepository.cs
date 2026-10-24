@@ -38,12 +38,17 @@ namespace EscalaMensal.Infrastructure.Repositories
                 .FirstOrDefaultAsync(e => e.Id == id);
         }
 
-        public async Task<Escala?> ObterPorMesAnoAsync(int mes, int ano, int? usuarioId = null, int? perfil = null)
+        public async Task<Escala?> ObterPorMesAnoAsync(int mes, int ano, int? usuarioId = null, int? perfil = null, int? paroquiaId = null)
         {
             var query = _context.Escalas
                 .Include(e => e.Missas)
                     .ThenInclude(i => i.ItensMissa)
                 .Where(e => e.Missas.Any(i => i.Dia.Month == mes && i.Dia.Year == ano));
+
+            if (paroquiaId.HasValue)
+            {
+                query = query.Where(e => e.ParoquiaId == paroquiaId.Value);
+            }
 
             if (usuarioId.HasValue && perfil != 1)
             {
@@ -53,7 +58,7 @@ namespace EscalaMensal.Infrastructure.Repositories
             return await query.FirstOrDefaultAsync();
         }
 
-        public async Task<List<Escala>> ObterTodasAsync(int? usuarioId = null, int? perfil = null)
+        public async Task<List<Escala>> ObterTodasAsync(int? usuarioId = null, int? perfil = null, int? paroquiaId = null)
         {
             var query = _context.Escalas
                 .Include(e => e.Missas)
@@ -63,6 +68,11 @@ namespace EscalaMensal.Infrastructure.Repositories
                     .ThenInclude(i => i.ItensMissa)
                     .ThenInclude(i => i.Membro)
                 .AsQueryable();
+
+            if (paroquiaId.HasValue)
+            {
+                query = query.Where(e => e.ParoquiaId == paroquiaId.Value);
+            }
 
             if (usuarioId.HasValue && perfil != 1)
             {

@@ -20,9 +20,9 @@ namespace EscalaMensal.API.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<List<MembroDto>>> ObterTodos()
+        public async Task<ActionResult<List<MembroDto>>> ObterTodos([FromQuery] int? paroquiaId = null)
         {
-            var membros = await _membroService.ObterTodosAsync();
+            var membros = await _membroService.ObterTodosAsync(paroquiaId);
             return Ok(membros);
         }
 

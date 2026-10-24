@@ -33,9 +33,14 @@ namespace EscalaMensal.Infrastructure.Repositories
                 .FirstOrDefaultAsync(u => u.Id == id);
         }
 
-        public async Task<List<Membro>> ObterTodosAsync()
+        public async Task<List<Membro>> ObterTodosAsync(int? paroquiaId = null)
         {
-            return await _context.Membros.ToListAsync();
+            var query = _context.Membros.AsQueryable();
+            if (paroquiaId.HasValue)
+            {
+                query = query.Where(m => m.ParoquiaId == paroquiaId.Value);
+            }
+            return await query.ToListAsync();
         }
 
         public async Task RemoverAsync(int id)

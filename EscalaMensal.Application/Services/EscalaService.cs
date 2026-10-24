@@ -30,16 +30,16 @@ namespace EscalaMensal.Application.Services
             _funcaoRepository = funcaoRepository;
         }
 
-        public async Task<EscalaDto?> ObterPorMesAnoAsync(int mes, int ano, int? usuarioId = null, int? perfil = null)
+        public async Task<EscalaDto?> ObterPorMesAnoAsync(int mes, int ano, int? usuarioId = null, int? perfil = null, int? paroquiaId = null)
         {
-            var escala = await _escalaRepository.ObterPorMesAnoAsync(mes, ano, usuarioId, perfil);
+            var escala = await _escalaRepository.ObterPorMesAnoAsync(mes, ano, usuarioId, perfil, paroquiaId);
             var dto = _mapper.Map<EscalaDto>(escala);
             return dto;
         }
 
-        public async Task<List<EscalaDto>> ObterTodasAsync(int? usuarioId = null, int? perfil = null)
+        public async Task<List<EscalaDto>> ObterTodasAsync(int? usuarioId = null, int? perfil = null, int? paroquiaId = null)
         {
-            var escalas = await _escalaRepository.ObterTodasAsync(usuarioId, perfil);
+            var escalas = await _escalaRepository.ObterTodasAsync(usuarioId, perfil, paroquiaId);
             var dto = _mapper.Map<List<EscalaDto>>(escalas);
 
             return dto;
@@ -52,11 +52,15 @@ namespace EscalaMensal.Application.Services
             {
                 novaEscalaEntity.DefinirCriador(escala.CriadoPorUsuarioId.Value);
             }
+            if (escala.ParoquiaId.HasValue)
+            {
+                novaEscalaEntity.DefinirParoquia(escala.ParoquiaId.Value);
+            }
 
             if (escala.CriarMissasPadrao)
             {
-                var missasPadrao = await _missaPadraoRepository.ObterTodasAsync();
-                var funcoesObrigatorias = await _funcaoRepository.ObterObrigatoriasAsync();
+                var missasPadrao = await _missaPadraoRepository.ObterTodasAsync(escala.ParoquiaId);
+                var funcoesObrigatorias = await _funcaoRepository.ObterObrigatoriasAsync(escala.ParoquiaId);
 
                 var dataAtual = escala.DataInicio;
                 while (dataAtual <= escala.DataFim)

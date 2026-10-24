@@ -8,7 +8,7 @@ namespace EscalaMensal.Domain.Interfaces
     public interface IHorarioFixoRepository
     {
         Task<HorarioFixo?> ObterPorIdAsync(int id);
-        Task<List<HorarioFixo>> ObterTodosAsync();
+        Task<List<HorarioFixo>> ObterTodosAsync(int? paroquiaId = null);
         Task AdicionarAsync(HorarioFixo horario);
         Task RemoverAsync(int id);
     }

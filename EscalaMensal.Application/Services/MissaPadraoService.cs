@@ -22,21 +22,21 @@ namespace EscalaMensal.Application.Services
             _mapper = mapper;
         }
 
-        public async Task<List<MissaPadraoDto>> ObterTodasAsync()
+        public async Task<List<MissaPadraoDto>> ObterTodasAsync(int? paroquiaId = null)
         {
-            var entities = await _missaPadraoRepository.ObterTodasAsync();
+            var entities = await _missaPadraoRepository.ObterTodasAsync(paroquiaId);
             return _mapper.Map<List<MissaPadraoDto>>(entities);
         }
 
         public async Task AdicionarAsync(MissaPadraoAdicionarDto dto)
         {
-            var existe = await _missaPadraoRepository.ExistePorDiaHorarioAsync(dto.DiaSemana, dto.Horario);
+            var existe = await _missaPadraoRepository.ExistePorDiaHorarioAsync(dto.DiaSemana, dto.Horario, dto.ParoquiaId);
             if (existe)
             {
                 throw new DomainException("Já existe uma missa padrão cadastrada para esse dia da semana e horário.");
             }
 
-            var entity = new MissaPadrao(dto.DiaSemana, dto.Horario, dto.CriarFuncoesPadrao);
+            var entity = new MissaPadrao(dto.DiaSemana, dto.Horario, dto.CriarFuncoesPadrao, dto.ParoquiaId);
 
             if (!dto.CriarFuncoesPadrao && dto.FuncoesIds != null && dto.FuncoesIds.Count > 0)
             {
@@ -55,7 +55,7 @@ namespace EscalaMensal.Application.Services
                 throw new DomainException("Missa padrão não encontrada.");
             }
 
-            var todas = await _missaPadraoRepository.ObterTodasAsync();
+            var todas = await _missaPadraoRepository.ObterTodasAsync(dto.ParoquiaId);
             if (todas.Any(m => m.Id != id && m.DiaSemana == dto.DiaSemana && m.Horario == dto.Horario))
             {
                 throw new DomainException("Já existe uma missa padrão cadastrada para esse dia da semana e horário.");

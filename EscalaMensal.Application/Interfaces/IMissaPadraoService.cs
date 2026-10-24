@@ -6,7 +6,7 @@ namespace EscalaMensal.Application.Interfaces
 {
     public interface IMissaPadraoService
     {
-        Task<List<MissaPadraoDto>> ObterTodasAsync();
+        Task<List<MissaPadraoDto>> ObterTodasAsync(int? paroquiaId = null);
         Task AdicionarAsync(MissaPadraoAdicionarDto dto);
         Task AtualizarAsync(int id, MissaPadraoAdicionarDto dto);
         Task RemoverAsync(int id);

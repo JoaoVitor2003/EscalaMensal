@@ -27,9 +27,9 @@ namespace EscalaMensal.Application.Services
             return dto;
         }
 
-        public async Task<List<MembroDto>> ObterTodosAsync()
+        public async Task<List<MembroDto>> ObterTodosAsync(int? paroquiaId = null)
         {
-            var membros = await _membroRepository.ObterTodosAsync();
+            var membros = await _membroRepository.ObterTodosAsync(paroquiaId);
             var membrosDto = _mapper.Map<List<MembroDto>>(membros);
             return membrosDto;
         }

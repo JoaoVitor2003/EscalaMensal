@@ -1,4 +1,4 @@
-﻿using EscalaMensal.Domain.Enums;
+using EscalaMensal.Domain.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,5 +17,6 @@ namespace EscalaMensal.Application.DTOs.Funcao
         public CargoEnum Cargo { get; set; }
         public NivelEnum NivelMinimo { get; set; }
         public bool Obrigatoria { get; set; }
+        public int? ParoquiaId { get; set; }
     }
 }

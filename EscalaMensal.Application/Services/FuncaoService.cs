@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using EscalaMensal.Application.DTOs.Funcao;
 using EscalaMensal.Domain.Entities;
 using EscalaMensal.Domain.Interfaces;
@@ -19,9 +19,16 @@ namespace EscalaMensal.Application.Services
             _mapper = mapper;
         }
 
-        public async Task<List<FuncaoDto>> ObterTodasAsync()
+        public async Task<List<FuncaoDto>> ObterTodasAsync(int? paroquiaId = null)
         {
-            var funcoes = await _funcaoRepository.ObterTodasAsync();
+            var funcoes = await _funcaoRepository.ObterTodasAsync(paroquiaId);
+            var dto = _mapper.Map<List<FuncaoDto>>(funcoes);
+            return dto;
+        }
+
+        public async Task<List<FuncaoDto>> ObterModelosBaseAsync()
+        {
+            var funcoes = await _funcaoRepository.ObterModelosBaseAsync();
             var dto = _mapper.Map<List<FuncaoDto>>(funcoes);
             return dto;
         }

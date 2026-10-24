@@ -31,6 +31,7 @@ builder.Services.AddScoped<IMissasRepository, MissasRepository>();
 builder.Services.AddScoped<IHorarioFixoRepository, HorarioFixoRepository>();
 builder.Services.AddScoped<IMissaPadraoRepository, MissaPadraoRepository>();
 builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
+builder.Services.AddScoped<IParoquiaRepository, ParoquiaRepository>();
 
 builder.Services.AddSingleton<IPasswordHasher, BCryptPasswordHasher>();
 builder.Services.AddScoped<ITokenService, TokenService>();
@@ -46,6 +47,7 @@ builder.Services.AddScoped<IMissasService, MissasService>();
 builder.Services.AddScoped<IHorarioFixoService, HorarioFixoService>();
 builder.Services.AddScoped<IMissaPadraoService, MissaPadraoService>();
 builder.Services.AddScoped<IUsuarioService, UsuarioService>();
+builder.Services.AddScoped<IParoquiaService, ParoquiaService>();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
@@ -57,6 +59,7 @@ builder.Services.AddAutoMapper(typeof(FuncaoDto));
 builder.Services.AddAutoMapper(typeof(HorarioFixoProfile));
 builder.Services.AddAutoMapper(typeof(MissaPadraoProfile));
 builder.Services.AddAutoMapper(typeof(MembroProfile));
+builder.Services.AddAutoMapper(typeof(ParoquiaProfile));
 
 builder.Services.AddCors(options =>
 {

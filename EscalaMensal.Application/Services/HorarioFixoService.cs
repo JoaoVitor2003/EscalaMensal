@@ -19,9 +19,9 @@ namespace EscalaMensal.Application.Services
             _mapper = mapper;
         }
 
-        public async Task<List<HorarioFixoDto>> ObterTodosAsync()
+        public async Task<List<HorarioFixoDto>> ObterTodosAsync(int? paroquiaId = null)
         {
-            var horarios = await _repository.ObterTodosAsync();
+            var horarios = await _repository.ObterTodosAsync(paroquiaId);
             return _mapper.Map<List<HorarioFixoDto>>(horarios);
         }
 

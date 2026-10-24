@@ -7,11 +7,11 @@ namespace EscalaMensal.Domain.Interfaces
 {
     public interface IMissaPadraoRepository
     {
-        Task<List<MissaPadrao>> ObterTodasAsync();
+        Task<List<MissaPadrao>> ObterTodasAsync(int? paroquiaId = null);
         Task AdicionarAsync(MissaPadrao missaPadrao);
         Task AtualizarAsync(MissaPadrao missaPadrao);
         Task RemoverAsync(int id);
         Task<MissaPadrao?> ObterPorIdAsync(int id);
-        Task<bool> ExistePorDiaHorarioAsync(DayOfWeek diaSemana, TimeOnly horario);
+        Task<bool> ExistePorDiaHorarioAsync(DayOfWeek diaSemana, TimeOnly horario, int? paroquiaId = null);
     }
 }

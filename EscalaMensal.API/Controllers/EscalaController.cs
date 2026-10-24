@@ -16,9 +16,9 @@ namespace EscalaMensal.API.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<List<EscalaDto>>> ObterTodas([FromQuery] int? usuarioId, [FromQuery] int? perfil)
+        public async Task<ActionResult<List<EscalaDto>>> ObterTodas([FromQuery] int? usuarioId, [FromQuery] int? perfil, [FromQuery] int? paroquiaId = null)
         {
-            var escalas = await _escalaService.ObterTodasAsync(usuarioId, perfil);
+            var escalas = await _escalaService.ObterTodasAsync(usuarioId, perfil, paroquiaId);
 
             return Ok(escalas);
         }
@@ -32,9 +32,9 @@ namespace EscalaMensal.API.Controllers
         }
 
         [HttpGet("por-mes-ano")]
-        public async Task<ActionResult<EscalaDto>> ObterPorMesAno([FromQuery] int mes, [FromQuery] int ano, [FromQuery] int? usuarioId, [FromQuery] int? perfil)
+        public async Task<ActionResult<EscalaDto>> ObterPorMesAno([FromQuery] int mes, [FromQuery] int ano, [FromQuery] int? usuarioId, [FromQuery] int? perfil, [FromQuery] int? paroquiaId = null)
         {
-            var escala = await _escalaService.ObterPorMesAnoAsync(mes, ano, usuarioId, perfil);
+            var escala = await _escalaService.ObterPorMesAnoAsync(mes, ano, usuarioId, perfil, paroquiaId);
             if (escala == null)
                 return NotFound();
 

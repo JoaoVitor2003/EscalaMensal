@@ -18,9 +18,9 @@ namespace EscalaMensal.API.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<List<MissaPadraoDto>>> ObterTodas()
+        public async Task<ActionResult<List<MissaPadraoDto>>> ObterTodas([FromQuery] int? paroquiaId = null)
         {
-            var missas = await _service.ObterTodasAsync();
+            var missas = await _service.ObterTodasAsync(paroquiaId);
             return Ok(missas);
         }
 

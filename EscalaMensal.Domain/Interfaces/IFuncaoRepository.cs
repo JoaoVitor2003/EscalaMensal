@@ -9,8 +9,9 @@ namespace EscalaMensal.Domain.Interfaces
 {
     public interface IFuncaoRepository
     {
-        Task<List<Funcao>> ObterTodasAsync();
-        Task<List<Funcao>> ObterObrigatoriasAsync();
+        Task<List<Funcao>> ObterTodasAsync(int? paroquiaId = null);
+        Task<List<Funcao>> ObterObrigatoriasAsync(int? paroquiaId = null);
+        Task<List<Funcao>> ObterModelosBaseAsync();
         Task<Funcao?> ObterPorIdAsync(int id);
         Task<List<Funcao>> ObterPorIdsAsync(List<int> ids);
         Task AdicionarAsync(Funcao funcao);

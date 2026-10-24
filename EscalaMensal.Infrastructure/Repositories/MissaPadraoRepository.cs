@@ -17,9 +17,14 @@ namespace EscalaMensal.Infrastructure.Repositories
             _context = context;
         }
 
-        public async Task<List<MissaPadrao>> ObterTodasAsync()
+        public async Task<List<MissaPadrao>> ObterTodasAsync(int? paroquiaId = null)
         {
-            return await _context.MissasPadrao.Include(m => m.Funcoes).ToListAsync();
+            var query = _context.MissasPadrao.Include(m => m.Funcoes).AsQueryable();
+            if (paroquiaId.HasValue)
+            {
+                query = query.Where(m => m.ParoquiaId == paroquiaId.Value);
+            }
+            return await query.ToListAsync();
         }
 
         public async Task AdicionarAsync(MissaPadrao missaPadrao)
@@ -49,10 +54,14 @@ namespace EscalaMensal.Infrastructure.Repositories
             return await _context.MissasPadrao.Include(m => m.Funcoes).FirstOrDefaultAsync(m => m.Id == id);
         }
 
-        public async Task<bool> ExistePorDiaHorarioAsync(DayOfWeek diaSemana, TimeOnly horario)
+        public async Task<bool> ExistePorDiaHorarioAsync(DayOfWeek diaSemana, TimeOnly horario, int? paroquiaId = null)
         {
-            return await _context.MissasPadrao
-                .AnyAsync(m => m.DiaSemana == diaSemana && m.Horario == horario);
+            var query = _context.MissasPadrao.Where(m => m.DiaSemana == diaSemana && m.Horario == horario);
+            if (paroquiaId.HasValue)
+            {
+                query = query.Where(m => m.ParoquiaId == paroquiaId.Value);
+            }
+            return await query.AnyAsync();
         }
     }
 }

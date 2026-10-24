@@ -14,14 +14,29 @@ namespace EscalaMensal.Infrastructure.Repositories
             _context = context;
         }
 
-        public async Task<List<Funcao>> ObterTodasAsync()
+        public async Task<List<Funcao>> ObterTodasAsync(int? paroquiaId = null)
         {
-            return await _context.Funcoes.ToListAsync();
+            var query = _context.Funcoes.AsQueryable();
+            if (paroquiaId.HasValue)
+            {
+                query = query.Where(f => f.ParoquiaId == paroquiaId.Value);
+            }
+            return await query.ToListAsync();
         }
 
-        public async Task<List<Funcao>> ObterObrigatoriasAsync()
+        public async Task<List<Funcao>> ObterObrigatoriasAsync(int? paroquiaId = null)
         {
-            return await _context.Funcoes.Where(f => f.Obrigatoria).ToListAsync();
+            var query = _context.Funcoes.Where(f => f.Obrigatoria);
+            if (paroquiaId.HasValue)
+            {
+                query = query.Where(f => f.ParoquiaId == paroquiaId.Value);
+            }
+            return await query.ToListAsync();
+        }
+
+        public async Task<List<Funcao>> ObterModelosBaseAsync()
+        {
+            return await _context.Funcoes.Where(f => f.ParoquiaId == null).ToListAsync();
         }
 
         public async Task<Funcao?> ObterPorIdAsync(int id)

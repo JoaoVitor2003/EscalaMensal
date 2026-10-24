@@ -21,6 +21,7 @@ namespace EscalaMensal.Application.DTOs.Membro
         public int? MembroVinculadoId { get; set; }
         public MembroDto? MembroVinculado { get; set; }
         public int? DiasEscalados { get; set; }
+        public int? ParoquiaId { get; set; }
         public ICollection<RestricaoDto> Restricoes { get; set; } = new List<RestricaoDto>();
     }
 }

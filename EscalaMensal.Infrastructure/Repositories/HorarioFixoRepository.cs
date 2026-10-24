@@ -27,9 +27,14 @@ namespace EscalaMensal.Infrastructure.Repositories
             return await _context.HorariosFixos.FindAsync(id);
         }
 
-        public async Task<List<HorarioFixo>> ObterTodosAsync()
+        public async Task<List<HorarioFixo>> ObterTodosAsync(int? paroquiaId = null)
         {
-            return await _context.HorariosFixos.ToListAsync();
+            var query = _context.HorariosFixos.AsQueryable();
+            if (paroquiaId.HasValue)
+            {
+                query = query.Where(h => h.ParoquiaId == paroquiaId.Value);
+            }
+            return await query.ToListAsync();
         }
 
         public async Task RemoverAsync(int id)

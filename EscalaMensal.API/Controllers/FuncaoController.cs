@@ -1,4 +1,4 @@
-﻿using EscalaMensal.Application.DTOs.Escala;
+using EscalaMensal.Application.DTOs.Escala;
 using EscalaMensal.Application.DTOs.Funcao;
 using EscalaMensal.Domain.Interfaces;
 using Microsoft.AspNetCore.Mvc;
@@ -17,10 +17,17 @@ namespace EscalaMensal.API.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<List<FuncaoDto>>> ObterTodas()
+        public async Task<ActionResult<List<FuncaoDto>>> ObterTodas([FromQuery] int? paroquiaId = null)
         {
-            var funcoes = await _funcaoService.ObterTodasAsync();
+            var funcoes = await _funcaoService.ObterTodasAsync(paroquiaId);
             return Ok(funcoes);
+        }
+
+        [HttpGet("modelos")]
+        public async Task<ActionResult<List<FuncaoDto>>> ObterModelosBase()
+        {
+            var modelos = await _funcaoService.ObterModelosBaseAsync();
+            return Ok(modelos);
         }
 
         [HttpGet("{id}")]

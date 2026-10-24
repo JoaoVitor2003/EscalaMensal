@@ -6,5 +6,6 @@ namespace EscalaMensal.Application.DTOs.HorarioFixo
     {
         public int Id { get; set; }
         public TimeOnly Horario { get; set; }
+        public int? ParoquiaId { get; set; }
     }
 }

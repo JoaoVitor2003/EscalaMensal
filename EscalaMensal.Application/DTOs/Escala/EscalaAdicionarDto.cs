@@ -13,5 +13,6 @@ namespace EscalaMensal.Application.DTOs.Escala
         public int LimitePermitido { get; set; }
         public bool CriarMissasPadrao { get; set; }
         public int? CriadoPorUsuarioId { get; set; }
+        public int? ParoquiaId { get; set; }
     }
 }
