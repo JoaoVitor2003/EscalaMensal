@@ -14,5 +14,6 @@ namespace EscalaMensal.Domain.Interfaces
         Task AtualizarAsync(EscalaAtualizarDto escala);
         Task RemoverAsync(int id);
         byte[] GerarPlanilhaExcel(EscalaDto escala);
+        Task<GerarEscalaAleatoriaResultadoDto> GerarEscalaAleatoriaAsync(int escalaId, GerarEscalaAleatoriaRequestDto request);
     }
 }

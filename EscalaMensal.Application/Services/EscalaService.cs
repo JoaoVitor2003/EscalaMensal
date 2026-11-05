@@ -3,6 +3,7 @@ using EscalaMensal.Application.DTOs.Escala;
 using EscalaMensal.Application.DTOs.ItemMissa;
 using EscalaMensal.Application.DTOs.Missa;
 using EscalaMensal.Domain.Entities;
+using EscalaMensal.Domain.Enums;
 using EscalaMensal.Domain.Interfaces;
 using EscalaMensal.Domain.Exceptions;
 using System.Collections.Generic;
@@ -21,13 +22,26 @@ namespace EscalaMensal.Application.Services
         private readonly IMapper _mapper;
         private readonly IMissaPadraoRepository _missaPadraoRepository;
         private readonly IFuncaoRepository _funcaoRepository;
+        private readonly IMembroRepository _membroRepository;
+        private readonly ICargoNivelFuncaoPermitidaRepository _cargoNivelRepository;
+        private readonly IRestricaoRepository _restricaoRepository;
 
-        public EscalaService(IEscalaRepository escalaRepository, IMapper mapper, IMissaPadraoRepository missaPadraoRepository, IFuncaoRepository funcaoRepository)
+        public EscalaService(
+            IEscalaRepository escalaRepository, 
+            IMapper mapper, 
+            IMissaPadraoRepository missaPadraoRepository, 
+            IFuncaoRepository funcaoRepository,
+            IMembroRepository membroRepository,
+            ICargoNivelFuncaoPermitidaRepository cargoNivelRepository,
+            IRestricaoRepository restricaoRepository)
         {
             _escalaRepository = escalaRepository;
             _mapper = mapper;
             _missaPadraoRepository = missaPadraoRepository;
             _funcaoRepository = funcaoRepository;
+            _membroRepository = membroRepository;
+            _cargoNivelRepository = cargoNivelRepository;
+            _restricaoRepository = restricaoRepository;
         }
 
         public async Task<EscalaDto?> ObterPorMesAnoAsync(int mes, int ano, int? usuarioId = null, int? perfil = null, int? paroquiaId = null)
@@ -117,6 +131,300 @@ namespace EscalaMensal.Application.Services
 
             var dto = _mapper.Map<EscalaDto>(escala);
             return dto;
+        }
+
+        public async Task<GerarEscalaAleatoriaResultadoDto> GerarEscalaAleatoriaAsync(int escalaId, GerarEscalaAleatoriaRequestDto request)
+        {
+            // 1. Validar perfil Premium / Administrador
+            if (request.Perfil.HasValue && 
+                request.Perfil.Value != (int)PerfilUsuarioEnum.Administrador && 
+                request.Perfil.Value != (int)PerfilUsuarioEnum.Premium)
+            {
+                return new GerarEscalaAleatoriaResultadoDto
+                {
+                    Sucesso = false,
+                    Mensagem = "Apenas usuários com perfil Premium ou Administrador podem utilizar a geração automática de escala."
+                };
+            }
+
+            // 2. Carregar escala
+            var escala = await _escalaRepository.ObterPorIdAsync(escalaId);
+            if (escala == null)
+            {
+                return new GerarEscalaAleatoriaResultadoDto { Sucesso = false, Mensagem = "Escala não encontrada." };
+            }
+
+            if (!escala.Missas.Any())
+            {
+                return new GerarEscalaAleatoriaResultadoDto { Sucesso = false, Mensagem = "A escala não possui celebrações/missas cadastradas." };
+            }
+
+            // 3. Obter membros ativos da paróquia
+            var todosMembros = await _membroRepository.ObterTodosAsync(escala.ParoquiaId);
+            var membrosAtivos = todosMembros.Where(m => m.Ativo).ToList();
+            if (!membrosAtivos.Any())
+            {
+                return new GerarEscalaAleatoriaResultadoDto { Sucesso = false, Mensagem = "Não há coroinhas/acólitos ativos cadastrados nesta paróquia para alocação." };
+            }
+
+            // 4. Carregar restrições de data
+            var mesesAnos = escala.Missas
+                .Select(m => new { m.Dia.Month, m.Dia.Year })
+                .Distinct()
+                .ToList();
+
+            var restricoes = new List<Restricao>();
+            foreach (var ma in mesesAnos)
+            {
+                var rMes = await _restricaoRepository.ObterPorMesAnoAsync(ma.Month, ma.Year);
+                if (rMes != null)
+                {
+                    restricoes.AddRange(rMes);
+                }
+            }
+
+            var restricoesPorMembro = restricoes
+                .GroupBy(r => r.MembroId)
+                .ToDictionary(g => g.Key, g => g.Select(r => DateOnly.FromDateTime(r.Data)).ToHashSet());
+
+            // 5. Carregar permissões de funções
+            var permissoes = await _cargoNivelRepository.ObterTodasAsync();
+
+            // 6. Contagem de participações e dias distintos escalados
+            var contagemParticipacoes = membrosAtivos.ToDictionary(m => m.Id, m => 0);
+            var diasEscaladosPorMembro = membrosAtivos.ToDictionary(m => m.Id, m => new HashSet<DateOnly>());
+
+            if (request.ApenasVagasVazias)
+            {
+                foreach (var missa in escala.Missas)
+                {
+                    foreach (var item in missa.ItensMissa)
+                    {
+                        if (item.MembroId.HasValue && contagemParticipacoes.ContainsKey(item.MembroId.Value))
+                        {
+                            contagemParticipacoes[item.MembroId.Value]++;
+                            diasEscaladosPorMembro[item.MembroId.Value].Add(missa.Dia);
+                        }
+                    }
+                }
+            }
+            else
+            {
+                // Limpar todas as alocações anteriores
+                foreach (var missa in escala.Missas)
+                {
+                    foreach (var item in missa.ItensMissa)
+                    {
+                        item.RemoverMembro();
+                    }
+                }
+            }
+
+            int totalAlocadosNestaRodada = 0;
+            var rand = new Random();
+
+            // 7. Ordenar as missas por data e horário
+            var missasOrdenadas = escala.Missas.OrderBy(m => m.Dia).ThenBy(m => m.Horario).ToList();
+
+            foreach (var missa in missasOrdenadas)
+            {
+                var membrosNaMissa = missa.ItensMissa
+                    .Where(i => i.MembroId.HasValue)
+                    .Select(i => i.MembroId.Value)
+                    .ToHashSet();
+
+                var membrosNoDia = escala.Missas
+                    .Where(m => m.Dia == missa.Dia)
+                    .SelectMany(m => m.ItensMissa)
+                    .Where(i => i.MembroId.HasValue)
+                    .Select(i => i.MembroId.Value)
+                    .ToHashSet();
+
+                // Ordena os itens colocando primeiro cerimoniários e funções mais específicas
+                var itensParaPreencher = missa.ItensMissa
+                    .Where(i => !request.ApenasVagasVazias || !i.MembroId.HasValue)
+                    .OrderByDescending(i => i.Funcao?.Cargo == CargoEnum.Cerimoniario ? 1 : 0)
+                    .ThenBy(i => i.Ordem)
+                    .ToList();
+
+                foreach (var item in itensParaPreencher)
+                {
+                    if (item.MembroId.HasValue && request.ApenasVagasVazias)
+                        continue;
+
+                    var funcao = item.Funcao;
+
+                    // Candidatos válidos estritamente
+                    var candidatos = membrosAtivos.Where(m =>
+                    {
+                        // Não pode repetir na mesma missa
+                        if (membrosNaMissa.Contains(m.Id))
+                            return false;
+
+                        // Cargo e Nível
+                        if (funcao != null)
+                        {
+                            if (funcao.Cargo == CargoEnum.Cerimoniario && (m.Cargo & CargoEnum.Cerimoniario) == 0)
+                                return false;
+
+                            if (permissoes.Any(p => p.FuncaoId == funcao.Id))
+                            {
+                                bool temPermissao = permissoes.Any(p =>
+                                    p.FuncaoId == funcao.Id &&
+                                    ((p.Cargo == m.Cargo && p.Nivel <= m.Nivel) || p.Cargo < m.Cargo));
+
+                                if (!temPermissao)
+                                    return false;
+                            }
+                        }
+
+                        // Restrição de data
+                        if (request.RespeitarRestricoes && restricoesPorMembro.TryGetValue(m.Id, out var datasRestritas))
+                        {
+                            if (datasRestritas.Contains(missa.Dia))
+                                return false;
+                        }
+
+                        // Dias disponíveis da semana
+                        if (m.DiasDisponiveis != null && m.DiasDisponiveis.Any())
+                        {
+                            if (!m.DiasDisponiveis.Contains(missa.Dia.DayOfWeek))
+                                return false;
+                        }
+
+                        // Limite estrito de vezes e de dias permitidos na escala
+                        if (request.RespeitarLimite && escala.LimitePermitido > 0)
+                        {
+                            // Não pode ultrapassar a quantidade máxima de participações permitidas
+                            if (contagemParticipacoes[m.Id] >= escala.LimitePermitido)
+                                return false;
+
+                            // Não pode ultrapassar a quantidade máxima de dias distintos escalados
+                            if (diasEscaladosPorMembro[m.Id].Count >= escala.LimitePermitido && !diasEscaladosPorMembro[m.Id].Contains(missa.Dia))
+                                return false;
+                        }
+
+                        return true;
+                    }).ToList();
+
+                    // Se ninguém qualificado estiver abaixo do limite, a vaga permanece aberta (sem violar o teto)
+                    if (!candidatos.Any())
+                        continue;
+
+                    // Priorização: Evitar mesmo dia (se configurado)
+                    var pool = candidatos;
+                    if (request.EvitarMesmoDia)
+                    {
+                        var semMissaNoDia = candidatos.Where(c => !membrosNoDia.Contains(c.Id)).ToList();
+                        if (semMissaNoDia.Any())
+                        {
+                            pool = semMissaNoDia;
+                        }
+                    }
+
+                    // Priorização: Menor contagem de participações para distribuição equilibrada
+                    int menorParticipacao = pool.Min(c => contagemParticipacoes[c.Id]);
+                    var empatados = pool.Where(c => contagemParticipacoes[c.Id] == menorParticipacao).ToList();
+
+                    // Sorteio aleatório entre os melhores empatados
+                    var escolhido = empatados[rand.Next(empatados.Count)];
+
+                    item.AtribuirMembro(escolhido.Id);
+                    contagemParticipacoes[escolhido.Id]++;
+                    diasEscaladosPorMembro[escolhido.Id].Add(missa.Dia);
+                    membrosNaMissa.Add(escolhido.Id);
+                    membrosNoDia.Add(escolhido.Id);
+                    totalAlocadosNestaRodada++;
+
+                    // Alocação de Irmão / Membro Vinculado na mesma celebração
+                    if (request.AlocarIrmaosJuntos && escolhido.MembroVinculadoId.HasValue && !membrosNaMissa.Contains(escolhido.MembroVinculadoId.Value))
+                    {
+                        var irmao = membrosAtivos.FirstOrDefault(m => m.Id == escolhido.MembroVinculadoId.Value);
+                        if (irmao != null)
+                        {
+                            bool podeAlocarIrmao = true;
+
+                            if (request.RespeitarLimite && escala.LimitePermitido > 0)
+                            {
+                                if (contagemParticipacoes[irmao.Id] >= escala.LimitePermitido)
+                                    podeAlocarIrmao = false;
+
+                                if (diasEscaladosPorMembro[irmao.Id].Count >= escala.LimitePermitido && !diasEscaladosPorMembro[irmao.Id].Contains(missa.Dia))
+                                    podeAlocarIrmao = false;
+                            }
+
+                            if (podeAlocarIrmao)
+                            {
+                                var outraVaga = missa.ItensMissa.FirstOrDefault(i =>
+                                    i.Id != item.Id &&
+                                    (!request.ApenasVagasVazias || !i.MembroId.HasValue) &&
+                                    !i.MembroId.HasValue);
+
+                                if (outraVaga != null)
+                                {
+                                    bool irmaoAptoFuncao = true;
+                                    if (outraVaga.Funcao != null)
+                                    {
+                                        if (outraVaga.Funcao.Cargo == CargoEnum.Cerimoniario && (irmao.Cargo & CargoEnum.Cerimoniario) == 0)
+                                            irmaoAptoFuncao = false;
+
+                                        if (permissoes.Any(p => p.FuncaoId == outraVaga.Funcao.Id))
+                                        {
+                                            irmaoAptoFuncao = permissoes.Any(p =>
+                                                p.FuncaoId == outraVaga.Funcao.Id &&
+                                                ((p.Cargo == irmao.Cargo && p.Nivel <= irmao.Nivel) || p.Cargo < irmao.Cargo));
+                                        }
+                                    }
+
+                                    if (request.RespeitarRestricoes && restricoesPorMembro.TryGetValue(irmao.Id, out var rIrmao) && rIrmao.Contains(missa.Dia))
+                                    {
+                                        irmaoAptoFuncao = false;
+                                    }
+
+                                    if (irmao.DiasDisponiveis != null && irmao.DiasDisponiveis.Any() && !irmao.DiasDisponiveis.Contains(missa.Dia.DayOfWeek))
+                                    {
+                                        irmaoAptoFuncao = false;
+                                    }
+
+                                    if (irmaoAptoFuncao)
+                                    {
+                                        outraVaga.AtribuirMembro(irmao.Id);
+                                        contagemParticipacoes[irmao.Id]++;
+                                        diasEscaladosPorMembro[irmao.Id].Add(missa.Dia);
+                                        membrosNaMissa.Add(irmao.Id);
+                                        membrosNoDia.Add(irmao.Id);
+                                        totalAlocadosNestaRodada++;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            await _escalaRepository.AtualizarAsync(escala);
+
+            var totalVagas = escala.Missas.SelectMany(m => m.ItensMissa).Count();
+            var vagasRestantes = escala.Missas.SelectMany(m => m.ItensMissa).Count(i => !i.MembroId.HasValue);
+
+            string mensagem;
+            if (vagasRestantes == 0)
+            {
+                mensagem = $"Escala gerada com 100% de sucesso! Todas as {totalAlocadosNestaRodada} funções foram preenchidas respeitando o limite de {escala.LimitePermitido} vezes.";
+            }
+            else
+            {
+                mensagem = $"{totalAlocadosNestaRodada} funções foram preenchidas respeitando rigorosamente o limite de {escala.LimitePermitido} vezes/dias. {vagasRestantes} vagas permaneceram abertas para não exceder a cota máxima dos membros.";
+            }
+
+            return new GerarEscalaAleatoriaResultadoDto
+            {
+                Sucesso = true,
+                TotalAlocados = totalAlocadosNestaRodada,
+                TotalVagas = totalVagas,
+                VagasRestantes = vagasRestantes,
+                Mensagem = mensagem
+            };
         }
 
         public byte[] GerarPlanilhaExcel(EscalaDto escala)

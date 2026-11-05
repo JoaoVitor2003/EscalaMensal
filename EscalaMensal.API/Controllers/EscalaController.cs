@@ -1,5 +1,6 @@
 using EscalaMensal.Application.DTOs.Escala;
 using EscalaMensal.Domain.Interfaces;
+using EscalaMensal.Domain.Enums;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EscalaMensal.API.Controllers
@@ -22,6 +23,7 @@ namespace EscalaMensal.API.Controllers
 
             return Ok(escalas);
         }
+
         [HttpGet("{id}")]
         public async Task<ActionResult<EscalaDto>> ObterPorId(int id)
         {
@@ -85,6 +87,40 @@ namespace EscalaMensal.API.Controllers
             byte[] fileBytes = _escalaService.GerarPlanilhaExcel(escala);
             var fileName = $"escala_{escala.DataInicio:yyyy_MM_dd}_a_{escala.DataFim:yyyy_MM_dd}.xlsx";
             return File(fileBytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
+        }
+
+        /// <summary>
+        /// Gera automaticamente e de forma equilibrada as alocações da escala (Recurso Exclusivo Premium / Administrador).
+        /// </summary>
+        [HttpPost("{id}/gerar-aleatorio")]
+        public async Task<ActionResult<GerarEscalaAleatoriaResultadoDto>> GerarAleatorio(
+            int id, 
+            [FromBody] GerarEscalaAleatoriaRequestDto request,
+            [FromQuery] int? usuarioId = null,
+            [FromQuery] int? perfil = null)
+        {
+            var perfilVerificar = perfil ?? request.Perfil;
+            if (perfilVerificar.HasValue && 
+                perfilVerificar.Value != (int)PerfilUsuarioEnum.Administrador && 
+                perfilVerificar.Value != (int)PerfilUsuarioEnum.Premium)
+            {
+                return StatusCode(403, new GerarEscalaAleatoriaResultadoDto
+                {
+                    Sucesso = false,
+                    Mensagem = "Recurso exclusivo do Plano Premium. Atualize seu plano para gerar escalas automaticamente!"
+                });
+            }
+
+            request.Perfil = perfilVerificar;
+            request.UsuarioId = usuarioId ?? request.UsuarioId;
+
+            var resultado = await _escalaService.GerarEscalaAleatoriaAsync(id, request);
+            if (!resultado.Sucesso)
+            {
+                return BadRequest(resultado);
+            }
+
+            return Ok(resultado);
         }
     }
 }
