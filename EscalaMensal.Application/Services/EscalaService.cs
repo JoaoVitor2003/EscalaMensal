@@ -223,182 +223,203 @@ namespace EscalaMensal.Application.Services
             int totalAlocadosNestaRodada = 0;
             var rand = new Random();
 
-            // 7. Ordenar as missas por data e horário
-            var missasOrdenadas = escala.Missas.OrderBy(m => m.Dia).ThenBy(m => m.Horario).ToList();
+            // 7. Embaralhar membros e celebrações para garantir distribuição aleatória e nova versão a cada clique
+            membrosAtivos = membrosAtivos.OrderBy(_ => rand.Next()).ToList();
+            var missasEmbaralhadasFase1 = escala.Missas.OrderBy(_ => rand.Next()).ToList();
+            var missasEmbaralhadasFase2 = escala.Missas.OrderBy(_ => rand.Next()).ToList();
 
-            foreach (var missa in missasOrdenadas)
+            void AlocarItem(ItemMissa item, Missas missa)
             {
+                if (item.MembroId.HasValue)
+                    return;
+
+                var funcao = item.Funcao;
+
                 var membrosNaMissa = missa.ItensMissa
                     .Where(i => i.MembroId.HasValue)
-                    .Select(i => i.MembroId.Value)
+                    .Select(i => i.MembroId!.Value)
                     .ToHashSet();
 
                 var membrosNoDia = escala.Missas
                     .Where(m => m.Dia == missa.Dia)
                     .SelectMany(m => m.ItensMissa)
                     .Where(i => i.MembroId.HasValue)
-                    .Select(i => i.MembroId.Value)
+                    .Select(i => i.MembroId!.Value)
                     .ToHashSet();
 
-                // Ordena os itens colocando primeiro cerimoniários e funções mais específicas
-                var itensParaPreencher = missa.ItensMissa
-                    .Where(i => !request.ApenasVagasVazias || !i.MembroId.HasValue)
-                    .OrderByDescending(i => i.Funcao?.Cargo == CargoEnum.Cerimoniario ? 1 : 0)
-                    .ThenBy(i => i.Ordem)
-                    .ToList();
-
-                foreach (var item in itensParaPreencher)
+                // Candidatos válidos estritamente
+                var candidatos = membrosAtivos.Where(m =>
                 {
-                    if (item.MembroId.HasValue && request.ApenasVagasVazias)
-                        continue;
+                    // Não pode repetir na mesma missa
+                    if (membrosNaMissa.Contains(m.Id))
+                        return false;
 
-                    var funcao = item.Funcao;
-
-                    // Candidatos válidos estritamente
-                    var candidatos = membrosAtivos.Where(m =>
+                    // Cargo e Nível
+                    if (funcao != null)
                     {
-                        // Não pode repetir na mesma missa
-                        if (membrosNaMissa.Contains(m.Id))
+                        if (funcao.Cargo == CargoEnum.Cerimoniario && (m.Cargo & CargoEnum.Cerimoniario) == 0)
                             return false;
 
-                        // Cargo e Nível
-                        if (funcao != null)
+                        if (permissoes.Any(p => p.FuncaoId == funcao.Id))
                         {
-                            if (funcao.Cargo == CargoEnum.Cerimoniario && (m.Cargo & CargoEnum.Cerimoniario) == 0)
+                            bool temPermissao = permissoes.Any(p =>
+                                p.FuncaoId == funcao.Id &&
+                                ((p.Cargo == m.Cargo && p.Nivel <= m.Nivel) || p.Cargo < m.Cargo));
+
+                            if (!temPermissao)
                                 return false;
-
-                            if (permissoes.Any(p => p.FuncaoId == funcao.Id))
-                            {
-                                bool temPermissao = permissoes.Any(p =>
-                                    p.FuncaoId == funcao.Id &&
-                                    ((p.Cargo == m.Cargo && p.Nivel <= m.Nivel) || p.Cargo < m.Cargo));
-
-                                if (!temPermissao)
-                                    return false;
-                            }
-                        }
-
-                        // Restrição de data
-                        if (request.RespeitarRestricoes && restricoesPorMembro.TryGetValue(m.Id, out var datasRestritas))
-                        {
-                            if (datasRestritas.Contains(missa.Dia))
-                                return false;
-                        }
-
-                        // Dias disponíveis da semana
-                        if (m.DiasDisponiveis != null && m.DiasDisponiveis.Any())
-                        {
-                            if (!m.DiasDisponiveis.Contains(missa.Dia.DayOfWeek))
-                                return false;
-                        }
-
-                        // Limite estrito de vezes e de dias permitidos na escala
-                        if (request.RespeitarLimite && escala.LimitePermitido > 0)
-                        {
-                            // Não pode ultrapassar a quantidade máxima de participações permitidas
-                            if (contagemParticipacoes[m.Id] >= escala.LimitePermitido)
-                                return false;
-
-                            // Não pode ultrapassar a quantidade máxima de dias distintos escalados
-                            if (diasEscaladosPorMembro[m.Id].Count >= escala.LimitePermitido && !diasEscaladosPorMembro[m.Id].Contains(missa.Dia))
-                                return false;
-                        }
-
-                        return true;
-                    }).ToList();
-
-                    // Se ninguém qualificado estiver abaixo do limite, a vaga permanece aberta (sem violar o teto)
-                    if (!candidatos.Any())
-                        continue;
-
-                    // Priorização: Evitar mesmo dia (se configurado)
-                    var pool = candidatos;
-                    if (request.EvitarMesmoDia)
-                    {
-                        var semMissaNoDia = candidatos.Where(c => !membrosNoDia.Contains(c.Id)).ToList();
-                        if (semMissaNoDia.Any())
-                        {
-                            pool = semMissaNoDia;
                         }
                     }
 
-                    // Priorização: Menor contagem de participações para distribuição equilibrada
-                    int menorParticipacao = pool.Min(c => contagemParticipacoes[c.Id]);
-                    var empatados = pool.Where(c => contagemParticipacoes[c.Id] == menorParticipacao).ToList();
-
-                    // Sorteio aleatório entre os melhores empatados
-                    var escolhido = empatados[rand.Next(empatados.Count)];
-
-                    item.AtribuirMembro(escolhido.Id);
-                    contagemParticipacoes[escolhido.Id]++;
-                    diasEscaladosPorMembro[escolhido.Id].Add(missa.Dia);
-                    membrosNaMissa.Add(escolhido.Id);
-                    membrosNoDia.Add(escolhido.Id);
-                    totalAlocadosNestaRodada++;
-
-                    // Alocação de Irmão / Membro Vinculado na mesma celebração
-                    if (request.AlocarIrmaosJuntos && escolhido.MembroVinculadoId.HasValue && !membrosNaMissa.Contains(escolhido.MembroVinculadoId.Value))
+                    // Restrição de data
+                    if (request.RespeitarRestricoes && restricoesPorMembro.TryGetValue(m.Id, out var datasRestritas))
                     {
-                        var irmao = membrosAtivos.FirstOrDefault(m => m.Id == escolhido.MembroVinculadoId.Value);
-                        if (irmao != null)
+                        if (datasRestritas.Contains(missa.Dia))
+                            return false;
+                    }
+
+                    // Dias disponíveis da semana
+                    if (m.DiasDisponiveis != null && m.DiasDisponiveis.Any())
+                    {
+                        if (!m.DiasDisponiveis.Contains(missa.Dia.DayOfWeek))
+                            return false;
+                    }
+
+                    // Limite estrito de vezes e de dias permitidos na escala
+                    if (request.RespeitarLimite && escala.LimitePermitido > 0)
+                    {
+                        // Não pode ultrapassar a quantidade máxima de participações permitidas
+                        if (contagemParticipacoes[m.Id] >= escala.LimitePermitido)
+                            return false;
+
+                        // Não pode ultrapassar a quantidade máxima de dias distintos escalados
+                        if (diasEscaladosPorMembro[m.Id].Count >= escala.LimitePermitido && !diasEscaladosPorMembro[m.Id].Contains(missa.Dia))
+                            return false;
+                    }
+
+                    return true;
+                }).ToList();
+
+                // Se ninguém qualificado estiver abaixo do limite, a vaga permanece aberta (sem violar o teto)
+                if (!candidatos.Any())
+                    return;
+
+                // Priorização: Evitar mesmo dia (se configurado)
+                var pool = candidatos;
+                if (request.EvitarMesmoDia)
+                {
+                    var semMissaNoDia = candidatos.Where(c => !membrosNoDia.Contains(c.Id)).ToList();
+                    if (semMissaNoDia.Any())
+                    {
+                        pool = semMissaNoDia;
+                    }
+                }
+
+                // Priorização: Menor contagem de participações para distribuição equilibrada
+                int menorParticipacao = pool.Min(c => contagemParticipacoes[c.Id]);
+                var empatados = pool.Where(c => contagemParticipacoes[c.Id] == menorParticipacao).ToList();
+
+                // Sorteio aleatório entre os melhores empatados
+                var escolhido = empatados[rand.Next(empatados.Count)];
+
+                item.AtribuirMembro(escolhido.Id);
+                contagemParticipacoes[escolhido.Id]++;
+                diasEscaladosPorMembro[escolhido.Id].Add(missa.Dia);
+                membrosNaMissa.Add(escolhido.Id);
+                membrosNoDia.Add(escolhido.Id);
+                totalAlocadosNestaRodada++;
+
+                // Alocação de Irmão / Membro Vinculado na mesma celebração
+                if (request.AlocarIrmaosJuntos && escolhido.MembroVinculadoId.HasValue && !membrosNaMissa.Contains(escolhido.MembroVinculadoId.Value))
+                {
+                    var irmao = membrosAtivos.FirstOrDefault(m => m.Id == escolhido.MembroVinculadoId.Value);
+                    if (irmao != null)
+                    {
+                        bool podeAlocarIrmao = true;
+
+                        if (request.RespeitarLimite && escala.LimitePermitido > 0)
                         {
-                            bool podeAlocarIrmao = true;
+                            if (contagemParticipacoes[irmao.Id] >= escala.LimitePermitido)
+                                podeAlocarIrmao = false;
 
-                            if (request.RespeitarLimite && escala.LimitePermitido > 0)
+                            if (diasEscaladosPorMembro[irmao.Id].Count >= escala.LimitePermitido && !diasEscaladosPorMembro[irmao.Id].Contains(missa.Dia))
+                                podeAlocarIrmao = false;
+                        }
+
+                        if (podeAlocarIrmao)
+                        {
+                            var outraVaga = missa.ItensMissa.FirstOrDefault(i =>
+                                i.Id != item.Id &&
+                                (!request.ApenasVagasVazias || !i.MembroId.HasValue) &&
+                                !i.MembroId.HasValue);
+
+                            if (outraVaga != null)
                             {
-                                if (contagemParticipacoes[irmao.Id] >= escala.LimitePermitido)
-                                    podeAlocarIrmao = false;
-
-                                if (diasEscaladosPorMembro[irmao.Id].Count >= escala.LimitePermitido && !diasEscaladosPorMembro[irmao.Id].Contains(missa.Dia))
-                                    podeAlocarIrmao = false;
-                            }
-
-                            if (podeAlocarIrmao)
-                            {
-                                var outraVaga = missa.ItensMissa.FirstOrDefault(i =>
-                                    i.Id != item.Id &&
-                                    (!request.ApenasVagasVazias || !i.MembroId.HasValue) &&
-                                    !i.MembroId.HasValue);
-
-                                if (outraVaga != null)
+                                bool irmaoAptoFuncao = true;
+                                if (outraVaga.Funcao != null)
                                 {
-                                    bool irmaoAptoFuncao = true;
-                                    if (outraVaga.Funcao != null)
-                                    {
-                                        if (outraVaga.Funcao.Cargo == CargoEnum.Cerimoniario && (irmao.Cargo & CargoEnum.Cerimoniario) == 0)
-                                            irmaoAptoFuncao = false;
-
-                                        if (permissoes.Any(p => p.FuncaoId == outraVaga.Funcao.Id))
-                                        {
-                                            irmaoAptoFuncao = permissoes.Any(p =>
-                                                p.FuncaoId == outraVaga.Funcao.Id &&
-                                                ((p.Cargo == irmao.Cargo && p.Nivel <= irmao.Nivel) || p.Cargo < irmao.Cargo));
-                                        }
-                                    }
-
-                                    if (request.RespeitarRestricoes && restricoesPorMembro.TryGetValue(irmao.Id, out var rIrmao) && rIrmao.Contains(missa.Dia))
-                                    {
+                                    if (outraVaga.Funcao.Cargo == CargoEnum.Cerimoniario && (irmao.Cargo & CargoEnum.Cerimoniario) == 0)
                                         irmaoAptoFuncao = false;
-                                    }
 
-                                    if (irmao.DiasDisponiveis != null && irmao.DiasDisponiveis.Any() && !irmao.DiasDisponiveis.Contains(missa.Dia.DayOfWeek))
+                                    if (permissoes.Any(p => p.FuncaoId == outraVaga.Funcao.Id))
                                     {
-                                        irmaoAptoFuncao = false;
+                                        irmaoAptoFuncao = permissoes.Any(p =>
+                                            p.FuncaoId == outraVaga.Funcao.Id &&
+                                            ((p.Cargo == irmao.Cargo && p.Nivel <= irmao.Nivel) || p.Cargo < irmao.Cargo));
                                     }
+                                }
 
-                                    if (irmaoAptoFuncao)
-                                    {
-                                        outraVaga.AtribuirMembro(irmao.Id);
-                                        contagemParticipacoes[irmao.Id]++;
-                                        diasEscaladosPorMembro[irmao.Id].Add(missa.Dia);
-                                        membrosNaMissa.Add(irmao.Id);
-                                        membrosNoDia.Add(irmao.Id);
-                                        totalAlocadosNestaRodada++;
-                                    }
+                                if (request.RespeitarRestricoes && restricoesPorMembro.TryGetValue(irmao.Id, out var rIrmao) && rIrmao.Contains(missa.Dia))
+                                {
+                                    irmaoAptoFuncao = false;
+                                }
+
+                                if (irmao.DiasDisponiveis != null && irmao.DiasDisponiveis.Any() && !irmao.DiasDisponiveis.Contains(missa.Dia.DayOfWeek))
+                                {
+                                    irmaoAptoFuncao = false;
+                                }
+
+                                if (irmaoAptoFuncao)
+                                {
+                                    outraVaga.AtribuirMembro(irmao.Id);
+                                    contagemParticipacoes[irmao.Id]++;
+                                    diasEscaladosPorMembro[irmao.Id].Add(missa.Dia);
+                                    membrosNaMissa.Add(irmao.Id);
+                                    membrosNoDia.Add(irmao.Id);
+                                    totalAlocadosNestaRodada++;
                                 }
                             }
                         }
                     }
+                }
+            }
+
+            // FASE 1: Alocar funções de Cerimoniário primeiro em todas as celebrações (ordem aleatória)
+            foreach (var missa in missasEmbaralhadasFase1)
+            {
+                var itensCerimoniario = missa.ItensMissa
+                    .Where(i => (!request.ApenasVagasVazias || !i.MembroId.HasValue) && !i.MembroId.HasValue)
+                    .Where(i => i.Funcao?.Cargo == CargoEnum.Cerimoniario)
+                    .OrderBy(i => i.Ordem)
+                    .ToList();
+
+                foreach (var item in itensCerimoniario)
+                {
+                    AlocarItem(item, missa);
+                }
+            }
+
+            // FASE 2: Alocar todas as demais funções nas celebrações (ordem aleatória)
+            foreach (var missa in missasEmbaralhadasFase2)
+            {
+                var demaisItens = missa.ItensMissa
+                    .Where(i => (!request.ApenasVagasVazias || !i.MembroId.HasValue) && !i.MembroId.HasValue)
+                    .OrderBy(_ => rand.Next())
+                    .ToList();
+
+                foreach (var item in demaisItens)
+                {
+                    AlocarItem(item, missa);
                 }
             }
 
