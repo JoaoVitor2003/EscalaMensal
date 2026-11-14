@@ -1,10 +1,13 @@
+using EscalaMensal.API.Extensions;
 using EscalaMensal.Application.DTOs.Escala;
 using EscalaMensal.Domain.Interfaces;
 using EscalaMensal.Domain.Enums;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EscalaMensal.API.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class EscalaController : ControllerBase
@@ -19,7 +22,14 @@ namespace EscalaMensal.API.Controllers
         [HttpGet]
         public async Task<ActionResult<List<EscalaDto>>> ObterTodas([FromQuery] int? usuarioId, [FromQuery] int? perfil, [FromQuery] int? paroquiaId = null)
         {
-            var escalas = await _escalaService.ObterTodasAsync(usuarioId, perfil, paroquiaId);
+            var idAutenticado = User.ObterUsuarioId();
+            var perfilAutenticado = User.ObterPerfil();
+
+            // Administrador pode consultar qualquer usuário; usuários comuns consultam apenas o próprio ID
+            var idEfetivo = User.EhAdmin() && usuarioId.HasValue ? usuarioId.Value : idAutenticado;
+            var perfilEfetivo = User.EhAdmin() && perfil.HasValue ? perfil.Value : (int)perfilAutenticado;
+
+            var escalas = await _escalaService.ObterTodasAsync(idEfetivo, perfilEfetivo, paroquiaId);
 
             return Ok(escalas);
         }
@@ -36,7 +46,13 @@ namespace EscalaMensal.API.Controllers
         [HttpGet("por-mes-ano")]
         public async Task<ActionResult<EscalaDto>> ObterPorMesAno([FromQuery] int mes, [FromQuery] int ano, [FromQuery] int? usuarioId, [FromQuery] int? perfil, [FromQuery] int? paroquiaId = null)
         {
-            var escala = await _escalaService.ObterPorMesAnoAsync(mes, ano, usuarioId, perfil, paroquiaId);
+            var idAutenticado = User.ObterUsuarioId();
+            var perfilAutenticado = User.ObterPerfil();
+
+            var idEfetivo = User.EhAdmin() && usuarioId.HasValue ? usuarioId.Value : idAutenticado;
+            var perfilEfetivo = User.EhAdmin() && perfil.HasValue ? perfil.Value : (int)perfilAutenticado;
+
+            var escala = await _escalaService.ObterPorMesAnoAsync(mes, ano, idEfetivo, perfilEfetivo, paroquiaId);
             if (escala == null)
                 return NotFound();
 
@@ -46,6 +62,12 @@ namespace EscalaMensal.API.Controllers
         [HttpPost]
         public async Task<ActionResult> Adicionar([FromBody] EscalaAdicionarDto novaEscala)
         {
+            // Vincula o criador ao usuário autenticado de forma confiável
+            if (!novaEscala.CriadoPorUsuarioId.HasValue || !User.EhAdmin())
+            {
+                novaEscala.CriadoPorUsuarioId = User.ObterUsuarioId();
+            }
+
             await _escalaService.AdicionarAsync(novaEscala);
             return Ok(novaEscala);
         }
@@ -65,12 +87,12 @@ namespace EscalaMensal.API.Controllers
             if (escala == null)
                 return NotFound();
 
-            if (usuarioId.HasValue && perfil.HasValue && perfil.Value != 1)
+            var idAutenticado = User.ObterUsuarioId();
+            var ehAdmin = User.EhAdmin();
+
+            if (!ehAdmin && escala.CriadoPorUsuarioId.HasValue && escala.CriadoPorUsuarioId.Value != idAutenticado)
             {
-                if (escala.CriadoPorUsuarioId.HasValue && escala.CriadoPorUsuarioId.Value != usuarioId.Value)
-                {
-                    return Forbid();
-                }
+                return Forbid();
             }
 
             await _escalaService.RemoverAsync(id);
@@ -91,18 +113,15 @@ namespace EscalaMensal.API.Controllers
 
         /// <summary>
         /// Gera automaticamente e de forma equilibrada as alocações da escala (Recurso Exclusivo Premium / Administrador).
+        /// Protegido por Token JWT e Claims autorizadas.
         /// </summary>
+        [Authorize(Roles = "Administrador,Premium")]
         [HttpPost("{id}/gerar-aleatorio")]
         public async Task<ActionResult<GerarEscalaAleatoriaResultadoDto>> GerarAleatorio(
             int id, 
-            [FromBody] GerarEscalaAleatoriaRequestDto request,
-            [FromQuery] int? usuarioId = null,
-            [FromQuery] int? perfil = null)
+            [FromBody] GerarEscalaAleatoriaRequestDto request)
         {
-            var perfilVerificar = perfil ?? request.Perfil;
-            if (perfilVerificar.HasValue && 
-                perfilVerificar.Value != (int)PerfilUsuarioEnum.Administrador && 
-                perfilVerificar.Value != (int)PerfilUsuarioEnum.Premium)
+            if (!User.EhPremiumOuAdmin())
             {
                 return StatusCode(403, new GerarEscalaAleatoriaResultadoDto
                 {
@@ -111,8 +130,9 @@ namespace EscalaMensal.API.Controllers
                 });
             }
 
-            request.Perfil = perfilVerificar;
-            request.UsuarioId = usuarioId ?? request.UsuarioId;
+            // Garante que o ID e o Perfil enviados ao Service venham dos Claims verificados
+            request.UsuarioId = User.ObterUsuarioId();
+            request.Perfil = (int)User.ObterPerfil();
 
             var resultado = await _escalaService.GerarEscalaAleatoriaAsync(id, request);
             if (!resultado.Sucesso)

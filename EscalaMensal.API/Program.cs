@@ -6,13 +6,16 @@ using EscalaMensal.Domain.Interfaces;
 using EscalaMensal.Infrastructure.Context;
 using EscalaMensal.Infrastructure.Repositories;
 using EscalaMensal.Application.Security;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddSignalR();
-
 
 builder.Services.AddDbContext<AppDbContext>(opt =>
     opt.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
@@ -49,9 +52,75 @@ builder.Services.AddScoped<IMissaPadraoService, MissaPadraoService>();
 builder.Services.AddScoped<IUsuarioService, UsuarioService>();
 builder.Services.AddScoped<IParoquiaService, ParoquiaService>();
 
-builder.Services.AddControllers();
+// Configuração de Autenticação JWT Rígida
+var jwtKey = builder.Configuration["Jwt:Key"] ?? "EscalaMensalSuperSecretKey2026LiturgiaAppSecuritySecretKey#99";
+var jwtIssuer = builder.Configuration["Jwt:Issuer"] ?? "EscalaMensalAPI";
+var jwtAudience = builder.Configuration["Jwt:Audience"] ?? "EscalaMensalApp";
+
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+    options.RequireHttpsMetadata = false;
+    options.SaveToken = true;
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey)),
+        ValidateIssuer = true,
+        ValidIssuer = jwtIssuer,
+        ValidateAudience = true,
+        ValidAudience = jwtAudience,
+        ValidateLifetime = true,
+        ClockSkew = TimeSpan.Zero
+    };
+
+    // Suporte ao SignalR para ler o token da Query String (?access_token=...)
+    options.Events = new JwtBearerEvents
+    {
+        OnMessageReceived = context =>
+        {
+            var accessToken = context.Request.Query["access_token"];
+            var path = context.HttpContext.Request.Path;
+            if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/hubs"))
+            {
+                context.Token = accessToken;
+            }
+            return Task.CompletedTask;
+        }
+    };
+});
+
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "EscalaMensal API", Version = "v1" });
+    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Description = "Insira o token JWT no formato: Bearer {seu_token}",
+        Name = "Authorization",
+        In = ParameterLocation.Header,
+        Type = SecuritySchemeType.ApiKey,
+        Scheme = "Bearer"
+    });
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            Array.Empty<string>()
+        }
+    });
+});
 
 builder.Services.AddAutoMapper(typeof(MissaProfile));
 builder.Services.AddAutoMapper(typeof(ItemMissaProfile));
@@ -83,6 +152,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

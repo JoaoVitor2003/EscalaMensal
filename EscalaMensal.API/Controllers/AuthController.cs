@@ -1,7 +1,9 @@
+using EscalaMensal.API.Extensions;
 using EscalaMensal.Application.DTOs.Usuario;
 using EscalaMensal.Application.Interfaces;
 using EscalaMensal.Domain.Enums;
 using EscalaMensal.Domain.Exceptions;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -12,6 +14,7 @@ using System.Threading.Tasks;
 
 namespace EscalaMensal.API.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class AuthController : ControllerBase
@@ -27,6 +30,7 @@ namespace EscalaMensal.API.Controllers
         /// Registra uma nova solicitação de acesso com senha criptografada de alta segurança.
         /// O status inicial fica como Pendente até a aprovação de um administrador.
         /// </summary>
+        [AllowAnonymous]
         [HttpPost("solicitar-acesso")]
         public async Task<ActionResult<UsuarioRespostaDto>> SolicitarAcesso([FromBody] SolicitarAcessoDto dto)
         {
@@ -53,6 +57,13 @@ namespace EscalaMensal.API.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<UsuarioRespostaDto>> ObterPorId(int id)
         {
+            // Usuário comum só pode consultar o próprio perfil, exceto Administrador
+            var idAutenticado = User.ObterUsuarioId();
+            if (!User.EhAdmin() && idAutenticado != id)
+            {
+                return Forbid();
+            }
+
             var usuario = await _usuarioService.ObterPorIdAsync(id);
             if (usuario == null)
                 return NotFound(new { mensagem = "Usuário não encontrado." });
@@ -60,6 +71,7 @@ namespace EscalaMensal.API.Controllers
             return Ok(usuario);
         }
 
+        [Authorize(Roles = "Administrador")]
         [HttpGet("pendentes")]
         public async Task<ActionResult<List<UsuarioRespostaDto>>> ObterPendentes()
         {
@@ -67,6 +79,7 @@ namespace EscalaMensal.API.Controllers
             return Ok(pendentes);
         }
 
+        [Authorize(Roles = "Administrador")]
         [HttpGet("usuarios")]
         public async Task<ActionResult<List<UsuarioRespostaDto>>> ObterTodos()
         {
@@ -74,12 +87,14 @@ namespace EscalaMensal.API.Controllers
             return Ok(usuarios);
         }
 
+        [Authorize(Roles = "Administrador")]
         [HttpPost("{id}/aprovar")]
-        public async Task<ActionResult> Aprovar(int id, [FromQuery] int aprovadorId = 1)
+        public async Task<ActionResult> Aprovar(int id, [FromQuery] int? aprovadorId = null)
         {
             try
             {
-                await _usuarioService.AprovarUsuarioAsync(id, aprovadorId);
+                var idAprovador = aprovadorId ?? User.ObterUsuarioId();
+                await _usuarioService.AprovarUsuarioAsync(id, idAprovador);
                 return Ok(new { mensagem = "Usuário aprovado com sucesso!" });
             }
             catch (DomainException ex)
@@ -88,12 +103,14 @@ namespace EscalaMensal.API.Controllers
             }
         }
 
+        [Authorize(Roles = "Administrador")]
         [HttpPost("{id}/rejeitar")]
-        public async Task<ActionResult> Rejeitar(int id, [FromQuery] int aprovadorId = 1)
+        public async Task<ActionResult> Rejeitar(int id, [FromQuery] int? aprovadorId = null)
         {
             try
             {
-                await _usuarioService.RejeitarUsuarioAsync(id, aprovadorId);
+                var idAprovador = aprovadorId ?? User.ObterUsuarioId();
+                await _usuarioService.RejeitarUsuarioAsync(id, idAprovador);
                 return Ok(new { mensagem = "Solicitação rejeitada com sucesso." });
             }
             catch (DomainException ex)
@@ -103,8 +120,9 @@ namespace EscalaMensal.API.Controllers
         }
 
         /// <summary>
-        /// Altera o perfil do usuário (ex: Normal para Premium, ou vice-versa).
+        /// Altera o perfil do usuário (ex: Normal para Premium, ou vice-versa). Exclusivo de Administrador.
         /// </summary>
+        [Authorize(Roles = "Administrador")]
         [HttpPut("{id}/perfil")]
         public async Task<ActionResult> AlterarPerfil(int id, [FromBody] PerfilUsuarioEnum novoPerfil)
         {
@@ -123,6 +141,7 @@ namespace EscalaMensal.API.Controllers
             }
         }
 
+        [AllowAnonymous]
         [HttpPost("login")]
         public async Task<ActionResult<LoginRespostaDto>> Login([FromBody] LoginDto dto)
         {
@@ -197,6 +216,7 @@ namespace EscalaMensal.API.Controllers
         /// <summary>
         /// Encerra a sessão atual do usuário limpando a sessão ativa no banco de dados.
         /// </summary>
+        [AllowAnonymous]
         [HttpPost("logout")]
         public async Task<IActionResult> Logout()
         {

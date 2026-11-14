@@ -20,6 +20,10 @@ public class ExceptionHandlingMiddleware
         {
             await HandleExceptionAsync(context, ex.Message, HttpStatusCode.BadRequest);
         }
+        catch (UnauthorizedAccessException ex)
+        {
+            await HandleExceptionAsync(context, ex.Message, HttpStatusCode.Forbidden);
+        }
         catch (Exception ex)
         {
             Console.WriteLine($"ERRO INTERNO DETECTADO: {ex}");
