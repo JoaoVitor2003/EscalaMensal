@@ -14,12 +14,18 @@ namespace EscalaMensal.Application.Services
         private readonly IHistoricoEscalaRepository _historicoEscalaRepository;
         private readonly IEscalaRepository _escalaRepository;
         private readonly IMapper _mapper;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public HistoricoEscalaService(IHistoricoEscalaRepository historicoEscalaRepository, IEscalaRepository escalaRepository, IMapper mapper)
+        public HistoricoEscalaService(
+            IHistoricoEscalaRepository historicoEscalaRepository, 
+            IEscalaRepository escalaRepository, 
+            IMapper mapper,
+            IUnitOfWork unitOfWork)
         {
             _historicoEscalaRepository = historicoEscalaRepository;
             _escalaRepository = escalaRepository;
             _mapper = mapper;
+            _unitOfWork = unitOfWork;
         }
 
         public async Task<List<HistoricoEscalaDto>> ObterPorMesAnoAsync(int mes, int ano)
@@ -61,48 +67,51 @@ namespace EscalaMensal.Application.Services
                 }
             }
 
-            foreach (var hist in historicosExistentes)
+            await _unitOfWork.ExecuteInTransactionAsync(async () =>
             {
-                await _historicoEscalaRepository.RemoverAsync(hist.Id);
-            }
-
-            var historicoEscala = new HistoricoEscala(
-                escala.Id,
-                escala.DataInicio,
-                escala.DataFim,
-                escala.LimitePermitido,
-                DateTime.Now
-            );
-
-            foreach (var missa in escala.Missas)
-            {
-                var historicoMissa = new HistoricoMissa(
-                    missa.Id,
-                    0,
-                    missa.Dia,
-                    missa.Horario
-                );
-
-                foreach (var item in missa.ItensMissa)
+                foreach (var hist in historicosExistentes)
                 {
-                    var historicoItem = new HistoricoItemMissa(
-                        item.Id,
-                        0,
-                        item.FuncaoId,
-                        item.Funcao?.Nome ?? "N/A",
-                        item.Funcao?.Abreviacao ?? "N/A",
-                        item.MembroId,
-                        item.Membro?.Nome,
-                        item.Ordem
-                    );
-
-                    historicoMissa.HistoricoItensMissa.Add(historicoItem);
+                    await _historicoEscalaRepository.RemoverAsync(hist.Id);
                 }
 
-                historicoEscala.HistoricoMissas.Add(historicoMissa);
-            }
+                var historicoEscala = new HistoricoEscala(
+                    escala.Id,
+                    escala.DataInicio,
+                    escala.DataFim,
+                    escala.LimitePermitido,
+                    DateTime.Now
+                );
 
-            await _historicoEscalaRepository.AdicionarAsync(historicoEscala);
+                foreach (var missa in escala.Missas)
+                {
+                    var historicoMissa = new HistoricoMissa(
+                        missa.Id,
+                        0,
+                        missa.Dia,
+                        missa.Horario
+                    );
+
+                    foreach (var item in missa.ItensMissa)
+                    {
+                        var historicoItem = new HistoricoItemMissa(
+                            item.Id,
+                            0,
+                            item.FuncaoId,
+                            item.Funcao?.Nome ?? "N/A",
+                            item.Funcao?.Abreviacao ?? "N/A",
+                            item.MembroId,
+                            item.Membro?.Nome,
+                            item.Ordem
+                        );
+
+                        historicoMissa.HistoricoItensMissa.Add(historicoItem);
+                    }
+
+                    historicoEscala.HistoricoMissas.Add(historicoMissa);
+                }
+
+                await _historicoEscalaRepository.AdicionarAsync(historicoEscala);
+            });
         }
 
         private bool EscalaIgualAoHistorico(Escala escala, HistoricoEscala historico)

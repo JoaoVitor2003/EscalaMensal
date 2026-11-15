@@ -25,6 +25,7 @@ namespace EscalaMensal.Application.Services
         private readonly IMembroRepository _membroRepository;
         private readonly ICargoNivelFuncaoPermitidaRepository _cargoNivelRepository;
         private readonly IRestricaoRepository _restricaoRepository;
+        private readonly IUnitOfWork _unitOfWork;
 
         public EscalaService(
             IEscalaRepository escalaRepository, 
@@ -33,7 +34,8 @@ namespace EscalaMensal.Application.Services
             IFuncaoRepository funcaoRepository,
             IMembroRepository membroRepository,
             ICargoNivelFuncaoPermitidaRepository cargoNivelRepository,
-            IRestricaoRepository restricaoRepository)
+            IRestricaoRepository restricaoRepository,
+            IUnitOfWork unitOfWork)
         {
             _escalaRepository = escalaRepository;
             _mapper = mapper;
@@ -42,6 +44,7 @@ namespace EscalaMensal.Application.Services
             _membroRepository = membroRepository;
             _cargoNivelRepository = cargoNivelRepository;
             _restricaoRepository = restricaoRepository;
+            _unitOfWork = unitOfWork;
         }
 
         public async Task<EscalaDto?> ObterPorMesAnoAsync(int mes, int ano, int? usuarioId = null, int? perfil = null, int? paroquiaId = null)
@@ -61,51 +64,54 @@ namespace EscalaMensal.Application.Services
 
         public async Task AdicionarAsync(EscalaAdicionarDto escala)
         {
-            var novaEscalaEntity = _mapper.Map<Escala>(escala);
-            if (escala.CriadoPorUsuarioId.HasValue)
+            await _unitOfWork.ExecuteInTransactionAsync(async () =>
             {
-                novaEscalaEntity.DefinirCriador(escala.CriadoPorUsuarioId.Value);
-            }
-            if (escala.ParoquiaId.HasValue)
-            {
-                novaEscalaEntity.DefinirParoquia(escala.ParoquiaId.Value);
-            }
-
-            if (escala.CriarMissasPadrao)
-            {
-                var missasPadrao = await _missaPadraoRepository.ObterTodasAsync(escala.ParoquiaId);
-                var funcoesObrigatorias = await _funcaoRepository.ObterObrigatoriasAsync(escala.ParoquiaId);
-
-                var dataAtual = escala.DataInicio;
-                while (dataAtual <= escala.DataFim)
+                var novaEscalaEntity = _mapper.Map<Escala>(escala);
+                if (escala.CriadoPorUsuarioId.HasValue)
                 {
-                    var diaSemana = dataAtual.DayOfWeek;
-                    var templatesDoDia = missasPadrao.Where(m => m.DiaSemana == diaSemana).ToList();
-
-                    foreach (var template in templatesDoDia)
-                    {
-                        var missa = novaEscalaEntity.AdicionarMissa(dataAtual, template.Horario);
-                        if (template.CriarFuncoesPadrao)
-                        {
-                            foreach (var funcao in funcoesObrigatorias)
-                            {
-                                missa.ItensMissa.Add(new ItemMissa(missaId: 0, funcaoId: funcao.Id));
-                            }
-                        }
-                        else
-                        {
-                            foreach (var funcao in template.Funcoes)
-                            {
-                                missa.ItensMissa.Add(new ItemMissa(missaId: 0, funcaoId: funcao.Id));
-                            }
-                        }
-                    }
-
-                    dataAtual = dataAtual.AddDays(1);
+                    novaEscalaEntity.DefinirCriador(escala.CriadoPorUsuarioId.Value);
                 }
-            }
+                if (escala.ParoquiaId.HasValue)
+                {
+                    novaEscalaEntity.DefinirParoquia(escala.ParoquiaId.Value);
+                }
 
-            await _escalaRepository.AdicionarAsync(novaEscalaEntity);
+                if (escala.CriarMissasPadrao)
+                {
+                    var missasPadrao = await _missaPadraoRepository.ObterTodasAsync(escala.ParoquiaId);
+                    var funcoesObrigatorias = await _funcaoRepository.ObterObrigatoriasAsync(escala.ParoquiaId);
+
+                    var dataAtual = escala.DataInicio;
+                    while (dataAtual <= escala.DataFim)
+                    {
+                        var diaSemana = dataAtual.DayOfWeek;
+                        var templatesDoDia = missasPadrao.Where(m => m.DiaSemana == diaSemana).ToList();
+
+                        foreach (var template in templatesDoDia)
+                        {
+                            var missa = novaEscalaEntity.AdicionarMissa(dataAtual, template.Horario);
+                            if (template.CriarFuncoesPadrao)
+                            {
+                                foreach (var funcao in funcoesObrigatorias)
+                                {
+                                    missa.ItensMissa.Add(new ItemMissa(missaId: 0, funcaoId: funcao.Id));
+                                }
+                            }
+                            else
+                            {
+                                foreach (var funcao in template.Funcoes)
+                                {
+                                    missa.ItensMissa.Add(new ItemMissa(missaId: 0, funcaoId: funcao.Id));
+                                }
+                            }
+                        }
+
+                        dataAtual = dataAtual.AddDays(1);
+                    }
+                }
+
+                await _escalaRepository.AdicionarAsync(novaEscalaEntity);
+            });
         }
 
         public async Task AtualizarAsync(EscalaAtualizarDto escalaDto)
@@ -122,7 +128,10 @@ namespace EscalaMensal.Application.Services
 
         public async Task RemoverAsync(int id)
         {
-            await _escalaRepository.RemoverAsync(id);
+            await _unitOfWork.ExecuteInTransactionAsync(async () =>
+            {
+                await _escalaRepository.RemoverAsync(id);
+            });
         }
 
         public async Task<EscalaDto?> ObterPorIdAsync(int id)
@@ -423,29 +432,32 @@ namespace EscalaMensal.Application.Services
                 }
             }
 
-            await _escalaRepository.AtualizarAsync(escala);
-
-            var totalVagas = escala.Missas.SelectMany(m => m.ItensMissa).Count();
-            var vagasRestantes = escala.Missas.SelectMany(m => m.ItensMissa).Count(i => !i.MembroId.HasValue);
-
-            string mensagem;
-            if (vagasRestantes == 0)
+            return await _unitOfWork.ExecuteInTransactionAsync(async () =>
             {
-                mensagem = $"Escala gerada com 100% de sucesso! Todas as {totalAlocadosNestaRodada} funções foram preenchidas respeitando o limite de {escala.LimitePermitido} vezes.";
-            }
-            else
-            {
-                mensagem = $"{totalAlocadosNestaRodada} funções foram preenchidas respeitando rigorosamente o limite de {escala.LimitePermitido} vezes/dias. {vagasRestantes} vagas permaneceram abertas para não exceder a cota máxima dos membros.";
-            }
+                await _escalaRepository.AtualizarAsync(escala);
 
-            return new GerarEscalaAleatoriaResultadoDto
-            {
-                Sucesso = true,
-                TotalAlocados = totalAlocadosNestaRodada,
-                TotalVagas = totalVagas,
-                VagasRestantes = vagasRestantes,
-                Mensagem = mensagem
-            };
+                var totalVagas = escala.Missas.SelectMany(m => m.ItensMissa).Count();
+                var vagasRestantes = escala.Missas.SelectMany(m => m.ItensMissa).Count(i => !i.MembroId.HasValue);
+
+                string mensagem;
+                if (vagasRestantes == 0)
+                {
+                    mensagem = $"Escala gerada com 100% de sucesso! Todas as {totalAlocadosNestaRodada} funções foram preenchidas respeitando o limite de {escala.LimitePermitido} vezes.";
+                }
+                else
+                {
+                    mensagem = $"{totalAlocadosNestaRodada} funções foram preenchidas respeitando rigorosamente o limite de {escala.LimitePermitido} vezes/dias. {vagasRestantes} vagas permaneceram abertas para não exceder a cota máxima dos membros.";
+                }
+
+                return new GerarEscalaAleatoriaResultadoDto
+                {
+                    Sucesso = true,
+                    TotalAlocados = totalAlocadosNestaRodada,
+                    TotalVagas = totalVagas,
+                    VagasRestantes = vagasRestantes,
+                    Mensagem = mensagem
+                };
+            });
         }
 
         public byte[] GerarPlanilhaExcel(EscalaDto escala)

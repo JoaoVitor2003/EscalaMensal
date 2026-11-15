@@ -15,6 +15,7 @@ namespace EscalaMensal.Application.Services
         private readonly IConfiguracaoRepository _configuracaoRepository;
         private readonly IMembroRepository _membroRepository;
         private readonly IFuncaoRepository _funcaoRepository;
+        private readonly IUnitOfWork _unitOfWork;
 
         private static List<CargoNivelFuncaoPermitida> _backupPermissoesDeletadas = new();
         private static int _nivelRemovidoBackup = 0;
@@ -23,12 +24,14 @@ namespace EscalaMensal.Application.Services
             ICargoNivelFuncaoPermitidaRepository repository,
             IConfiguracaoRepository configuracaoRepository,
             IMembroRepository membroRepository,
-            IFuncaoRepository funcaoRepository)
+            IFuncaoRepository funcaoRepository,
+            IUnitOfWork unitOfWork)
         {
             _repository = repository;
             _configuracaoRepository = configuracaoRepository;
             _membroRepository = membroRepository;
             _funcaoRepository = funcaoRepository;
+            _unitOfWork = unitOfWork;
         }
 
         public async Task<List<Funcao>> ObterFuncoesPermitidasAsync(CargoEnum cargo, NivelEnum nivel)
@@ -94,13 +97,16 @@ namespace EscalaMensal.Application.Services
             _backupPermissoesDeletadas = deletadas;
             _nivelRemovidoBackup = maxNivel;
 
-            foreach (var p in deletadas)
+            await _unitOfWork.ExecuteInTransactionAsync(async () =>
             {
-                await _repository.RemoverAsync(p.Id);
-            }
+                foreach (var p in deletadas)
+                {
+                    await _repository.RemoverAsync(p.Id);
+                }
 
-            maxNivel--;
-            await _configuracaoRepository.SalvarMaxNivelAsync(maxNivel);
+                maxNivel--;
+                await _configuracaoRepository.SalvarMaxNivelAsync(maxNivel);
+            });
         }
 
         public async Task DesfazerRemocaoNivelAsync()
@@ -110,16 +116,19 @@ namespace EscalaMensal.Application.Services
                 throw new DomainException("Não há nenhuma remoção de nível para desfazer.");
             }
 
-            await _configuracaoRepository.SalvarMaxNivelAsync(_nivelRemovidoBackup);
-
-            if (_backupPermissoesDeletadas.Any())
+            await _unitOfWork.ExecuteInTransactionAsync(async () =>
             {
-                foreach (var p in _backupPermissoesDeletadas)
+                await _configuracaoRepository.SalvarMaxNivelAsync(_nivelRemovidoBackup);
+
+                if (_backupPermissoesDeletadas.Any())
                 {
-                    var novo = new CargoNivelFuncaoPermitida(p.Cargo, p.Nivel, p.FuncaoId);
-                    await _repository.AdicionarAsync(novo);
+                    foreach (var p in _backupPermissoesDeletadas)
+                    {
+                        var novo = new CargoNivelFuncaoPermitida(p.Cargo, p.Nivel, p.FuncaoId);
+                        await _repository.AdicionarAsync(novo);
+                    }
                 }
-            }
+            });
 
             _backupPermissoesDeletadas.Clear();
             _nivelRemovidoBackup = 0;

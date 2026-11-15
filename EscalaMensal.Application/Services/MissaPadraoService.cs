@@ -14,12 +14,18 @@ namespace EscalaMensal.Application.Services
         private readonly IMissaPadraoRepository _missaPadraoRepository;
         private readonly IFuncaoRepository _funcaoRepository;
         private readonly IMapper _mapper;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public MissaPadraoService(IMissaPadraoRepository missaPadraoRepository, IFuncaoRepository funcaoRepository, IMapper mapper)
+        public MissaPadraoService(
+            IMissaPadraoRepository missaPadraoRepository, 
+            IFuncaoRepository funcaoRepository, 
+            IMapper mapper,
+            IUnitOfWork unitOfWork)
         {
             _missaPadraoRepository = missaPadraoRepository;
             _funcaoRepository = funcaoRepository;
             _mapper = mapper;
+            _unitOfWork = unitOfWork;
         }
 
         public async Task<List<MissaPadraoDto>> ObterTodasAsync(int? paroquiaId = null)
@@ -61,19 +67,22 @@ namespace EscalaMensal.Application.Services
                 throw new DomainException("Já existe uma missa padrão cadastrada para esse dia da semana e horário.");
             }
 
-            missaPadrao.Atualizar(dto.DiaSemana, dto.Horario, dto.CriarFuncoesPadrao);
-
-            if (!dto.CriarFuncoesPadrao && dto.FuncoesIds != null)
+            await _unitOfWork.ExecuteInTransactionAsync(async () =>
             {
-                var funcoes = await _funcaoRepository.ObterPorIdsAsync(dto.FuncoesIds);
-                missaPadrao.AtualizarFuncoes(funcoes);
-            }
-            else
-            {
-                missaPadrao.Funcoes.Clear();
-            }
+                missaPadrao.Atualizar(dto.DiaSemana, dto.Horario, dto.CriarFuncoesPadrao);
 
-            await _missaPadraoRepository.AtualizarAsync(missaPadrao);
+                if (!dto.CriarFuncoesPadrao && dto.FuncoesIds != null)
+                {
+                    var funcoes = await _funcaoRepository.ObterPorIdsAsync(dto.FuncoesIds);
+                    missaPadrao.AtualizarFuncoes(funcoes);
+                }
+                else
+                {
+                    missaPadrao.Funcoes.Clear();
+                }
+
+                await _missaPadraoRepository.AtualizarAsync(missaPadrao);
+            });
         }
 
         public async Task RemoverAsync(int id)

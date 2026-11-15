@@ -18,15 +18,18 @@ namespace EscalaMensal.Application.Services
         private readonly IParoquiaRepository _paroquiaRepository;
         private readonly IFuncaoRepository _funcaoRepository;
         private readonly IMapper _mapper;
+        private readonly IUnitOfWork _unitOfWork;
 
         public ParoquiaService(
             IParoquiaRepository paroquiaRepository,
             IFuncaoRepository funcaoRepository,
-            IMapper mapper)
+            IMapper mapper,
+            IUnitOfWork unitOfWork)
         {
             _paroquiaRepository = paroquiaRepository;
             _funcaoRepository = funcaoRepository;
             _mapper = mapper;
+            _unitOfWork = unitOfWork;
         }
 
         public async Task<List<ParoquiaDto>> ObterMinhasParoquiasAsync(int usuarioId)
@@ -108,56 +111,59 @@ namespace EscalaMensal.Application.Services
             if (string.IsNullOrWhiteSpace(dto.Estado))
                 throw new DomainException("Estado da paróquia é obrigatório.");
 
-            var codigoAcesso = await GerarCodigoAcessoUnicoAsync(dto.Nome);
-
-            var novaParoquia = new Paroquia(
-                dto.Nome.Trim(),
-                dto.Cidade.Trim(),
-                dto.Estado.Trim(),
-                dto.Bairro?.Trim(),
-                dto.Endereco?.Trim(),
-                codigoAcesso,
-                dto.CriadoPorUsuarioId
-            );
-
-            await _paroquiaRepository.AdicionarAsync(novaParoquia);
-
-            // Vincula o criador como membro da paróquia
-            var vinculoCriador = new UsuarioParoquia(dto.CriadoPorUsuarioId, novaParoquia.Id);
-            await _paroquiaRepository.AdicionarVinculoUsuarioAsync(vinculoCriador);
-
-            // Clonagem de Funções Litúrgicas
-            List<Funcao> funcoesBase;
-            if (dto.ModeloBaseParoquiaId.HasValue && dto.ModeloBaseParoquiaId.Value > 0)
+            return await _unitOfWork.ExecuteInTransactionAsync(async () =>
             {
-                funcoesBase = await _funcaoRepository.ObterTodasAsync(dto.ModeloBaseParoquiaId.Value);
-                if (funcoesBase == null || !funcoesBase.Any())
+                var codigoAcesso = await GerarCodigoAcessoUnicoAsync(dto.Nome);
+
+                var novaParoquia = new Paroquia(
+                    dto.Nome.Trim(),
+                    dto.Cidade.Trim(),
+                    dto.Estado.Trim(),
+                    dto.Bairro?.Trim(),
+                    dto.Endereco?.Trim(),
+                    codigoAcesso,
+                    dto.CriadoPorUsuarioId
+                );
+
+                await _paroquiaRepository.AdicionarAsync(novaParoquia);
+
+                // Vincula o criador como membro da paróquia
+                var vinculoCriador = new UsuarioParoquia(dto.CriadoPorUsuarioId, novaParoquia.Id);
+                await _paroquiaRepository.AdicionarVinculoUsuarioAsync(vinculoCriador);
+
+                // Clonagem de Funções Litúrgicas
+                List<Funcao> funcoesBase;
+                if (dto.ModeloBaseParoquiaId.HasValue && dto.ModeloBaseParoquiaId.Value > 0)
+                {
+                    funcoesBase = await _funcaoRepository.ObterTodasAsync(dto.ModeloBaseParoquiaId.Value);
+                    if (funcoesBase == null || !funcoesBase.Any())
+                    {
+                        funcoesBase = await _funcaoRepository.ObterModelosBaseAsync();
+                    }
+                }
+                else
                 {
                     funcoesBase = await _funcaoRepository.ObterModelosBaseAsync();
                 }
-            }
-            else
-            {
-                funcoesBase = await _funcaoRepository.ObterModelosBaseAsync();
-            }
 
-            foreach (var template in funcoesBase)
-            {
-                var novaFuncao = new Funcao(template.Nome)
+                foreach (var template in funcoesBase)
                 {
-                    Abreviacao = template.Abreviacao,
-                    EhMultipla = template.EhMultipla,
-                    Cargo = template.Cargo,
-                    NivelMinimo = template.NivelMinimo,
-                    Obrigatoria = template.Obrigatoria,
-                    ParoquiaId = novaParoquia.Id
-                };
-                await _funcaoRepository.AdicionarAsync(novaFuncao);
-            }
+                    var novaFuncao = new Funcao(template.Nome)
+                    {
+                        Abreviacao = template.Abreviacao,
+                        EhMultipla = template.EhMultipla,
+                        Cargo = template.Cargo,
+                        NivelMinimo = template.NivelMinimo,
+                        Obrigatoria = template.Obrigatoria,
+                        ParoquiaId = novaParoquia.Id
+                    };
+                    await _funcaoRepository.AdicionarAsync(novaFuncao);
+                }
 
-            var paroquiaDto = _mapper.Map<ParoquiaDto>(novaParoquia);
-            paroquiaDto.EhCriador = true;
-            return paroquiaDto;
+                var paroquiaDto = _mapper.Map<ParoquiaDto>(novaParoquia);
+                paroquiaDto.EhCriador = true;
+                return paroquiaDto;
+            });
         }
 
         public async Task<(bool Sucesso, string Mensagem, ParoquiaDto? Paroquia)> EntrarPorCodigoAsync(EntrarCodigoDto dto)
@@ -257,28 +263,31 @@ namespace EscalaMensal.Application.Services
             if (solicitacao.Status != 1)
                 return (false, "Esta solicitação já foi respondida anteriormente.");
 
-            if (aprovar)
+            return await _unitOfWork.ExecuteInTransactionAsync(async () =>
             {
-                solicitacao.Aprovar(respondidoPorUsuarioId);
-                var vinculo = await _paroquiaRepository.ObterVinculoUsuarioAsync(solicitacao.UsuarioId, solicitacao.ParoquiaId);
-                if (vinculo != null)
+                if (aprovar)
                 {
-                    vinculo.ResetarTentativas();
-                    await _paroquiaRepository.AtualizarVinculoUsuarioAsync(vinculo);
+                    solicitacao.Aprovar(respondidoPorUsuarioId);
+                    var vinculo = await _paroquiaRepository.ObterVinculoUsuarioAsync(solicitacao.UsuarioId, solicitacao.ParoquiaId);
+                    if (vinculo != null)
+                    {
+                        vinculo.ResetarTentativas();
+                        await _paroquiaRepository.AtualizarVinculoUsuarioAsync(vinculo);
+                    }
+                    else
+                    {
+                        vinculo = new UsuarioParoquia(solicitacao.UsuarioId, solicitacao.ParoquiaId);
+                        await _paroquiaRepository.AdicionarVinculoUsuarioAsync(vinculo);
+                    }
                 }
                 else
                 {
-                    vinculo = new UsuarioParoquia(solicitacao.UsuarioId, solicitacao.ParoquiaId);
-                    await _paroquiaRepository.AdicionarVinculoUsuarioAsync(vinculo);
+                    solicitacao.Rejeitar(respondidoPorUsuarioId);
                 }
-            }
-            else
-            {
-                solicitacao.Rejeitar(respondidoPorUsuarioId);
-            }
 
-            await _paroquiaRepository.AtualizarSolicitacaoAsync(solicitacao);
-            return (true, aprovar ? "Solicitação aprovada com sucesso!" : "Solicitação rejeitada com sucesso!");
+                await _paroquiaRepository.AtualizarSolicitacaoAsync(solicitacao);
+                return (true, aprovar ? "Solicitação aprovada com sucesso!" : "Solicitação rejeitada com sucesso!");
+            });
         }
 
         public async Task<(bool Sucesso, string Mensagem)> ReivindicarAsync(ReivindicarParoquiaDto dto)
