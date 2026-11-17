@@ -5,6 +5,7 @@ using EscalaMensal.Domain.Enums;
 using EscalaMensal.Domain.Exceptions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
@@ -31,6 +32,7 @@ namespace EscalaMensal.API.Controllers
         /// O status inicial fica como Pendente até a aprovação de um administrador.
         /// </summary>
         [AllowAnonymous]
+        [EnableRateLimiting("RegistroPolicy")]
         [HttpPost("solicitar-acesso")]
         public async Task<ActionResult<UsuarioRespostaDto>> SolicitarAcesso([FromBody] SolicitarAcessoDto dto)
         {
@@ -142,6 +144,7 @@ namespace EscalaMensal.API.Controllers
         }
 
         [AllowAnonymous]
+        [EnableRateLimiting("LoginPolicy")]
         [HttpPost("login")]
         public async Task<ActionResult<LoginRespostaDto>> Login([FromBody] LoginDto dto)
         {

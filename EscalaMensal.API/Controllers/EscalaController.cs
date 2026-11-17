@@ -4,6 +4,7 @@ using EscalaMensal.Domain.Interfaces;
 using EscalaMensal.Domain.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace EscalaMensal.API.Controllers
 {
@@ -116,6 +117,7 @@ namespace EscalaMensal.API.Controllers
         /// Protegido por Token JWT e Claims autorizadas.
         /// </summary>
         [Authorize(Roles = "Administrador,Premium")]
+        [EnableRateLimiting("GerarAleatorioPolicy")]
         [HttpPost("{id}/gerar-aleatorio")]
         public async Task<ActionResult<GerarEscalaAleatoriaResultadoDto>> GerarAleatorio(
             int id, 

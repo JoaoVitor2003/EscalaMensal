@@ -6,6 +6,7 @@ using EscalaMensal.Domain.Interfaces;
 using EscalaMensal.Infrastructure.Context;
 using EscalaMensal.Infrastructure.Repositories;
 using EscalaMensal.Application.Security;
+using EscalaMensal.API.Extensions;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -148,6 +149,9 @@ builder.Services.AddCors(options =>
             .AllowCredentials());
 });
 
+// Configuração de Rate Limiting para Proteção contra Ataques de Força Bruta e DoS
+builder.Services.ConfigurarRateLimiting();
+
 var app = builder.Build();
 
 app.UseMiddleware<ExceptionHandlingMiddleware>();
@@ -159,6 +163,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseRateLimiter();
 
 app.UseAuthentication();
 app.UseAuthorization();

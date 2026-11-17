@@ -3,6 +3,7 @@ using EscalaMensal.Application.DTOs.Paroquia;
 using EscalaMensal.Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -64,6 +65,7 @@ namespace EscalaMensal.API.Controllers
             return CreatedAtAction(nameof(ObterPorId), new { id = novaParoquia.Id }, novaParoquia);
         }
 
+        [EnableRateLimiting("CodigoParoquiaPolicy")]
         [HttpPost("entrar-codigo")]
         public async Task<ActionResult> EntrarPorCodigo([FromBody] EntrarCodigoDto dto)
         {
@@ -81,6 +83,7 @@ namespace EscalaMensal.API.Controllers
             return Ok(new { mensagem = resultado.Mensagem, paroquia = resultado.Paroquia });
         }
 
+        [EnableRateLimiting("RegistroPolicy")]
         [HttpPost("solicitar-acesso")]
         public async Task<ActionResult> SolicitarAcesso([FromBody] SolicitarAcessoParoquiaDto dto)
         {
