@@ -1,11 +1,13 @@
 using EscalaMensal.Application.DTOs.HorarioFixo;
 using EscalaMensal.Application.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace EscalaMensal.API.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class HorarioFixoController : ControllerBase

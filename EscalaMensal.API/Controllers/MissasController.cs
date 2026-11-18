@@ -3,10 +3,12 @@ using EscalaMensal.Application.DTOs.Escala;
 using EscalaMensal.Application.DTOs.Missa;
 using EscalaMensal.Domain.Entities;
 using EscalaMensal.Domain.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EscalaMensal.API.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class MissasController : Controller

@@ -2,10 +2,12 @@ using EscalaMensal.Application.DTOs.CargoNivel;
 using EscalaMensal.Domain.Entities;
 using EscalaMensal.Domain.Enums;
 using EscalaMensal.Domain.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EscalaMensal.API.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class CargoNivelFuncaoPermitidaController : ControllerBase
@@ -31,6 +33,7 @@ namespace EscalaMensal.API.Controllers
             return Ok(todas);
         }
 
+        [Authorize(Roles = "Administrador")]
         [HttpPost]
         public async Task<IActionResult> Adicionar([FromBody] CargoNivelAdicionarDto dto)
         {
@@ -38,6 +41,7 @@ namespace EscalaMensal.API.Controllers
             return Ok();
         }
 
+        [Authorize(Roles = "Administrador")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> Remover(int id)
         {
@@ -52,6 +56,7 @@ namespace EscalaMensal.API.Controllers
             return Ok(max);
         }
 
+        [Authorize(Roles = "Administrador")]
         [HttpPost("max-nivel/incrementar")]
         public async Task<IActionResult> IncrementarNivel()
         {
@@ -59,6 +64,7 @@ namespace EscalaMensal.API.Controllers
             return Ok(max);
         }
 
+        [Authorize(Roles = "Administrador")]
         [HttpPost("max-nivel/remover")]
         public async Task<IActionResult> RemoverNivelMaisAlto()
         {
@@ -66,6 +72,7 @@ namespace EscalaMensal.API.Controllers
             return Ok();
         }
 
+        [Authorize(Roles = "Administrador")]
         [HttpPost("max-nivel/desfazer")]
         public async Task<IActionResult> DesfazerRemocaoNivel()
         {

@@ -2,15 +2,18 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using EscalaMensal.API.Extensions;
 using EscalaMensal.Application.DTOs.Escala;
 using EscalaMensal.Domain.Entities;
 using EscalaMensal.Domain.Enums;
 using EscalaMensal.Infrastructure.Context;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace EscalaMensal.API.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class EscalaCompartilhamentoController : ControllerBase
@@ -81,11 +84,16 @@ namespace EscalaMensal.API.Controllers
         }
 
         /// <summary>
-        /// Compartilha a escala com um usuário específico
+        /// Compartilha a escala com um usuário específico (Exclusivo Administrador / Premium)
         /// </summary>
         [HttpPost("{escalaId}/compartilhar")]
         public async Task<IActionResult> CompartilharComUsuario(int escalaId, [FromBody] CompartilharUsuarioRequest request)
         {
+            if (!User.EhPremiumOuAdmin())
+            {
+                return StatusCode(403, new { mensagem = "Apenas administradores e usuários com plano Premium podem compartilhar escalas." });
+            }
+
             var escala = await _context.Escalas.FindAsync(escalaId);
             if (escala == null)
                 return NotFound(new { mensagem = "Escala não encontrada." });
@@ -99,14 +107,7 @@ namespace EscalaMensal.API.Controllers
                 return BadRequest(new { mensagem = "Apenas usuários com perfil Premium ou Administrador podem receber compartilhamento de escala." });
             }
 
-            if (request.CriadoPorUsuarioId.HasValue)
-            {
-                var criador = await _context.Usuarios.FindAsync(request.CriadoPorUsuarioId.Value);
-                if (criador != null && criador.Perfil == PerfilUsuarioEnum.Normal)
-                {
-                    return BadRequest(new { mensagem = "Apenas administradores e usuários Premium podem compartilhar escalas." });
-                }
-            }
+            var criadorId = User.ObterUsuarioId();
 
             var existente = await _context.EscalaCompartilhamentos
                 .FirstOrDefaultAsync(c => c.EscalaId == escalaId && c.UsuarioId == request.UsuarioId);
@@ -124,7 +125,7 @@ namespace EscalaMensal.API.Controllers
                 UsuarioId = request.UsuarioId,
                 Permissao = request.Permissao,
                 CodigoAcesso = Guid.NewGuid().ToString("N")[..10].ToUpper(),
-                CriadoPorUsuarioId = request.CriadoPorUsuarioId ?? request.UsuarioId,
+                CriadoPorUsuarioId = criadorId,
                 DataCriacao = DateTime.UtcNow
             };
 
@@ -140,6 +141,11 @@ namespace EscalaMensal.API.Controllers
         [HttpDelete("{escalaId}/remover/{usuarioId}")]
         public async Task<IActionResult> RemoverCompartilhamento(int escalaId, int usuarioId)
         {
+            if (!User.EhPremiumOuAdmin())
+            {
+                return StatusCode(403, new { mensagem = "Apenas administradores e usuários com plano Premium podem gerenciar compartilhamentos." });
+            }
+
             var item = await _context.EscalaCompartilhamentos
                 .FirstOrDefaultAsync(c => c.EscalaId == escalaId && c.UsuarioId == usuarioId);
 
@@ -153,16 +159,19 @@ namespace EscalaMensal.API.Controllers
         }
 
         /// <summary>
-        /// Lista as escalas compartilhadas visíveis para o usuário
-        /// (Admin vê todas que foram compartilhadas com alguém; usuário comum só vê as compartilhadas com ele)
+        /// Lista as escalas compartilhadas visíveis para o usuário autenticado
+        /// (Admin vê todas que foram compartilhadas com alguém; usuário Premium só vê as compartilhadas com ele)
         /// </summary>
         [HttpGet("listar")]
         public async Task<ActionResult<List<EscalaCompartilhadaResumoDto>>> ListarEscalasCompartilhadas(
-            [FromQuery] int usuarioId, 
-            [FromQuery] int perfil)
+            [FromQuery] int? usuarioId = null, 
+            [FromQuery] int? perfil = null)
         {
+            var idUsuario = (User.EhAdmin() && usuarioId.HasValue && usuarioId.Value > 0) ? usuarioId.Value : User.ObterUsuarioId();
+            var perfilUsuario = User.EhAdmin() ? PerfilUsuarioEnum.Administrador : User.ObterPerfil();
+
             // Usuários com perfil Normal não possuem acesso a escalas colaborativas
-            if (perfil == (int)PerfilUsuarioEnum.Normal)
+            if (perfilUsuario == PerfilUsuarioEnum.Normal)
             {
                 return Ok(new List<EscalaCompartilhadaResumoDto>());
             }
@@ -174,7 +183,7 @@ namespace EscalaMensal.API.Controllers
 
             var resultado = new List<EscalaCompartilhadaResumoDto>();
 
-            if (perfil == 1) // Administrador: vê todas as escalas compartilhadas com alguém
+            if (perfilUsuario == PerfilUsuarioEnum.Administrador) // Administrador: vê todas as escalas compartilhadas com alguém
             {
                 var grupos = await queryCompartilhamentos
                     .GroupBy(c => c.EscalaId)
@@ -195,7 +204,7 @@ namespace EscalaMensal.API.Controllers
                         TotalUsuarios = grupo.Count(),
                         NomesUsuariosCompartilhados = grupo.Select(g => g.Usuario?.Nome ?? "Usuário").Distinct().ToList(),
                         CodigoAcesso = grupo.FirstOrDefault()?.CodigoAcesso ?? string.Empty,
-                        CompartilhadoPorMim = grupo.Any(g => g.CriadoPorUsuarioId == usuarioId),
+                        CompartilhadoPorMim = grupo.Any(g => g.CriadoPorUsuarioId == idUsuario),
                         DataCompartilhamento = grupo.Min(g => g.DataCriacao)
                     });
                 }
@@ -203,7 +212,7 @@ namespace EscalaMensal.API.Controllers
             else // Premium: vê apenas as compartilhadas com ele (ou criadas por ele)
             {
                 var compartilhamentosUsuario = await queryCompartilhamentos
-                    .Where(c => c.UsuarioId == usuarioId || c.CriadoPorUsuarioId == usuarioId)
+                    .Where(c => c.UsuarioId == idUsuario || c.CriadoPorUsuarioId == idUsuario)
                     .GroupBy(c => c.EscalaId)
                     .ToListAsync();
 
@@ -212,7 +221,7 @@ namespace EscalaMensal.API.Controllers
                     var escala = grupo.First().Escala;
                     if (escala == null) continue;
 
-                    var meuRegistro = grupo.FirstOrDefault(g => g.UsuarioId == usuarioId);
+                    var meuRegistro = grupo.FirstOrDefault(g => g.UsuarioId == idUsuario);
                     string minhaPermissao = meuRegistro != null ? (meuRegistro.Permissao == 1 ? "Editor" : "Visualizador") : "Editor";
 
                     resultado.Add(new EscalaCompartilhadaResumoDto
@@ -225,7 +234,7 @@ namespace EscalaMensal.API.Controllers
                         TotalUsuarios = grupo.Count(),
                         NomesUsuariosCompartilhados = grupo.Select(g => g.Usuario?.Nome ?? "Usuário").Distinct().ToList(),
                         CodigoAcesso = grupo.FirstOrDefault()?.CodigoAcesso ?? string.Empty,
-                        CompartilhadoPorMim = grupo.Any(g => g.CriadoPorUsuarioId == usuarioId),
+                        CompartilhadoPorMim = grupo.Any(g => g.CriadoPorUsuarioId == idUsuario),
                         DataCompartilhamento = grupo.Min(g => g.DataCriacao)
                     });
                 }
@@ -239,15 +248,18 @@ namespace EscalaMensal.API.Controllers
         /// </summary>
         [HttpGet("ids-compartilhadas")]
         public async Task<ActionResult<List<int>>> ObterIdsEscalasCompartilhadas(
-            [FromQuery] int usuarioId, 
-            [FromQuery] int perfil)
+            [FromQuery] int? usuarioId = null, 
+            [FromQuery] int? perfil = null)
         {
-            if (perfil == (int)PerfilUsuarioEnum.Normal)
+            var idUsuario = (User.EhAdmin() && usuarioId.HasValue && usuarioId.Value > 0) ? usuarioId.Value : User.ObterUsuarioId();
+            var perfilUsuario = User.EhAdmin() ? PerfilUsuarioEnum.Administrador : User.ObterPerfil();
+
+            if (perfilUsuario == PerfilUsuarioEnum.Normal)
             {
                 return Ok(new List<int>());
             }
 
-            if (perfil == 1) // Administrador: todas que foram compartilhadas com alguém
+            if (perfilUsuario == PerfilUsuarioEnum.Administrador) // Administrador: todas que foram compartilhadas com alguém
             {
                 var ids = await _context.EscalaCompartilhamentos
                     .Where(c => c.UsuarioId != null)
@@ -259,7 +271,7 @@ namespace EscalaMensal.API.Controllers
             else // Usuário Premium: apenas as compartilhadas com ele ou criadas por ele
             {
                 var ids = await _context.EscalaCompartilhamentos
-                    .Where(c => (c.UsuarioId == usuarioId || c.CriadoPorUsuarioId == usuarioId) && c.UsuarioId != null)
+                    .Where(c => (c.UsuarioId == idUsuario || c.CriadoPorUsuarioId == idUsuario) && c.UsuarioId != null)
                     .Select(c => c.EscalaId)
                     .Distinct()
                     .ToListAsync();
@@ -270,6 +282,7 @@ namespace EscalaMensal.API.Controllers
         /// <summary>
         /// Valida se um usuário ou código tem acesso à escala compartilhada e retorna a permissão
         /// </summary>
+        [AllowAnonymous]
         [HttpGet("{escalaId}/validar")]
         public async Task<ActionResult<ValidarAcessoEscalaRespostaDto>> ValidarAcesso(
             int escalaId, 
@@ -281,8 +294,12 @@ namespace EscalaMensal.API.Controllers
             if (escala == null)
                 return NotFound(new ValidarAcessoEscalaRespostaDto { TemAcesso = false, Mensagem = "Escala não encontrada." });
 
+            // Se autenticado via token, prioriza dados do token
+            int? idFinal = User.Identity?.IsAuthenticated == true ? User.ObterUsuarioId() : usuarioId;
+            int? perfilFinal = User.Identity?.IsAuthenticated == true ? (int)User.ObterPerfil() : perfil;
+
             // 0. Bloqueio imediato para usuário com perfil Normal (3)
-            if (perfil.HasValue && perfil.Value == (int)PerfilUsuarioEnum.Normal)
+            if (perfilFinal.HasValue && perfilFinal.Value == (int)PerfilUsuarioEnum.Normal)
             {
                 return Ok(new ValidarAcessoEscalaRespostaDto
                 {
@@ -293,9 +310,9 @@ namespace EscalaMensal.API.Controllers
             }
 
             // Se usuarioId for fornecido, verificar no banco se o usuário é Normal
-            if (usuarioId.HasValue)
+            if (idFinal.HasValue)
             {
-                var usuario = await _context.Usuarios.FindAsync(usuarioId.Value);
+                var usuario = await _context.Usuarios.FindAsync(idFinal.Value);
                 if (usuario != null && usuario.Perfil == PerfilUsuarioEnum.Normal)
                 {
                     return Ok(new ValidarAcessoEscalaRespostaDto
@@ -308,7 +325,7 @@ namespace EscalaMensal.API.Controllers
             }
 
             // 1. Administrador (1) tem acesso total
-            if (perfil.HasValue && perfil.Value == 1)
+            if (perfilFinal.HasValue && perfilFinal.Value == (int)PerfilUsuarioEnum.Administrador)
             {
                 return Ok(new ValidarAcessoEscalaRespostaDto
                 {
@@ -319,14 +336,14 @@ namespace EscalaMensal.API.Controllers
             }
 
             // 2. Validação por Usuário cadastrado (convidado ou criador)
-            if (usuarioId.HasValue)
+            if (idFinal.HasValue)
             {
                 var compUsuario = await _context.EscalaCompartilhamentos
-                    .FirstOrDefaultAsync(c => c.EscalaId == escalaId && (c.UsuarioId == usuarioId.Value || c.CriadoPorUsuarioId == usuarioId.Value));
+                    .FirstOrDefaultAsync(c => c.EscalaId == escalaId && (c.UsuarioId == idFinal.Value || c.CriadoPorUsuarioId == idFinal.Value));
 
                 if (compUsuario != null)
                 {
-                    bool ehCriador = compUsuario.CriadoPorUsuarioId == usuarioId.Value;
+                    bool ehCriador = compUsuario.CriadoPorUsuarioId == idFinal.Value;
                     string permissaoNome = ehCriador || compUsuario.Permissao == 1 ? "Editor" : "Visualizador";
                     return Ok(new ValidarAcessoEscalaRespostaDto
                     {

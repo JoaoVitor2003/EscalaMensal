@@ -3,10 +3,12 @@ using EscalaMensal.Application.DTOs.Escala;
 using EscalaMensal.Application.DTOs.ItemMissa;
 using EscalaMensal.Domain.Entities;
 using EscalaMensal.Domain.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EscalaMensal.API.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class ItensMissaController : ControllerBase
@@ -46,7 +48,7 @@ namespace EscalaMensal.API.Controllers
         public async Task<ActionResult> Atualizar(int id, [FromBody] ItemMissaAtualizarDto item)
         {
             if (id != item.Id)
-                return BadRequest("O ID do item não confere.");
+                return BadRequest("O ID do item n�o confere.");
             item.Id = id;
             await _itemMissaService.AtualizarAsync(item);
             return NoContent();
